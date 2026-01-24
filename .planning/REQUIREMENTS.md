@@ -12,9 +12,9 @@
 
 ### Output
 
-- [ ] **OUT-01**: Sync produces concise summary (not verbose progress messages)
-- [ ] **OUT-02**: Summary shows: sync timestamp, members processed per list, errors if any
-- [ ] **OUT-03**: Output is clean enough for cron MAILTO delivery
+- [x] **OUT-01**: Sync produces concise summary (not verbose progress messages)
+- [x] **OUT-02**: Summary shows: sync timestamp, members processed per list, errors if any
+- [x] **OUT-03**: Output is clean enough for cron MAILTO delivery
 
 ## v2 Requirements
 
@@ -32,9 +32,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OUT-01 | Phase 1 | Pending |
-| OUT-02 | Phase 1 | Pending |
-| OUT-03 | Phase 1 | Pending |
+| OUT-01 | Phase 1 | Complete |
+| OUT-02 | Phase 1 | Complete |
+| OUT-03 | Phase 1 | Complete |
 | AUTO-01 | Phase 2 | Pending |
 | AUTO-02 | Phase 2 | Pending |
 
