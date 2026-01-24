@@ -2,7 +2,14 @@ require('dotenv').config();
 
 const fs = require('fs/promises');
 const path = require('path');
-const { openDb, upsertMembers, deleteMembersForList, getLatestSportlinkResults } = require('./laposta-db');
+const {
+  openDb,
+  upsertMembers,
+  deleteMembersNotInList,
+  getLatestSportlinkResults,
+  getMembersForList,
+  computeSourceHash
+} = require('./laposta-db');
 
 const DEFAULT_MAPPING = path.join(process.cwd(), 'field-mapping.json');
 const MAX_LISTS = 4;
@@ -282,168 +289,253 @@ function buildMemberEntry(
   };
 }
 
-async function main() {
-  const inputPath = process.argv[2] || null;
-  const mappingPath = process.argv[3] || DEFAULT_MAPPING;
+/**
+ * Prepare Laposta members from Sportlink data
+ * @param {Object} options
+ * @param {Object} [options.logger] - Logger instance with log(), verbose(), error() methods
+ * @param {boolean} [options.verbose=false] - Verbose mode
+ * @param {string} [options.inputPath] - Optional input JSON file path
+ * @param {string} [options.mappingPath] - Optional field mapping file path
+ * @returns {Promise<{success: boolean, lists: Array<{index: number, total: number, updates: number}>, excluded: number, error?: string}>}
+ */
+async function runPrepare(options = {}) {
+  const { logger, verbose = false, inputPath, mappingPath } = options;
 
-  const [inputContent, mappingContent] = await Promise.all([
-    inputPath ? fs.readFile(inputPath, 'utf8') : Promise.resolve(getLatestResultsFromDb()),
-    fs.readFile(mappingPath, 'utf8')
-  ]);
+  // Use provided logger or create simple fallback
+  const logVerbose = logger ? logger.verbose.bind(logger) : (verbose ? console.log : () => {});
+  const logError = logger ? logger.error.bind(logger) : console.error;
 
-  if (!inputContent) {
-    throw new Error('No Sportlink results found in SQLite. Run the download first.');
-  }
+  try {
+    const resolvedInputPath = inputPath || null;
+    const resolvedMappingPath = mappingPath || DEFAULT_MAPPING;
 
-  const sportlinkData = JSON.parse(inputContent);
-  const mapping = JSON.parse(mappingContent);
-  const members = Array.isArray(sportlinkData.Members) ? sportlinkData.Members : [];
+    const [inputContent, mappingContent] = await Promise.all([
+      resolvedInputPath ? fs.readFile(resolvedInputPath, 'utf8') : Promise.resolve(getLatestResultsFromDb()),
+      fs.readFile(resolvedMappingPath, 'utf8')
+    ]);
 
-  const primaryEmailMap = new Map();
-  members.forEach((member, index) => {
-    const emailValue = member.Email;
-    if (!isValidEmail(emailValue)) return;
-    const normalized = normalizeEmail(emailValue);
-    if (!primaryEmailMap.has(normalized)) {
-      primaryEmailMap.set(normalized, []);
+    if (!inputContent) {
+      const errorMsg = 'No Sportlink results found in SQLite. Run the download first.';
+      logError(errorMsg);
+      return { success: false, lists: [], excluded: 0, error: errorMsg };
     }
-    primaryEmailMap.get(normalized).push({ index, member });
-  });
 
-  const emailUsageMap = new Map();
-  members.forEach((member, memberIndex) => {
-    EMAIL_FIELDS.forEach(({ key }) => {
-      const emailValue = member[key];
+    const sportlinkData = JSON.parse(inputContent);
+    const mapping = JSON.parse(mappingContent);
+    const members = Array.isArray(sportlinkData.Members) ? sportlinkData.Members : [];
+
+    const primaryEmailMap = new Map();
+    members.forEach((member, index) => {
+      const emailValue = member.Email;
       if (!isValidEmail(emailValue)) return;
       const normalized = normalizeEmail(emailValue);
-      if (!emailUsageMap.has(normalized)) {
-        emailUsageMap.set(normalized, new Set());
+      if (!primaryEmailMap.has(normalized)) {
+        primaryEmailMap.set(normalized, []);
       }
-      emailUsageMap.get(normalized).add(memberIndex);
+      primaryEmailMap.get(normalized).push({ index, member });
     });
-  });
 
-  const primaryEmails = new Set();
-  members.forEach((member) => {
-    if (!isValidEmail(member.Email)) return;
-    primaryEmails.add(normalizeEmail(member.Email));
-  });
-
-  const teamFieldKey = mapping.team;
-  const leeftijdFieldKey = mapping.leeftijdscategorie;
-  const memberNameMap = new Map();
-  const parentNamesMap = new Map();
-  const parentTeamsMap = new Map();
-  const parentAgeClassMap = new Map();
-  primaryEmailMap.forEach((entries, normalized) => {
-    if (entries.length === 0) return;
-    const { member } = entries[0];
-    memberNameMap.set(normalized, buildMemberNameParts(member));
-  });
-  members.forEach((member) => {
-    const childName = buildChildFullName(member);
-    const teamValue = teamFieldKey ? member[teamFieldKey] : '';
-    const leeftijdValue = leeftijdFieldKey ? member[leeftijdFieldKey] : '';
-    EMAIL_FIELDS.filter(field => field.type === 'parent1' || field.type === 'parent2')
-      .forEach(({ key }) => {
+    const emailUsageMap = new Map();
+    members.forEach((member, memberIndex) => {
+      EMAIL_FIELDS.forEach(({ key }) => {
         const emailValue = member[key];
         if (!isValidEmail(emailValue)) return;
         const normalized = normalizeEmail(emailValue);
-        if (!parentNamesMap.has(normalized)) {
-          parentNamesMap.set(normalized, []);
+        if (!emailUsageMap.has(normalized)) {
+          emailUsageMap.set(normalized, new Set());
         }
-        if (childName) {
-          const existing = parentNamesMap.get(normalized);
-          if (!existing.includes(childName)) {
-            existing.push(childName);
+        emailUsageMap.get(normalized).add(memberIndex);
+      });
+    });
+
+    const primaryEmails = new Set();
+    members.forEach((member) => {
+      if (!isValidEmail(member.Email)) return;
+      primaryEmails.add(normalizeEmail(member.Email));
+    });
+
+    const teamFieldKey = mapping.team;
+    const leeftijdFieldKey = mapping.leeftijdscategorie;
+    const memberNameMap = new Map();
+    const parentNamesMap = new Map();
+    const parentTeamsMap = new Map();
+    const parentAgeClassMap = new Map();
+    primaryEmailMap.forEach((entries, normalized) => {
+      if (entries.length === 0) return;
+      const { member } = entries[0];
+      memberNameMap.set(normalized, buildMemberNameParts(member));
+    });
+    members.forEach((member) => {
+      const childName = buildChildFullName(member);
+      const teamValue = teamFieldKey ? member[teamFieldKey] : '';
+      const leeftijdValue = leeftijdFieldKey ? member[leeftijdFieldKey] : '';
+      EMAIL_FIELDS.filter(field => field.type === 'parent1' || field.type === 'parent2')
+        .forEach(({ key }) => {
+          const emailValue = member[key];
+          if (!isValidEmail(emailValue)) return;
+          const normalized = normalizeEmail(emailValue);
+          if (!parentNamesMap.has(normalized)) {
+            parentNamesMap.set(normalized, []);
+          }
+          if (childName) {
+            const existing = parentNamesMap.get(normalized);
+            if (!existing.includes(childName)) {
+              existing.push(childName);
+            }
+          }
+          if (!parentTeamsMap.has(normalized)) {
+            parentTeamsMap.set(normalized, new Set());
+          }
+          normalizeTeams(teamValue).forEach(team => parentTeamsMap.get(normalized).add(team));
+          if (!parentAgeClassMap.has(normalized)) {
+            parentAgeClassMap.set(normalized, new Set());
+          }
+          normalizeTeams(leeftijdValue).forEach(category => parentAgeClassMap.get(normalized).add(category));
+        });
+    });
+
+    const listMembers = Array.from({ length: MAX_LISTS }, () => []);
+    const emailAssignmentCount = new Map();
+    const parentEmailAssigned = new Set();
+    let excludedDueToDuplication = 0;
+    members.forEach((member, memberIndex) => {
+      const baseCustomFields = buildBaseCustomFields(member, mapping);
+      const dedupeLocal = new Set();
+      const primaryEmail = member.Email;
+      const normalizedPrimary = isValidEmail(primaryEmail) ? normalizeEmail(primaryEmail) : '';
+
+      EMAIL_FIELDS.forEach(({ key, type }) => {
+        const emailValue = member[key];
+        if (!isValidEmail(emailValue)) return;
+
+        const normalized = normalizeEmail(emailValue);
+        if (dedupeLocal.has(normalized)) return;
+        if (type === 'parent1' && normalizedPrimary && normalized === normalizedPrimary) {
+          const usage = emailUsageMap.get(normalized);
+          if (usage && usage.size === 1) {
+            return;
           }
         }
-        if (!parentTeamsMap.has(normalized)) {
-          parentTeamsMap.set(normalized, new Set());
-        }
-        normalizeTeams(teamValue).forEach(team => parentTeamsMap.get(normalized).add(team));
-        if (!parentAgeClassMap.has(normalized)) {
-          parentAgeClassMap.set(normalized, new Set());
-        }
-        normalizeTeams(leeftijdValue).forEach(category => parentAgeClassMap.get(normalized).add(category));
-      });
-  });
-
-  const listMembers = Array.from({ length: MAX_LISTS }, () => []);
-  const emailAssignmentCount = new Map();
-  const parentEmailAssigned = new Set();
-  let excludedDueToDuplication = 0;
-  members.forEach((member, memberIndex) => {
-    const baseCustomFields = buildBaseCustomFields(member, mapping);
-    const dedupeLocal = new Set();
-    const primaryEmail = member.Email;
-    const normalizedPrimary = isValidEmail(primaryEmail) ? normalizeEmail(primaryEmail) : '';
-
-    EMAIL_FIELDS.forEach(({ key, type }) => {
-      const emailValue = member[key];
-      if (!isValidEmail(emailValue)) return;
-
-      const normalized = normalizeEmail(emailValue);
-      if (dedupeLocal.has(normalized)) return;
-      if (type === 'parent1' && normalizedPrimary && normalized === normalizedPrimary) {
-        const usage = emailUsageMap.get(normalized);
-        if (usage && usage.size === 1) {
+        if ((type === 'parent1' || type === 'parent2') && primaryEmails.has(normalized)) {
           return;
         }
-      }
-      if ((type === 'parent1' || type === 'parent2') && primaryEmails.has(normalized)) {
-        return;
-      }
-      if ((type === 'parent1' || type === 'parent2') && parentEmailAssigned.has(normalized)) {
-        return;
-      }
-      const isStandaloneParent = (type === 'parent1' || type === 'parent2')
-        ? !primaryEmails.has(normalized)
-        : false;
-      const newEntry = buildMemberEntry(
-        member,
-        emailValue.trim(),
-        type,
-        baseCustomFields,
-        parentNamesMap,
-        parentTeamsMap,
-        parentAgeClassMap,
-        memberNameMap,
-        isStandaloneParent
-      );
-      const usedCount = emailAssignmentCount.get(normalized) || 0;
-      if (usedCount >= MAX_LISTS) {
-        excludedDueToDuplication += 1;
-        return;
-      }
-      emailAssignmentCount.set(normalized, usedCount + 1);
-      listMembers[usedCount].push(newEntry);
-      dedupeLocal.add(normalized);
-      if (type === 'parent1' || type === 'parent2') {
-        parentEmailAssigned.add(normalized);
-      }
+        if ((type === 'parent1' || type === 'parent2') && parentEmailAssigned.has(normalized)) {
+          return;
+        }
+        const isStandaloneParent = (type === 'parent1' || type === 'parent2')
+          ? !primaryEmails.has(normalized)
+          : false;
+        const newEntry = buildMemberEntry(
+          member,
+          emailValue.trim(),
+          type,
+          baseCustomFields,
+          parentNamesMap,
+          parentTeamsMap,
+          parentAgeClassMap,
+          memberNameMap,
+          isStandaloneParent
+        );
+        const usedCount = emailAssignmentCount.get(normalized) || 0;
+        if (usedCount >= MAX_LISTS) {
+          excludedDueToDuplication += 1;
+          return;
+        }
+        emailAssignmentCount.set(normalized, usedCount + 1);
+        listMembers[usedCount].push(newEntry);
+        dedupeLocal.add(normalized);
+        if (type === 'parent1' || type === 'parent2') {
+          parentEmailAssigned.add(normalized);
+        }
+      });
     });
-  });
 
-  const db = openDb();
-  try {
-    listMembers.forEach((membersForList, index) => {
-      const listId = readEnv(LIST_ENV_KEYS[index]) || null;
-      deleteMembersForList(db, index + 1);
-      upsertMembers(db, index + 1, listId, membersForList);
+    const db = openDb();
+    const updateCounts = Array.from({ length: MAX_LISTS }, () => 0);
+    try {
+      listMembers.forEach((membersForList, index) => {
+        const listIndex = index + 1;
+        const existingMembers = getMembersForList(db, listIndex);
+        const existingByEmail = new Map(
+          existingMembers.map((member) => [normalizeEmail(member.email), member])
+        );
+        updateCounts[index] = membersForList.reduce((count, member) => {
+          const normalized = normalizeEmail(member.email);
+          const existing = existingByEmail.get(normalized);
+          const newHash = computeSourceHash(member.email, member.custom_fields || {});
+          if (!existing || !existing.last_synced_hash || existing.last_synced_hash !== newHash) {
+            return count + 1;
+          }
+          return count;
+        }, 0);
+
+        const listId = readEnv(LIST_ENV_KEYS[index]) || null;
+        upsertMembers(db, listIndex, listId, membersForList);
+        deleteMembersNotInList(
+          db,
+          listIndex,
+          membersForList.map((member) => member.email)
+        );
+      });
+    } finally {
+      db.close();
+    }
+
+    // Build result stats
+    const lists = listMembers.map((membersForList, index) => ({
+      index: index + 1,
+      total: membersForList.length,
+      updates: updateCounts[index]
+    }));
+
+    // Log verbose details
+    lists.forEach(({ index, total, updates }) => {
+      logVerbose(`Prepared ${total} Laposta members for list ${index} (${updates} updates)`);
     });
-  } finally {
-    db.close();
-  }
-  listMembers.forEach((membersForList, index) => {
-    console.log(`Prepared ${membersForList.length} Laposta members for list ${index + 1}.`);
-  });
-  if (excludedDueToDuplication > 0) {
-    console.error(`Members excluded due to duplicate Email (all lists full): ${excludedDueToDuplication}`);
+
+    if (excludedDueToDuplication > 0) {
+      logError(`Members excluded due to duplicate Email (all lists full): ${excludedDueToDuplication}`);
+    }
+
+    return {
+      success: true,
+      lists,
+      excluded: excludedDueToDuplication
+    };
+  } catch (err) {
+    const errorMsg = err.message || String(err);
+    logError('Error:', errorMsg);
+    return { success: false, lists: [], excluded: 0, error: errorMsg };
   }
 }
 
-main().catch((err) => {
-  console.error('Error:', err.message);
-  process.exitCode = 1;
-});
+module.exports = { runPrepare };
+
+// CLI entry point
+if (require.main === module) {
+  const verbose = process.argv.includes('--verbose');
+  const args = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
+  const inputPath = args[0] || null;
+  const mappingPath = args[1] || null;
+
+  runPrepare({ verbose, inputPath, mappingPath })
+    .then(result => {
+      if (!result.success) {
+        process.exitCode = 1;
+      } else if (verbose) {
+        // In verbose mode, stats are already logged
+      } else {
+        // In default mode, print summary
+        result.lists.forEach(({ index, total, updates }) => {
+          console.log(`Prepared ${total} Laposta members for list ${index} (${updates} updates).`);
+        });
+        if (result.excluded > 0) {
+          console.error(`Members excluded due to duplicate Email (all lists full): ${result.excluded}`);
+        }
+      }
+    })
+    .catch(err => {
+      console.error('Error:', err.message);
+      process.exitCode = 1;
+    });
+}
