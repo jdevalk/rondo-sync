@@ -1,5 +1,33 @@
 # Project Milestones: Sportlink Sync
 
+## v1.3 Connect to Stadion (Shipped: 2026-01-25)
+
+**Delivered:** Dual-system sync pipeline - Sportlink member data now syncs to both Laposta email lists and Stadion WordPress app via REST API.
+
+**Phases completed:** 5-8 (8 plans total)
+
+**Key accomplishments:**
+
+- Created WordPress REST API client with application password authentication
+- Implemented member sync with KNVB ID matching and email fallback
+- Built hash-based change detection for efficient incremental sync
+- Added parent sync as separate person records with bidirectional relationship linking
+- Unified sync-all pipeline orchestrating both Laposta and Stadion destinations
+- Extended email reports with dual-system statistics and consolidated error handling
+
+**Stats:**
+
+- 40 files created/modified
+- 4,393 lines of JavaScript
+- 4 phases, 8 plans
+- Same day development (2026-01-25)
+
+**Git range:** `feat(05-01)` → `feat(08-01)`
+
+**What's next:** To be determined in next milestone planning.
+
+---
+
 ## v1.2 Email Improvements (Shipped: 2026-01-25)
 
 **Delivered:** Polished email reports with semantic HTML formatting and clean cron output.
