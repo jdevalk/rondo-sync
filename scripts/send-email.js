@@ -88,7 +88,7 @@ function formatAsHtml(textContent) {
       continue;
     }
 
-    // Section headers (all caps)
+    // Section headers (all caps) - handles TOTALS, PER-LIST BREAKDOWN, STADION SYNC, ERRORS, etc.
     if (/^[A-Z][A-Z\s()-]+$/.test(trimmed) && trimmed.length > 3) {
       if (inList) {
         htmlParts.push('</ul>');
@@ -172,6 +172,10 @@ function formatAsHtml(textContent) {
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+    /* First h2 after intro needs less top margin */
+    h1 + * + h2, h1 + h2 {
+      margin-top: 16px;
     }
     p {
       margin: 4px 0;
