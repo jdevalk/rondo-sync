@@ -69,18 +69,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STAD-01 | Phase 6 | Pending |
-| STAD-02 | Phase 6 | Pending |
+| STAD-01 | Phase 6 | Complete |
+| STAD-02 | Phase 6 | Complete |
 | STAD-03 | Phase 5 | Complete |
 | STAD-04 | Phase 5 | Complete |
-| STAD-05 | Phase 6 | Pending |
-| STAD-06 | Phase 6 | Pending |
-| STAD-07 | Phase 6 | Pending |
-| STAD-08 | Phase 6 | Pending |
-| STAD-09 | Phase 6 | Pending |
-| STAD-10 | Phase 6 | Pending |
-| STAD-11 | Phase 6 | Pending |
-| STAD-12 | Phase 6 | Pending |
+| STAD-05 | Phase 6 | Complete |
+| STAD-06 | Phase 6 | Complete |
+| STAD-07 | Phase 6 | Complete |
+| STAD-08 | Phase 6 | Complete |
+| STAD-09 | Phase 6 | Complete |
+| STAD-10 | Phase 6 | Complete |
+| STAD-11 | Phase 6 | Complete |
+| STAD-12 | Phase 6 | Complete |
 | STAD-13 | Phase 7 | Pending |
 | STAD-14 | Phase 7 | Pending |
 | STAD-15 | Phase 7 | Pending |

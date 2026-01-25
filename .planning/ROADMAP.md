@@ -21,7 +21,7 @@ See MILESTONES.md for completed work.
 **Milestone Goal:** Sync Sportlink member data to Stadion WordPress app via REST API.
 
 - [x] **Phase 5: Stadion Foundation** - API client with auth and error handling
-- [ ] **Phase 6: Member Sync** - Field mapping, matching, and change detection
+- [x] **Phase 6: Member Sync** - Field mapping, matching, and change detection
 - [ ] **Phase 7: Parent Sync** - Parents as separate person records
 - [ ] **Phase 8: Pipeline Integration** - Integrate into sync-all and email reports
 
@@ -53,9 +53,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Stadion database module for hash-based change detection
-- [ ] 06-02-PLAN.md — Field mapping and member preparation
-- [ ] 06-03-PLAN.md — Sync execution with matching and CRUD operations
+- [x] 06-01-PLAN.md — Stadion database module for hash-based change detection
+- [x] 06-02-PLAN.md — Field mapping and member preparation
+- [x] 06-03-PLAN.md — Sync execution with matching and CRUD operations
 
 ### Phase 7: Parent Sync
 **Goal**: Parents sync as separate person records linked to children
@@ -90,7 +90,7 @@ Plans:
 | 3. Postmark | v1.1 | 2/2 | Complete | 2026-01-25 |
 | 4. Email Polish | v1.2 | 2/2 | Complete | 2026-01-25 |
 | 5. Stadion Foundation | v1.3 | 1/1 | Complete | 2026-01-25 |
-| 6. Member Sync | v1.3 | 0/3 | Planned | - |
+| 6. Member Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
 | 7. Parent Sync | v1.3 | 0/? | Not started | - |
 | 8. Pipeline Integration | v1.3 | 0/? | Not started | - |
 
