@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 5 of 8 (Stadion Foundation)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-01-25 — Roadmap created for v1.3
+Plan: 1 of ? in current phase
+Status: In progress
+Last activity: 2026-01-25 — Completed 05-01-PLAN.md
 
-Progress: [=======...] 7/11 plans (v1.0-v1.2 complete, v1.3 starting)
+Progress: [========..] 8/11 plans (v1.0-v1.2 complete, v1.3 in progress)
 
 ## Performance Metrics
 
@@ -22,7 +22,7 @@ Progress: [=======...] 7/11 plans (v1.0-v1.2 complete, v1.3 starting)
 |--------|-------|
 | Milestones shipped | 3 (v1.0, v1.1, v1.2) |
 | Total phases | 4 complete, 4 planned |
-| Total plans | 7 complete |
+| Total plans | 8 complete |
 
 ## Accumulated Context
 
@@ -36,6 +36,8 @@ See PROJECT.md Key Decisions table (12 decisions total).
 - KNVB ID field stores Sportlink relatiecode for matching
 - Parents as separate person records (not contact info on child)
 - Added to existing sync-all pipeline (not separate schedule)
+- Promise-based HTTP client pattern for consistency with Laposta
+- 30 second timeout for WordPress API requests
 
 ### Pending Todos
 
@@ -48,8 +50,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Roadmap created, ready to plan Phase 5
-Resume with: `/gsd:plan-phase 5`
+Stopped at: Completed 05-01-PLAN.md (Stadion API Client)
+Resume file: None
 
 ---
-*Last updated: 2026-01-25 (v1.3 roadmap created)*
+*Last updated: 2026-01-25 (Completed plan 05-01)*
