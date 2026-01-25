@@ -9,16 +9,16 @@ Requirements for Postmark Email Delivery milestone.
 
 ### Email Delivery
 
-- [ ] **EMAIL-01**: System sends sync report via Postmark API after each sync
-- [ ] **EMAIL-02**: Postmark API key configured via POSTMARK_API_KEY env var
-- [ ] **EMAIL-03**: Sender email configured via POSTMARK_FROM_EMAIL env var
-- [ ] **EMAIL-04**: Recipient email configured via existing OPERATOR_EMAIL env var
-- [ ] **EMAIL-05**: Email failure is logged but does not fail the sync
+- [x] **EMAIL-01**: System sends sync report via Postmark API after each sync
+- [x] **EMAIL-02**: Postmark API key configured via POSTMARK_API_KEY env var
+- [x] **EMAIL-03**: Sender email configured via POSTMARK_FROM_EMAIL env var
+- [x] **EMAIL-04**: Recipient email configured via existing OPERATOR_EMAIL env var
+- [x] **EMAIL-05**: Email failure is logged but does not fail the sync
 
 ### Integration
 
-- [ ] **INTG-01**: cron-wrapper.sh calls Node.js script for email instead of `mail` command
-- [ ] **INTG-02**: install-cron.sh prompts for Postmark credentials during setup
+- [x] **INTG-01**: cron-wrapper.sh calls Node.js script for email instead of `mail` command
+- [x] **INTG-02**: install-cron.sh prompts for Postmark credentials during setup
 
 ## Future Requirements
 
@@ -36,13 +36,13 @@ None planned - define in next milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EMAIL-01 | Phase 3 | Pending |
-| EMAIL-02 | Phase 3 | Pending |
-| EMAIL-03 | Phase 3 | Pending |
-| EMAIL-04 | Phase 3 | Pending |
-| EMAIL-05 | Phase 3 | Pending |
-| INTG-01 | Phase 3 | Pending |
-| INTG-02 | Phase 3 | Pending |
+| EMAIL-01 | Phase 3 | Complete |
+| EMAIL-02 | Phase 3 | Complete |
+| EMAIL-03 | Phase 3 | Complete |
+| EMAIL-04 | Phase 3 | Complete |
+| EMAIL-05 | Phase 3 | Complete |
+| INTG-01 | Phase 3 | Complete |
+| INTG-02 | Phase 3 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 7 total
@@ -51,4 +51,4 @@ None planned - define in next milestone.
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 after roadmap creation*
+*Last updated: 2026-01-25 - Phase 3 complete*
