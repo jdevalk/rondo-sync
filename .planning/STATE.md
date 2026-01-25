@@ -32,10 +32,11 @@ See PROJECT.md Key Decisions table (12 decisions total).
 
 ### Pending Todos
 
-3 todos pending - see `.planning/todos/pending/`
+4 todos pending - see `.planning/todos/pending/`
 - install-cron should overwrite existing crons
 - Set email from name to Sportlink SYNC
 - Remove npm script header from email output
+- Switch sync reports to HTML email format
 
 ### Known Blockers
 
