@@ -19,8 +19,9 @@
   },
   "dependencies": {
     "better-sqlite3": "latest",
-    "varlock": "latest",
     "otplib": "latest",
-    "playwright": "latest"
+    "playwright": "latest",
+    "postmark": "^4.0.5",
+    "varlock": "latest"
   }
 }
