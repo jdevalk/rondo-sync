@@ -4,16 +4,18 @@ const { createSyncLogger } = require('./lib/logger');
 const { runDownload } = require('./download-data-from-sportlink');
 const { runPrepare } = require('./prepare-laposta-members');
 const { runSubmit } = require('./submit-laposta-list');
+const { runSync: runStadionSync } = require('./submit-stadion-sync');
 
 /**
  * Parse CLI arguments
  * @param {string[]} argv - Process arguments
- * @returns {{ verbose: boolean, force: boolean }}
+ * @returns {{ verbose: boolean, force: boolean, dryRun: boolean }}
  */
 function parseArgs(argv) {
   return {
     verbose: argv.includes('--verbose'),
-    force: argv.includes('--force')
+    force: argv.includes('--force'),
+    dryRun: argv.includes('--dry-run')
   };
 }
 
@@ -69,11 +71,23 @@ function printSummary(logger, stats) {
   });
   logger.log('');
 
-  if (stats.errors.length > 0) {
-    logger.log(`ERRORS (${stats.errors.length})`);
+  logger.log('STADION SYNC');
+  logger.log(minorDivider);
+  logger.log(`Persons synced: ${stats.stadion.synced}/${stats.stadion.total} (${stats.stadion.created} created, ${stats.stadion.updated} updated)`);
+  logger.log(`Skipped: ${stats.stadion.skipped} (unchanged)`);
+  if (stats.stadion.deleted > 0) {
+    logger.log(`Deleted: ${stats.stadion.deleted}`);
+  }
+  logger.log('');
+
+  const allErrors = [...stats.errors, ...stats.stadion.errors];
+  if (allErrors.length > 0) {
+    logger.log(`ERRORS (${allErrors.length})`);
     logger.log(minorDivider);
-    stats.errors.forEach(error => {
-      logger.log(`- ${error.email}: ${error.message}`);
+    allErrors.forEach(error => {
+      const identifier = error.knvb_id || error.email || 'system';
+      const system = error.system ? ` [${error.system}]` : '';
+      logger.log(`- ${identifier}${system}: ${error.message}`);
     });
     logger.log('');
   }
@@ -104,7 +118,16 @@ async function runSyncAll(options = {}) {
     added: 0,
     updated: 0,
     errors: [],
-    lists: []
+    lists: [],
+    stadion: {
+      total: 0,
+      synced: 0,
+      created: 0,
+      updated: 0,
+      skipped: 0,
+      deleted: 0,
+      errors: []
+    }
   };
 
   try {
@@ -171,6 +194,56 @@ async function runSyncAll(options = {}) {
       }
     });
 
+    // Step 4: Sync to Stadion
+    logger.verbose('Syncing to Stadion...');
+    try {
+      const stadionResult = await runStadionSync({ logger, verbose, force });
+
+      // Members stats
+      stats.stadion.total = stadionResult.total;
+      stats.stadion.synced = stadionResult.synced;
+      stats.stadion.created = stadionResult.created;
+      stats.stadion.updated = stadionResult.updated;
+      stats.stadion.skipped = stadionResult.skipped;
+      stats.stadion.deleted = stadionResult.deleted;
+
+      // Parents stats (add to totals for combined persons count)
+      if (stadionResult.parents) {
+        stats.stadion.total += stadionResult.parents.total;
+        stats.stadion.synced += stadionResult.parents.synced;
+        stats.stadion.created += stadionResult.parents.created;
+        stats.stadion.updated += stadionResult.parents.updated;
+        stats.stadion.skipped += stadionResult.parents.skipped;
+        stats.stadion.deleted += stadionResult.parents.deleted;
+
+        // Collect parent errors
+        if (stadionResult.parents.errors?.length > 0) {
+          stats.stadion.errors.push(...stadionResult.parents.errors.map(e => ({
+            email: e.email,
+            message: e.message,
+            system: 'stadion'
+          })));
+        }
+      }
+
+      // Collect member errors
+      if (stadionResult.errors?.length > 0) {
+        stats.stadion.errors.push(...stadionResult.errors.map(e => ({
+          knvb_id: e.knvb_id,
+          email: e.email,
+          message: e.message,
+          system: 'stadion'
+        })));
+      }
+    } catch (err) {
+      // Stadion failure is non-critical - log error but continue
+      logger.error(`Stadion sync failed: ${err.message}`);
+      stats.stadion.errors.push({
+        message: `Stadion sync failed: ${err.message}`,
+        system: 'stadion'
+      });
+    }
+
     // Complete timing
     const endTime = Date.now();
     stats.completedAt = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
@@ -185,7 +258,7 @@ async function runSyncAll(options = {}) {
     logger.close();
 
     return {
-      success: stats.errors.length === 0,
+      success: stats.errors.length === 0 && stats.stadion.errors.length === 0,
       stats
     };
   } catch (err) {
@@ -206,9 +279,9 @@ module.exports = { runSyncAll };
 
 // CLI entry point
 if (require.main === module) {
-  const { verbose, force } = parseArgs(process.argv);
+  const { verbose, force, dryRun } = parseArgs(process.argv);
 
-  runSyncAll({ verbose, force })
+  runSyncAll({ verbose, force, dryRun })
     .then(result => {
       if (!result.success) {
         process.exitCode = 1;
