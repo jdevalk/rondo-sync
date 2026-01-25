@@ -57,6 +57,7 @@ function initDb(db) {
       last_seen_at TEXT NOT NULL,
       last_synced_at TEXT,
       last_synced_hash TEXT,
+      last_synced_custom_fields_json TEXT,
       created_at TEXT NOT NULL,
       UNIQUE (list_index, email)
     );
@@ -64,6 +65,12 @@ function initDb(db) {
     CREATE INDEX IF NOT EXISTS idx_members_list_hash
       ON members (list_index, source_hash, last_synced_hash);
   `);
+
+  const memberColumns = db.prepare('PRAGMA table_info(members)').all();
+  const hasSyncedFields = memberColumns.some((column) => column.name === 'last_synced_custom_fields_json');
+  if (!hasSyncedFields) {
+    db.exec('ALTER TABLE members ADD COLUMN last_synced_custom_fields_json TEXT');
+  }
 }
 
 function insertSportlinkRun(db, resultsJson) {
@@ -143,6 +150,20 @@ function deleteMembersForList(db, listIndex) {
   stmt.run(listIndex);
 }
 
+function deleteMembersNotInList(db, listIndex, emails) {
+  if (!emails || emails.length === 0) {
+    deleteMembersForList(db, listIndex);
+    return;
+  }
+  const placeholders = emails.map(() => '?').join(', ');
+  const stmt = db.prepare(`
+    DELETE FROM members
+    WHERE list_index = ?
+      AND lower(email) NOT IN (${placeholders})
+  `);
+  stmt.run(listIndex, ...emails.map((email) => String(email).toLowerCase()));
+}
+
 function getMembersNeedingSync(db, listIndex, force = false) {
   const stmt = force
     ? db.prepare(`
@@ -163,6 +184,40 @@ function getMembersNeedingSync(db, listIndex, force = false) {
     custom_fields: JSON.parse(row.custom_fields_json),
     source_hash: row.source_hash
   }));
+}
+
+function getMembersNeedingSyncWithPrevious(db, listIndex, force = false) {
+  const stmt = force
+    ? db.prepare(`
+      SELECT email, custom_fields_json, source_hash, last_synced_custom_fields_json
+      FROM members
+      WHERE list_index = ?
+      ORDER BY email ASC
+    `)
+    : db.prepare(`
+      SELECT email, custom_fields_json, source_hash, last_synced_custom_fields_json
+      FROM members
+      WHERE list_index = ?
+        AND (last_synced_hash IS NULL OR last_synced_hash != source_hash)
+      ORDER BY email ASC
+    `);
+  return stmt.all(listIndex).map((row) => ({
+    email: row.email,
+    custom_fields: JSON.parse(row.custom_fields_json),
+    source_hash: row.source_hash,
+    last_synced_custom_fields: row.last_synced_custom_fields_json
+      ? JSON.parse(row.last_synced_custom_fields_json)
+      : null
+  }));
+}
+
+function getMembersForList(db, listIndex) {
+  const stmt = db.prepare(`
+    SELECT email, source_hash, last_synced_hash
+    FROM members
+    WHERE list_index = ?
+  `);
+  return stmt.all(listIndex);
 }
 
 function getMembersByEmail(db, email, listIndex = null) {
@@ -197,14 +252,15 @@ function getMembersByEmail(db, email, listIndex = null) {
   }));
 }
 
-function updateSyncState(db, listIndex, email, sourceHash) {
+function updateSyncState(db, listIndex, email, sourceHash, customFields) {
   const now = new Date().toISOString();
   const stmt = db.prepare(`
     UPDATE members
-    SET last_synced_at = ?, last_synced_hash = ?
+    SET last_synced_at = ?, last_synced_hash = ?, last_synced_custom_fields_json = ?
     WHERE list_index = ? AND email = ?
   `);
-  stmt.run(now, sourceHash, listIndex, email);
+  const payload = stableStringify(customFields || {});
+  stmt.run(now, sourceHash, payload, listIndex, email);
 }
 
 function upsertLapostaFields(db, listId, fields) {
@@ -261,7 +317,10 @@ module.exports = {
   computeSourceHash,
   upsertMembers,
   deleteMembersForList,
+  deleteMembersNotInList,
   getMembersNeedingSync,
+  getMembersNeedingSyncWithPrevious,
+  getMembersForList,
   getMembersByEmail,
   updateSyncState,
   upsertLapostaFields,

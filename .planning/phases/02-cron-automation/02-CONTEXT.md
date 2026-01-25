@@ -19,9 +19,9 @@ Daily sync runs automatically with email reports on completion. Configure cron t
 - Use lockfile to prevent overlapping runs if previous job is still executing
 
 ### Email delivery
-- Single operator email address configured in crontab MAILTO
+- Single operator email address (prompted during install)
 - Email sent after every run (success and failure)
-- Use standard cron MAILTO mechanism for delivery
+- Use mail command in wrapper (MAILTO cannot customize subjects)
 - Subject should include date: "Sportlink Sync Report - 2026-01-24"
 
 ### Error handling
