@@ -14,6 +14,8 @@
     "sync-all-verbose": "node sync-all.js --verbose",
     "sync-stadion": "node submit-stadion-sync.js",
     "sync-stadion-verbose": "node submit-stadion-sync.js --verbose",
+    "sync-stadion-parents": "node submit-stadion-sync.js --parents-only",
+    "sync-stadion-parents-verbose": "node submit-stadion-sync.js --parents-only --verbose",
     "show-laposta-member": "node show-laposta-member.js",
     "show-sportlink-member": "node show-sportlink-member.js",
     "show-laposta-changes": "node show-laposta-changes.js",
