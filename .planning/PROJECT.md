@@ -8,6 +8,16 @@ A CLI tool that synchronizes member data from Sportlink Club (a Dutch sports clu
 
 Keep Laposta email lists automatically in sync with Sportlink member data without manual intervention.
 
+## Current Milestone: v1.2 Email Improvements
+
+**Goal:** Polish email reports with better formatting and fix cron installer edge cases.
+
+**Target features:**
+- HTML email formatting for sync reports
+- Set email from name to "Sportlink SYNC"
+- Remove npm script header noise from emails
+- Make install-cron overwrite existing entries instead of duplicating
+
 ## Current State (v1.1 Shipped)
 
 **Shipped:** 2026-01-25
@@ -45,7 +55,10 @@ npm run install-cron  # Prompts for operator email + Postmark credentials, sets 
 
 ### Active
 
-None currently — define in next milestone.
+- [ ] Switch sync reports to HTML email format — v1.2
+- [ ] Set email from name to "Sportlink SYNC" — v1.2
+- [ ] Remove npm script header from email output — v1.2
+- [ ] Install-cron should overwrite existing cron entries — v1.2
 
 ### Out of Scope
 
@@ -96,4 +109,4 @@ None currently — define in next milestone.
 | Store credentials via upsert | BSD sed compatible, handles existing .env | ✓ Good |
 
 ---
-*Last updated: 2026-01-25 after v1.1 milestone*
+*Last updated: 2026-01-25 after starting v1.2 milestone*
