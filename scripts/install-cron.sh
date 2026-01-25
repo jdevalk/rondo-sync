@@ -5,17 +5,6 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# Check if mail command exists
-if ! command -v mail &> /dev/null; then
-    echo "Error: 'mail' command not found" >&2
-    echo "" >&2
-    echo "Please install mail utilities:" >&2
-    echo "  Ubuntu/Debian: sudo apt-get install mailutils" >&2
-    echo "  RHEL/CentOS: sudo yum install mailx" >&2
-    echo "  macOS: brew install mailutils (or use built-in mail)" >&2
-    exit 1
-fi
-
 # Prompt for operator email
 read -p "Enter operator email address: " OPERATOR_EMAIL
 
@@ -25,12 +14,63 @@ if [ -z "$OPERATOR_EMAIL" ]; then
     exit 1
 fi
 
+# Prompt for Postmark API key
+echo ""
+echo "Postmark configuration (for email delivery):"
+echo "  Get your Server API Token from: Postmark Dashboard -> Servers -> API Tokens"
+echo ""
+read -p "Enter Postmark API Key: " POSTMARK_API_KEY
+
+# Validate API key is not empty
+if [ -z "$POSTMARK_API_KEY" ]; then
+    echo "Error: Postmark API Key cannot be empty" >&2
+    exit 1
+fi
+
+# Prompt for sender email
+echo ""
+echo "  Sender email must be verified in Postmark Dashboard -> Sender Signatures"
+echo ""
+read -p "Enter verified sender email address: " POSTMARK_FROM_EMAIL
+
+# Validate sender email is not empty
+if [ -z "$POSTMARK_FROM_EMAIL" ]; then
+    echo "Error: Sender email cannot be empty" >&2
+    exit 1
+fi
+
+# Store credentials in .env file
+ENV_FILE="$PROJECT_DIR/.env"
+
+# Create .env if it doesn't exist
+touch "$ENV_FILE"
+
+# Update or add OPERATOR_EMAIL
+if grep -q "^OPERATOR_EMAIL=" "$ENV_FILE"; then
+    sed -i.bak "s/^OPERATOR_EMAIL=.*/OPERATOR_EMAIL=$OPERATOR_EMAIL/" "$ENV_FILE" && rm -f "$ENV_FILE.bak"
+else
+    echo "OPERATOR_EMAIL=$OPERATOR_EMAIL" >> "$ENV_FILE"
+fi
+
+# Update or add POSTMARK_API_KEY
+if grep -q "^POSTMARK_API_KEY=" "$ENV_FILE"; then
+    sed -i.bak "s/^POSTMARK_API_KEY=.*/POSTMARK_API_KEY=$POSTMARK_API_KEY/" "$ENV_FILE" && rm -f "$ENV_FILE.bak"
+else
+    echo "POSTMARK_API_KEY=$POSTMARK_API_KEY" >> "$ENV_FILE"
+fi
+
+# Update or add POSTMARK_FROM_EMAIL
+if grep -q "^POSTMARK_FROM_EMAIL=" "$ENV_FILE"; then
+    sed -i.bak "s/^POSTMARK_FROM_EMAIL=.*/POSTMARK_FROM_EMAIL=$POSTMARK_FROM_EMAIL/" "$ENV_FILE" && rm -f "$ENV_FILE.bak"
+else
+    echo "POSTMARK_FROM_EMAIL=$POSTMARK_FROM_EMAIL" >> "$ENV_FILE"
+fi
+
 # Build cron entries
 CRON_ENTRIES="
 # Sportlink Sync automation (installed $(date +%Y-%m-%d))
 CRON_TZ=Europe/Amsterdam
 TZ=Europe/Amsterdam
-MAILTO=$OPERATOR_EMAIL
 
 # Main sync job: runs daily at 6:00 AM Amsterdam time
 0 6 * * * flock -w 0 $PROJECT_DIR/.cron.lock $PROJECT_DIR/scripts/cron-wrapper.sh
@@ -43,9 +83,14 @@ MAILTO=$OPERATOR_EMAIL
 (crontab -l 2>/dev/null || true; echo "$CRON_ENTRIES") | crontab -
 
 echo ""
-echo "✓ Cron jobs installed successfully!"
+echo "Cron jobs installed successfully!"
 echo ""
-echo "Email reports will be sent to: $OPERATOR_EMAIL"
+echo "Configuration stored in .env:"
+echo "  - OPERATOR_EMAIL=$OPERATOR_EMAIL"
+echo "  - POSTMARK_API_KEY=***"
+echo "  - POSTMARK_FROM_EMAIL=$POSTMARK_FROM_EMAIL"
+echo ""
+echo "Email reports will be sent via Postmark to: $OPERATOR_EMAIL"
 echo ""
 echo "Scheduled jobs:"
 echo "  - Daily sync at 6:00 AM (Amsterdam time)"
