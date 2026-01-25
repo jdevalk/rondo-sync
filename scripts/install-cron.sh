@@ -45,6 +45,11 @@ ENV_FILE="$PROJECT_DIR/.env"
 # Create .env if it doesn't exist
 touch "$ENV_FILE"
 
+# Ensure .env ends with a newline before appending
+if [ -s "$ENV_FILE" ] && [ -n "$(tail -c 1 "$ENV_FILE")" ]; then
+    echo "" >> "$ENV_FILE"
+fi
+
 # Update or add OPERATOR_EMAIL
 if grep -q "^OPERATOR_EMAIL=" "$ENV_FILE"; then
     sed -i.bak "s/^OPERATOR_EMAIL=.*/OPERATOR_EMAIL=$OPERATOR_EMAIL/" "$ENV_FILE" && rm -f "$ENV_FILE.bak"
