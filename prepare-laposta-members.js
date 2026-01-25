@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('varlock/auto-load');
 
 const fs = require('fs/promises');
 const path = require('path');

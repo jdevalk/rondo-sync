@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('varlock/auto-load');
 
 const { createSyncLogger } = require('./lib/logger');
 const { runDownload } = require('./download-data-from-sportlink');

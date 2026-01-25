@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('varlock/auto-load');
 
 const otplib = require('otplib');
 const { chromium } = require('playwright');

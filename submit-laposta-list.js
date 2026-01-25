@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('varlock/auto-load');
 
 const path = require('path');
 const https = require('https');
