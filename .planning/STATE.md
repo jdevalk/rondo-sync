@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
-**Current focus:** Phase 5 - Stadion Foundation
+**Current focus:** Phase 6 - Member Sync
 
 ## Current Position
 
-Phase: 5 of 8 (Stadion Foundation)
-Plan: 1 of ? in current phase
-Status: In progress
-Last activity: 2026-01-25 — Completed 05-01-PLAN.md
+Phase: 6 of 8 (Member Sync)
+Plan: 0 of ? in current phase
+Status: Ready for planning
+Last activity: 2026-01-25 — Phase 5 complete and verified
 
-Progress: [========..] 8/11 plans (v1.0-v1.2 complete, v1.3 in progress)
+Progress: [========..] 8/11 plans (v1.0-v1.2 + Phase 5 complete)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
 | Milestones shipped | 3 (v1.0, v1.1, v1.2) |
-| Total phases | 4 complete, 4 planned |
+| Total phases | 5 complete, 3 planned |
 | Total plans | 8 complete |
 
 ## Accumulated Context
@@ -50,8 +50,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 05-01-PLAN.md (Stadion API Client)
-Resume file: None
+Stopped at: Phase 5 complete, ready for Phase 6
+Resume with: `/gsd:discuss-phase 6` or `/gsd:plan-phase 6`
 
 ---
-*Last updated: 2026-01-25 (Completed plan 05-01)*
+*Last updated: 2026-01-25 (Phase 5 executed and verified)*
