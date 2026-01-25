@@ -79,10 +79,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Running `npm run sync-all` syncs to both Laposta and Stadion
   2. Email report includes Stadion sync results (creates, updates, skipped)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md — Integrate Stadion into sync-all pipeline and email reports
 
 ## Progress
 
@@ -94,7 +94,7 @@ Plans:
 | 5. Stadion Foundation | v1.3 | 1/1 | Complete | 2026-01-25 |
 | 6. Member Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
 | 7. Parent Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
-| 8. Pipeline Integration | v1.3 | 0/? | Not started | - |
+| 8. Pipeline Integration | v1.3 | 0/1 | In Progress | - |
 
 ---
 *Roadmap created: 2026-01-25*
