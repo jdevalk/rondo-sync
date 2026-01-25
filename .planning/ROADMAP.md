@@ -35,10 +35,10 @@ See MILESTONES.md for completed work.
   1. Script can authenticate to Stadion WordPress REST API using application password
   2. API errors return structured error messages without crashing
   3. Stadion credentials are loaded from environment variables
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Stadion API client with authentication and error handling
 
 ### Phase 6: Member Sync
 **Goal**: Members sync from Sportlink to Stadion with all field mappings
@@ -87,7 +87,7 @@ Plans:
 | 1-2. MVP | v1.0 | 3/3 | Complete | 2026-01-24 |
 | 3. Postmark | v1.1 | 2/2 | Complete | 2026-01-25 |
 | 4. Email Polish | v1.2 | 2/2 | Complete | 2026-01-25 |
-| 5. Stadion Foundation | v1.3 | 0/? | Not started | - |
+| 5. Stadion Foundation | v1.3 | 0/1 | Planned | - |
 | 6. Member Sync | v1.3 | 0/? | Not started | - |
 | 7. Parent Sync | v1.3 | 0/? | Not started | - |
 | 8. Pipeline Integration | v1.3 | 0/? | Not started | - |
