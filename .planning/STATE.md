@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Keep Laposta email lists automatically in sync with Sportlink member data without manual intervention.
-**Current focus:** Milestone v1.2 - Email Improvements
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 4 of 4 (Email Polish) ✓
-Plan: Complete
-Status: All phases complete, ready for milestone audit
-Last activity: 2026-01-25 — Phase 4 executed and verified
+Phase: Ready for next milestone
+Plan: Not started
+Status: v1.2 shipped, awaiting next milestone definition
+Last activity: 2026-01-25 — v1.2 milestone complete
 
-Progress: [██████████] 4/4 requirements
+Progress: [██████████] 3 milestones shipped (v1.0, v1.1, v1.2)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Milestones shipped | 2 (v1.0, v1.1) |
+| Milestones shipped | 3 (v1.0, v1.1, v1.2) |
 | Total phases | 4 |
 | Total plans | 7 |
 
@@ -30,13 +30,9 @@ Progress: [██████████] 4/4 requirements
 
 See PROJECT.md Key Decisions table (12 decisions total).
 
-New decisions from 04-02:
-- Direct node invocation instead of npm run for clean cron output
-- grep -v filter pattern for idempotent crontab installation
-
 ### Pending Todos
 
-5 todos pending (4 converted to v1.2 requirements + 1 new)
+Review with `/gsd:check-todos`
 
 ### Known Blockers
 
@@ -45,8 +41,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Phase 4 complete, milestone ready for audit
-Resume with: `/gsd:audit-milestone`
+Stopped at: v1.2 milestone complete
+Resume with: `/gsd:new-milestone`
 
 ---
-*Last updated: 2026-01-25 (Phase 4 verified)*
+*Last updated: 2026-01-25 (v1.2 shipped)*

@@ -8,27 +8,18 @@ A CLI tool that synchronizes member data from Sportlink Club (a Dutch sports clu
 
 Keep Laposta email lists automatically in sync with Sportlink member data without manual intervention.
 
-## Current Milestone: v1.2 Email Improvements
-
-**Goal:** Polish email reports with better formatting and fix cron installer edge cases.
-
-**Target features:**
-- HTML email formatting for sync reports
-- Set email from name to "Sportlink SYNC"
-- Remove npm script header noise from emails
-- Make install-cron overwrite existing entries instead of duplicating
-
-## Current State (v1.1 Shipped)
+## Current State (v1.2 Shipped)
 
 **Shipped:** 2026-01-25
 
-The sync pipeline is fully operational with reliable email delivery:
+The sync pipeline is fully operational with polished email delivery:
 - Browser automation downloads member data from Sportlink
 - Field transformation and hash-based change detection
 - Sync to up to 4 Laposta lists with state tracking
 - Clean summary output suitable for email delivery
 - Automated daily cron job at 6:00 AM Amsterdam time
-- **Email reports sent via Postmark** (no longer lands in spam)
+- **HTML email reports via Postmark** with semantic formatting
+- Sender displays as "Sportlink SYNC" in recipient inbox
 - Retry mechanism at 8:00 AM on failure
 
 **To deploy:**
@@ -52,13 +43,14 @@ npm run install-cron  # Prompts for operator email + Postmark credentials, sets 
 - ✓ Send sync reports via Postmark transactional email — v1.1
 - ✓ Configure Postmark via environment variables — v1.1
 - ✓ Graceful failure handling if email fails — v1.1
+- ✓ Sync reports sent as HTML email with semantic formatting — v1.2
+- ✓ Email from name displays as "Sportlink SYNC" — v1.2
+- ✓ Clean cron output without npm script header — v1.2
+- ✓ Install-cron overwrites existing cron entries (idempotent) — v1.2
 
 ### Active
 
-- [ ] Switch sync reports to HTML email format — v1.2
-- [ ] Set email from name to "Sportlink SYNC" — v1.2
-- [ ] Remove npm script header from email output — v1.2
-- [ ] Install-cron should overwrite existing cron entries — v1.2
+(None — define in next milestone)
 
 ### Out of Scope
 
@@ -109,4 +101,4 @@ npm run install-cron  # Prompts for operator email + Postmark credentials, sets 
 | Store credentials via upsert | BSD sed compatible, handles existing .env | ✓ Good |
 
 ---
-*Last updated: 2026-01-25 after starting v1.2 milestone*
+*Last updated: 2026-01-25 after v1.2 milestone*

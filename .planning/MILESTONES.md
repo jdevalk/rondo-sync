@@ -1,5 +1,31 @@
 # Project Milestones: Sportlink Sync
 
+## v1.2 Email Improvements (Shipped: 2026-01-25)
+
+**Delivered:** Polished email reports with semantic HTML formatting and clean cron output.
+
+**Phases completed:** 4 (2 plans total)
+
+**Key accomplishments:**
+
+- Converted sync report emails from pre-wrapped text to semantic HTML with headings and sections
+- Added "Sportlink SYNC" sender display name in email From field
+- Eliminated npm lifecycle header noise from cron-triggered sync output
+- Made install-cron.sh idempotent (re-runnable without creating duplicate entries)
+
+**Stats:**
+
+- 3 files modified
+- 2,619 lines of JavaScript + shell
+- 1 phase, 2 plans, 4 tasks
+- Same day as v1.1 ship
+
+**Git range:** `fix(04-02)` -> `fix(04-01)`
+
+**What's next:** To be determined in next milestone planning.
+
+---
+
 ## v1.1 Postmark Email Delivery (Shipped: 2026-01-25)
 
 **Delivered:** Reliable email delivery via Postmark - sync reports no longer land in spam.
