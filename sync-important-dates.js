@@ -177,7 +177,8 @@ async function runSync(options = {}) {
         result.errors.push({
           knvb_id: date.knvb_id,
           date_value: date.date_value,
-          message: error.message
+          message: error.message,
+          details: error.details
         });
       }
     }
@@ -227,7 +228,12 @@ if (require.main === module) {
 
       if (result.errors.length > 0) {
         console.error(`  Errors: ${result.errors.length}`);
-        result.errors.forEach(e => console.error(`    - ${e.knvb_id}: ${e.message}`));
+        result.errors.forEach(e => {
+          console.error(`    - ${e.knvb_id}: ${e.message}`);
+          if (e.details) {
+            console.error(`      Details: ${JSON.stringify(e.details, null, 2)}`);
+          }
+        });
         process.exitCode = 1;
       }
     })
