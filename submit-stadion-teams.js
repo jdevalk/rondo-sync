@@ -28,27 +28,51 @@ async function syncTeam(team, db, options) {
       return { action: 'skipped', id: stadion_id };
     }
     // UPDATE existing team (unlikely - team names don't change often)
+    const payload = { title: team_name, status: 'publish' };
+    const endpoint = `wp/v2/teams/${stadion_id}`;
     logVerbose(`Updating existing team: ${stadion_id} - ${team_name}`);
-    const response = await stadionRequest(
-      `wp/v2/teams/${stadion_id}`,
-      'PUT',
-      { title: team_name, status: 'publish' },
-      options
-    );
-    updateTeamSyncState(db, team_name, source_hash, stadion_id);
-    return { action: 'updated', id: stadion_id };
+    logVerbose(`  PUT ${endpoint}`);
+    logVerbose(`  Payload: ${JSON.stringify(payload)}`);
+    try {
+      const response = await stadionRequest(endpoint, 'PUT', payload, options);
+      updateTeamSyncState(db, team_name, source_hash, stadion_id);
+      return { action: 'updated', id: stadion_id };
+    } catch (error) {
+      console.error(`API Error updating team "${team_name}" (ID: ${stadion_id}):`);
+      console.error(`  Status: ${error.message}`);
+      if (error.details) {
+        console.error(`  Code: ${error.details.code || 'unknown'}`);
+        console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
+        if (error.details.data) {
+          console.error(`  Data: ${JSON.stringify(error.details.data)}`);
+        }
+      }
+      throw error;
+    }
   } else {
     // CREATE new team
+    const payload = { title: team_name, status: 'publish' };
+    const endpoint = 'wp/v2/teams';
     logVerbose(`Creating new team: ${team_name}`);
-    const response = await stadionRequest(
-      'wp/v2/teams',
-      'POST',
-      { title: team_name, status: 'publish' },
-      options
-    );
-    const newId = response.body.id;
-    updateTeamSyncState(db, team_name, source_hash, newId);
-    return { action: 'created', id: newId };
+    logVerbose(`  POST ${endpoint}`);
+    logVerbose(`  Payload: ${JSON.stringify(payload)}`);
+    try {
+      const response = await stadionRequest(endpoint, 'POST', payload, options);
+      const newId = response.body.id;
+      updateTeamSyncState(db, team_name, source_hash, newId);
+      return { action: 'created', id: newId };
+    } catch (error) {
+      console.error(`API Error creating team "${team_name}":`);
+      console.error(`  Status: ${error.message}`);
+      if (error.details) {
+        console.error(`  Code: ${error.details.code || 'unknown'}`);
+        console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
+        if (error.details.data) {
+          console.error(`  Data: ${JSON.stringify(error.details.data)}`);
+        }
+      }
+      throw error;
+    }
   }
 }
 
