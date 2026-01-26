@@ -2,10 +2,10 @@
 
 ## Milestones
 
-- ✅ **v1.0 MVP** — Phases 1-2 (shipped 2026-01-24)
-- ✅ **v1.1 Postmark Email** — Phase 3 (shipped 2026-01-25)
-- ✅ **v1.2 Email Polish** — Phase 4 (shipped 2026-01-25)
-- ✅ **v1.3 Connect to Stadion** — Phases 5-8 (shipped 2026-01-25)
+- **v1.0 MVP** — Phases 1-2 (shipped 2026-01-24)
+- **v1.1 Postmark Email** — Phase 3 (shipped 2026-01-25)
+- **v1.2 Email Polish** — Phase 4 (shipped 2026-01-25)
+- **v1.3 Connect to Stadion** — Phases 5-8 (shipped 2026-01-25)
 - **v1.4 Photo Sync** — Phases 9-12 (in progress)
 
 ## Phases
@@ -35,10 +35,10 @@ Archives:
   1. SQLite schema includes PersonImageDate column for photo state tracking
   2. System identifies members with new/changed PersonImageDate
   3. System identifies members whose PersonImageDate became empty (photo removed)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md — Add photo state tracking to stadion-db.js and pass PersonImageDate through pipeline
 
 #### Phase 10: Photo Download
 **Goal**: System extracts photos from Sportlink member detail pages via browser automation
@@ -91,7 +91,7 @@ Plans:
 | 6. Member Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
 | 7. Parent Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
 | 8. Pipeline Integration | v1.3 | 1/1 | Complete | 2026-01-25 |
-| 9. Photo State Tracking | v1.4 | 0/? | Not started | - |
+| 9. Photo State Tracking | v1.4 | 0/1 | Planned | - |
 | 10. Photo Download | v1.4 | 0/? | Not started | - |
 | 11. Photo Upload/Deletion | v1.4 | 0/? | Not started | - |
 | 12. Pipeline Integration | v1.4 | 0/? | Not started | - |
@@ -100,4 +100,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-25*
-*Last updated: 2026-01-26 after v1.4 roadmap creation*
+*Last updated: 2026-01-26 after Phase 9 planning*
