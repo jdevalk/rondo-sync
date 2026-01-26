@@ -103,9 +103,14 @@ function preparePerson(sportlinkMember) {
   if (gender) acf.gender = gender;
   if (birthYear) acf.birth_year = birthYear;
 
+  // Extract PersonImageDate for photo state tracking
+  // Normalize to null if empty string or whitespace
+  const personImageDate = (sportlinkMember.PersonImageDate || '').trim() || null;
+
   return {
     knvb_id: sportlinkMember.PublicPersonId,
     email: (sportlinkMember.Email || '').trim().toLowerCase() || null,
+    person_image_date: personImageDate,
     data: {
       status: 'publish',
       acf: acf
