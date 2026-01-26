@@ -16,6 +16,8 @@
     "sync-stadion-verbose": "node submit-stadion-sync.js --verbose",
     "sync-stadion-parents": "node submit-stadion-sync.js --parents-only",
     "sync-stadion-parents-verbose": "node submit-stadion-sync.js --parents-only --verbose",
+    "download-photos": "node download-photos-from-sportlink.js",
+    "download-photos-verbose": "node download-photos-from-sportlink.js --verbose",
     "sync-photos": "node upload-photos-to-stadion.js",
     "sync-photos-verbose": "node upload-photos-to-stadion.js --verbose",
     "show-laposta-member": "node show-laposta-member.js",
