@@ -174,6 +174,8 @@ async function runSync(options = {}) {
         }
         result.synced++;
       } catch (error) {
+        console.error(`ERROR for ${date.knvb_id}:`, error.message);
+        console.error('Error details:', JSON.stringify(error.details, null, 2));
         result.errors.push({
           knvb_id: date.knvb_id,
           date_value: date.date_value,
