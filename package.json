@@ -21,6 +21,7 @@
     "download-photos-verbose": "node download-photos-from-sportlink.js --verbose",
     "sync-photos": "node upload-photos-to-stadion.js",
     "sync-photos-verbose": "node upload-photos-to-stadion.js --verbose",
+    "check-photo-consistency": "node check-photo-consistency.js",
     "sync-teams": "node submit-stadion-teams.js",
     "sync-teams-verbose": "node submit-stadion-teams.js --verbose",
     "sync-work-history": "node submit-stadion-work-history.js",
