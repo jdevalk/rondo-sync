@@ -114,6 +114,16 @@ function preparePerson(sportlinkMember) {
   // Normalize to null if empty string or whitespace
   const personImageDate = (sportlinkMember.PersonImageDate || '').trim() || null;
 
+  // Membership metadata fields
+  const memberSince = (sportlinkMember.MemberSince || '').trim() || null;
+  const ageClass = (sportlinkMember.AgeClassDescription || '').trim() || null;
+  const memberType = (sportlinkMember.TypeOfMemberDescription || '').trim() || null;
+
+  if (memberSince) acf['lid-sinds'] = memberSince;
+  if (ageClass) acf['leeftijdsgroep'] = ageClass;
+  if (personImageDate) acf['datum-foto'] = personImageDate;
+  if (memberType) acf['type-lid'] = memberType;
+
   return {
     knvb_id: sportlinkMember.PublicPersonId,
     email: (sportlinkMember.Email || '').trim().toLowerCase() || null,
