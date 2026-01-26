@@ -30,7 +30,7 @@ Archives:
 **Milestone Goal:** Sync member teams from Sportlink to Stadion, creating teams and work history entries.
 
 #### Phase 13: Team Extraction and Management
-**Goal**: System extracts team names from Sportlink and creates teams in Stadion
+**Goal**: Extract unique team names from Sportlink and create teams in Stadion via REST API
 **Depends on**: Phase 12 (existing member sync infrastructure)
 **Requirements**: TEAM-01, TEAM-02, TEAM-03, TEAM-04
 **Success Criteria** (what must be TRUE):
@@ -38,10 +38,10 @@ Archives:
   2. System falls back to ClubTeams field when UnionTeams is empty
   3. System creates teams in Stadion via POST /wp/v2/teams with title field
   4. SQLite database tracks team name to Stadion team ID mappings
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 13-01: Team extraction and Stadion team creation
+- [ ] 13-01-PLAN.md — Team extraction and Stadion team creation
 
 #### Phase 14: Work History Sync
 **Goal**: System links persons to their teams via work history entries with change detection
@@ -86,7 +86,7 @@ Plans:
 | 10. Photo Download | v1.4 | 1/1 | Complete | 2026-01-26 |
 | 11. Photo Upload/Deletion | v1.4 | 1/1 | Complete | 2026-01-26 |
 | 12. Pipeline Integration | v1.4 | 1/1 | Complete | 2026-01-26 |
-| 13. Team Extraction | v1.5 | 0/1 | Not started | - |
+| 13. Team Extraction | v1.5 | 0/1 | Planned | - |
 | 14. Work History | v1.5 | 0/1 | Not started | - |
 | 15. Pipeline Integration | v1.5 | 0/1 | Not started | - |
 
@@ -94,4 +94,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-25*
-*Last updated: 2026-01-26 for v1.5 Team Sync milestone*
+*Last updated: 2026-01-26 for Phase 13 planning*
