@@ -30,8 +30,8 @@ Requirements for team sync milestone. Each maps to roadmap phases.
 
 ### Pipeline Integration
 
-- [ ] **TEAM-10**: Team sync runs as part of member sync to Stadion
-- [ ] **TEAM-11**: Email report includes team sync statistics
+- [x] **TEAM-10**: Team sync runs as part of member sync to Stadion
+- [x] **TEAM-11**: Email report includes team sync statistics
 
 ## Future Requirements
 
@@ -61,8 +61,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEAM-07 | Phase 14 | Complete |
 | TEAM-08 | Phase 14 | Complete |
 | TEAM-09 | Phase 14 | Complete |
-| TEAM-10 | Phase 15 | Pending |
-| TEAM-11 | Phase 15 | Pending |
+| TEAM-10 | Phase 15 | Complete |
+| TEAM-11 | Phase 15 | Complete |
 
 **Coverage:**
 - v1.5 requirements: 11 total
@@ -76,4 +76,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-26 after Phase 14 complete*
+*Last updated: 2026-01-26 after Phase 15 complete*

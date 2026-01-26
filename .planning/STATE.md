@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 
 Phase: 15 of 15 (Pipeline Integration)
 Plan: 1 of 1
-Status: Phase complete
+Status: Milestone complete
 Last activity: 2026-01-26 — Completed 15-01-PLAN.md
 
 Progress: [███████████████] 100% (15 of 15 phases complete)
@@ -68,7 +68,7 @@ None.
 
 Last session: 2026-01-26
 Stopped at: Completed 15-01-PLAN.md
-Resume with: All v1.5 features complete - ready for v2.0 planning or refinement
+Resume with: `/gsd:audit-milestone` to verify requirements and integration
 Resume file: None
 
 ---
