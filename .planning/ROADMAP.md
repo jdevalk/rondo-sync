@@ -38,7 +38,7 @@ Archives:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 09-01-PLAN.md — Add photo state tracking to stadion-db.js and pass PersonImageDate through pipeline
+- [x] 09-01-PLAN.md — Add photo state tracking to stadion-db.js and pass PersonImageDate through pipeline
 
 #### Phase 10: Photo Download
 **Goal**: System extracts photos from Sportlink member detail pages via browser automation
@@ -91,7 +91,7 @@ Plans:
 | 6. Member Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
 | 7. Parent Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
 | 8. Pipeline Integration | v1.3 | 1/1 | Complete | 2026-01-25 |
-| 9. Photo State Tracking | v1.4 | 0/1 | Planned | - |
+| 9. Photo State Tracking | v1.4 | 1/1 | Complete | 2026-01-26 |
 | 10. Photo Download | v1.4 | 0/? | Not started | - |
 | 11. Photo Upload/Deletion | v1.4 | 0/? | Not started | - |
 | 12. Pipeline Integration | v1.4 | 0/? | Not started | - |
@@ -100,4 +100,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-25*
-*Last updated: 2026-01-26 after Phase 9 planning*
+*Last updated: 2026-01-26 after Phase 9 complete*

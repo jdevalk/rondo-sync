@@ -15,8 +15,8 @@ Requirements for photo sync milestone. Each maps to roadmap phases.
 
 ### Change Detection
 
-- [ ] **PHOTO-04**: System tracks PersonImageDate in SQLite
-- [ ] **PHOTO-05**: System only downloads when PersonImageDate is new or changed
+- [x] **PHOTO-04**: System tracks PersonImageDate in SQLite
+- [x] **PHOTO-05**: System only downloads when PersonImageDate is new or changed
 
 ### Stadion Upload
 
@@ -56,8 +56,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PHOTO-01 | Phase 10 | Pending |
 | PHOTO-02 | Phase 10 | Pending |
 | PHOTO-03 | Phase 10 | Pending |
-| PHOTO-04 | Phase 9 | Pending |
-| PHOTO-05 | Phase 9 | Pending |
+| PHOTO-04 | Phase 9 | Complete |
+| PHOTO-05 | Phase 9 | Complete |
 | PHOTO-06 | Phase 11 | Pending |
 | PHOTO-07 | Phase 11 | Pending |
 | PHOTO-08 | Phase 11 | Pending |
@@ -73,4 +73,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-26 after roadmap creation*
+*Last updated: 2026-01-26 after Phase 9 complete*
