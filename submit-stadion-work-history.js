@@ -109,9 +109,10 @@ function detectTeamChanges(db, knvbId, currentTeams) {
  * @param {Map} teamMap - Map<team_name, stadion_id>
  * @param {Object} options - Logger and verbose options
  * @param {string} jobTitle - Job title ('Speler' or 'Staflid')
- * @returns {Promise<{action: string, added: number, ended: number}>}
+ * @param {boolean} force - Force update even unchanged entries
+ * @returns {Promise<{action: string, added: number, ended: number, updated: number}>}
  */
-async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, options, jobTitle = 'Speler') {
+async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, options, jobTitle = 'Speler', force = false) {
   const { knvb_id, stadion_id } = member;
   const logVerbose = options.logger?.verbose.bind(options.logger) || (options.verbose ? console.log : () => {});
 
@@ -136,6 +137,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
 
   let addedCount = 0;
   let endedCount = 0;
+  let updatedCount = 0;
   let modified = false;
 
   // Build new work_history array
@@ -188,6 +190,30 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
     logVerbose(`Added work_history for team ${teamName} (index ${newIndex})`);
   }
 
+  // Handle unchanged teams when force is true (update job_title)
+  if (force) {
+    const trackedHistory = getMemberWorkHistory(db, knvb_id);
+    for (const teamName of changes.unchanged) {
+      const tracked = trackedHistory.find(h => h.team_name === teamName);
+      if (tracked && tracked.stadion_work_history_id !== null && tracked.stadion_work_history_id !== undefined) {
+        const index = tracked.stadion_work_history_id;
+        if (index < newWorkHistory.length) {
+          const teamStadionId = teamMap.get(teamName);
+          if (teamStadionId) {
+            newWorkHistory[index] = {
+              ...newWorkHistory[index],
+              job_title: jobTitle,
+              post_object: teamStadionId
+            };
+            updatedCount++;
+            modified = true;
+            logVerbose(`Updated work_history for team ${teamName} (index ${index}) with job_title: ${jobTitle}`);
+          }
+        }
+      }
+    }
+  }
+
   // Update WordPress if modified
   if (modified) {
     await stadionRequest(
@@ -196,10 +222,10 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
       { acf: { work_history: newWorkHistory } },
       options
     );
-    return { action: 'updated', added: addedCount, ended: endedCount };
+    return { action: 'updated', added: addedCount, ended: endedCount, updated: updatedCount };
   }
 
-  return { action: 'unchanged', added: 0, ended: 0 };
+  return { action: 'unchanged', added: 0, ended: 0, updated: 0 };
 }
 
 /**
@@ -319,11 +345,13 @@ async function runSync(options = {}) {
             stadionDb,
             teamMap,
             options,
-            jobTitle
+            jobTitle,
+            force
           );
           if (syncResult.action === 'updated') {
             result.synced++;
             result.created += syncResult.added;
+            result.updated += syncResult.updated;
             result.ended += syncResult.ended;
           } else if (syncResult.action === 'skipped') {
             result.skipped++;
@@ -365,6 +393,7 @@ if (require.main === module) {
     .then(result => {
       console.log(`Work history sync: ${result.synced}/${result.total} synced`);
       console.log(`  Created: ${result.created}`);
+      console.log(`  Updated: ${result.updated}`);
       console.log(`  Ended: ${result.ended}`);
       console.log(`  Skipped: ${result.skipped}`);
       if (result.errors.length > 0) {
