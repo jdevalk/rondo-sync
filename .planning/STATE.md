@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 Phase: 15 of 15 (complete)
 Plan: All complete
 Status: Ready for next milestone
-Last activity: 2026-01-26 — v1.5 milestone complete
+Last activity: 2026-01-26 — Completed quick task 002: Add Sportlink-to-Stadion field mappings
 
 Progress: [███████████████] 100% (15 of 15 phases complete)
 
@@ -49,6 +49,12 @@ Review with `/gsd:check-todos`
 
 None.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 002 | Add Sportlink-to-Stadion field mappings | 2026-01-26 | ebad72a | [002-add-sportlink-to-stadion-field-mappings](./quick/002-add-sportlink-to-stadion-field-mappings/) |
+
 ## Session Continuity
 
 Last session: 2026-01-26
@@ -57,4 +63,4 @@ Resume with: `/gsd:new-milestone` to plan next version
 Resume file: None
 
 ---
-*Last updated: 2026-01-26 (v1.5 milestone archived)*
+*Last updated: 2026-01-26 (quick task 002 completed)*
