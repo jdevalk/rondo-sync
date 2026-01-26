@@ -8,7 +8,19 @@ A CLI tool that synchronizes member data from Sportlink Club (a Dutch sports clu
 
 Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
 
-## Current State (v1.3 Shipped)
+## Current Milestone: v1.4 Photo Sync
+
+**Goal:** Download member photos from Sportlink and sync them to both local storage and Stadion.
+
+**Target features:**
+- Download photos from Sportlink member detail pages via browser automation
+- Track PersonImageDate to detect new/changed photos
+- Save photos locally in `photos/` directory
+- Upload photos to Stadion via REST API
+- Delete photos from both locations when removed in Sportlink
+- Integrate into daily sync pipeline with email report statistics
+
+## Previous State (v1.3 Shipped)
 
 **Shipped:** 2026-01-25
 
@@ -16,17 +28,12 @@ The sync pipeline is fully operational with dual-system sync:
 - Browser automation downloads member data from Sportlink
 - Field transformation and hash-based change detection
 - Sync to up to 4 Laposta lists with state tracking
-- **Sync to Stadion WordPress via REST API** with KNVB ID matching
-- **Parent sync as separate person records** with bidirectional relationship linking
+- Sync to Stadion WordPress via REST API with KNVB ID matching
+- Parent sync as separate person records with bidirectional relationship linking
 - Automated daily cron job at 6:00 AM Amsterdam time
-- HTML email reports via Postmark with **dual-system statistics**
+- HTML email reports via Postmark with dual-system statistics
 - Sender displays as "Sportlink SYNC" in recipient inbox
 - Retry mechanism at 8:00 AM on failure
-
-**To deploy:**
-```bash
-npm run install-cron  # Prompts for operator email + Postmark credentials, sets up cron
-```
 
 ## Requirements
 
@@ -61,7 +68,14 @@ npm run install-cron  # Prompts for operator email + Postmark credentials, sets 
 
 ### Active
 
-(None — plan next milestone with `/gsd:new-milestone`)
+- [ ] Download photos from Sportlink when PersonImageDate indicates presence
+- [ ] Track PersonImageDate in SQLite for change detection
+- [ ] Navigate to member detail page and extract photo from modal
+- [ ] Save photos locally with PublicPersonId as filename
+- [ ] Upload photos to Stadion via REST API endpoint
+- [ ] Delete photos from local and Stadion when removed in Sportlink
+- [ ] Integrate photo sync into sync-all pipeline
+- [ ] Include photo sync statistics in email report
 
 ### Out of Scope
 
@@ -71,7 +85,7 @@ npm run install-cron  # Prompts for operator email + Postmark credentials, sets 
 - Slack/Discord notifications — Email reports are sufficient for now
 - Fallback to local mail — Postmark is reliable enough, no fallback needed
 - Fail sync on email failure — Email is secondary to the actual sync operation
-- Photo sync to Stadion — Storage/bandwidth costs, not needed currently
+- Photo sync to Stadion — **moved to v1.4 Active**
 - Team/work_history sync — Sportlink doesn't provide team role data
 - Delete sync — Members removed from Sportlink stay in downstream systems
 
@@ -122,4 +136,4 @@ npm run install-cron  # Prompts for operator email + Postmark credentials, sets 
 | 2 second API rate limiting | Prevents WordPress timeout on slow servers | ✓ Good |
 
 ---
-*Last updated: 2026-01-25 after v1.3 milestone*
+*Last updated: 2026-01-26 after starting v1.4 milestone*
