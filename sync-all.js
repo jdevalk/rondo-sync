@@ -5,6 +5,8 @@ const { runDownload } = require('./download-data-from-sportlink');
 const { runPrepare } = require('./prepare-laposta-members');
 const { runSubmit } = require('./submit-laposta-list');
 const { runSync: runStadionSync } = require('./submit-stadion-sync');
+const { runSync: runTeamSync } = require('./submit-stadion-teams');
+const { runSync: runWorkHistorySync } = require('./submit-stadion-work-history');
 const { runPhotoDownload } = require('./download-photos-from-sportlink');
 const { runPhotoSync } = require('./upload-photos-to-stadion');
 const { runSync: runBirthdaySync } = require('./sync-important-dates');
@@ -214,6 +216,22 @@ async function runSyncAll(options = {}) {
       skipped: 0,
       deleted: 0,
       errors: []
+    },
+    teams: {
+      total: 0,
+      synced: 0,
+      created: 0,
+      updated: 0,
+      skipped: 0,
+      errors: []
+    },
+    workHistory: {
+      total: 0,
+      synced: 0,
+      created: 0,
+      ended: 0,
+      skipped: 0,
+      errors: []
     }
   };
 
@@ -328,6 +346,54 @@ async function runSyncAll(options = {}) {
       stats.stadion.errors.push({
         message: `Stadion sync failed: ${err.message}`,
         system: 'stadion'
+      });
+    }
+
+    // Step 4b: Team Sync (NON-CRITICAL)
+    logger.verbose('Syncing teams to Stadion...');
+    try {
+      const teamResult = await runTeamSync({ logger, verbose, force });
+      stats.teams.total = teamResult.total;
+      stats.teams.synced = teamResult.synced;
+      stats.teams.created = teamResult.created;
+      stats.teams.updated = teamResult.updated;
+      stats.teams.skipped = teamResult.skipped;
+      if (teamResult.errors?.length > 0) {
+        stats.teams.errors = teamResult.errors.map(e => ({
+          team_name: e.team_name,
+          message: e.message,
+          system: 'team-sync'
+        }));
+      }
+    } catch (err) {
+      logger.error(`Team sync failed: ${err.message}`);
+      stats.teams.errors.push({
+        message: `Team sync failed: ${err.message}`,
+        system: 'team-sync'
+      });
+    }
+
+    // Step 4c: Work History Sync (NON-CRITICAL)
+    logger.verbose('Syncing work history to Stadion...');
+    try {
+      const workHistoryResult = await runWorkHistorySync({ logger, verbose, force });
+      stats.workHistory.total = workHistoryResult.total;
+      stats.workHistory.synced = workHistoryResult.synced;
+      stats.workHistory.created = workHistoryResult.created;
+      stats.workHistory.ended = workHistoryResult.ended;
+      stats.workHistory.skipped = workHistoryResult.skipped;
+      if (workHistoryResult.errors?.length > 0) {
+        stats.workHistory.errors = workHistoryResult.errors.map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'work-history-sync'
+        }));
+      }
+    } catch (err) {
+      logger.error(`Work history sync failed: ${err.message}`);
+      stats.workHistory.errors.push({
+        message: `Work history sync failed: ${err.message}`,
+        system: 'work-history-sync'
       });
     }
 
