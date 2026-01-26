@@ -257,7 +257,7 @@ async function runSync(options = {}) {
       const memberTeams = new Map(); // Map<knvb_id, { teams: [], jobTitle: string }>
 
       for (const member of members) {
-        const knvbId = member.MemberClientID;
+        const knvbId = member.PublicPersonId;
         if (!knvbId) continue;
 
         const teams = extractMemberTeams(member);
