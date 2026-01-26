@@ -51,7 +51,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 10-01-PLAN.md — Create photo download script with browser automation
+- [x] 10-01-PLAN.md — Create photo download script with browser automation
 
 #### Phase 11: Photo Upload and Deletion
 **Goal**: System syncs photos to Stadion and handles photo removal from both local and Stadion
@@ -92,12 +92,12 @@ Plans:
 | 7. Parent Sync | v1.3 | 3/3 | Complete | 2026-01-25 |
 | 8. Pipeline Integration | v1.3 | 1/1 | Complete | 2026-01-25 |
 | 9. Photo State Tracking | v1.4 | 1/1 | Complete | 2026-01-26 |
-| 10. Photo Download | v1.4 | 0/1 | Planned | - |
+| 10. Photo Download | v1.4 | 1/1 | Complete | 2026-01-26 |
 | 11. Photo Upload/Deletion | v1.4 | 0/? | Not started | - |
 | 12. Pipeline Integration | v1.4 | 0/? | Not started | - |
 
-**Total:** 12 phases (9 complete, 3 remaining in v1.4)
+**Total:** 12 phases (10 complete, 2 remaining in v1.4)
 
 ---
 *Roadmap created: 2026-01-25*
-*Last updated: 2026-01-26 after Phase 10 planned*
+*Last updated: 2026-01-26 after Phase 10 complete*

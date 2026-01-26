@@ -9,9 +9,9 @@ Requirements for photo sync milestone. Each maps to roadmap phases.
 
 ### Photo Download
 
-- [ ] **PHOTO-01**: System detects members with photos via PersonImageDate field
-- [ ] **PHOTO-02**: System navigates to member detail page and extracts photo from modal
-- [ ] **PHOTO-03**: System saves photo locally as `photos/<PublicPersonId>.<ext>`
+- [x] **PHOTO-01**: System detects members with photos via PersonImageDate field
+- [x] **PHOTO-02**: System navigates to member detail page and extracts photo from modal
+- [x] **PHOTO-03**: System saves photo locally as `photos/<PublicPersonId>.<ext>`
 
 ### Change Detection
 
@@ -53,9 +53,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PHOTO-01 | Phase 10 | Pending |
-| PHOTO-02 | Phase 10 | Pending |
-| PHOTO-03 | Phase 10 | Pending |
+| PHOTO-01 | Phase 10 | Complete |
+| PHOTO-02 | Phase 10 | Complete |
+| PHOTO-03 | Phase 10 | Complete |
 | PHOTO-04 | Phase 9 | Complete |
 | PHOTO-05 | Phase 9 | Complete |
 | PHOTO-06 | Phase 11 | Pending |
@@ -73,4 +73,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-26 after Phase 9 complete*
+*Last updated: 2026-01-26 after Phase 10 complete*
