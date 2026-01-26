@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 14 of 15 (Work History Sync)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-01-26 — Phase 13 complete
+Plan: 1 of 1
+Status: Phase complete
+Last activity: 2026-01-26 — Completed 14-01-PLAN.md
 
-Progress: [█████████████░░] 87% (13 of 15 phases complete)
+Progress: [██████████████░] 93% (14 of 15 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Total execution time: ~2 days per milestone
 
 **By Milestone:**
@@ -31,7 +31,7 @@ Progress: [█████████████░░] 87% (13 of 15 phases c
 | v1.2 Email Polish | 1 | 2 | same day |
 | v1.3 Stadion | 4 | 8 | same day |
 | v1.4 Photo Sync | 4 | 4 | same day |
-| v1.5 Team Sync | 1 | 1 | same day (in progress) |
+| v1.5 Team Sync | 2 | 2 | same day |
 
 **Recent Trend:** Consistent same-day delivery after initial v1.0 foundation
 
@@ -39,7 +39,7 @@ Progress: [█████████████░░] 87% (13 of 15 phases c
 
 ### Key Decisions
 
-See PROJECT.md Key Decisions table (20 decisions total).
+See PROJECT.md Key Decisions table (25 decisions total).
 
 Recent decisions affecting v1.5:
 - Phase 8: WordPress application password auth (simpler than browser automation)
@@ -47,6 +47,11 @@ Recent decisions affecting v1.5:
 - Phase 8: Parents as separate persons (enables proper relationship modeling)
 - Phase 13: COLLATE NOCASE on team_name (prevents capitalization duplicates)
 - Phase 13: UnionTeams priority over ClubTeams (KNVB data more authoritative)
+- Phase 14: Track WordPress repeater field row indices (stadion_work_history_id for update targeting)
+- Phase 14: Preserve manual WordPress entries (only modify sync-created work_history)
+- Phase 14: Composite unique key (knvb_id, team_name) for member-team tracking
+- Phase 14: Backfilled entries have empty start_date (historical data indicator)
+- Phase 14: Only end sync-created entries on team change (preserve manual history)
 
 ### Pending Todos
 
@@ -59,9 +64,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 13-01-PLAN.md
-Resume with: `/gsd:plan-phase 14` to create plan for Team-Member Linking
+Stopped at: Completed 14-01-PLAN.md
+Resume with: `/gsd:plan-phase 15` to create plan for Integration Testing
 Resume file: None
 
 ---
-*Last updated: 2026-01-26 (Phase 13 complete - team extraction and management)*
+*Last updated: 2026-01-26 (Phase 14 complete - work history sync)*
