@@ -134,6 +134,9 @@ The sync pipeline is fully operational with dual-system sync:
 | Bidirectional relationship linking | Parent.children and child.parents arrays stay in sync | ✓ Good |
 | Stadion sync non-critical | Pipeline continues if Stadion fails, Laposta is primary | ✓ Good |
 | 2 second API rate limiting | Prevents WordPress timeout on slow servers | ✓ Good |
+| Photo state CHECK constraint | Limits photo_state column to 6 valid states, prevents invalid states | ✓ Good |
+| Empty string normalization to NULL | PersonImageDate empty strings normalized to null for SQL correctness | ✓ Good |
+| Atomic state detection in ON CONFLICT | State transitions handled entirely in SQL ON CONFLICT clause | ✓ Good |
 
 ---
-*Last updated: 2026-01-26 after starting v1.4 milestone*
+*Last updated: 2026-01-26 after completing Phase 9 Plan 1*
