@@ -13,14 +13,12 @@ const {
 } = require('./lib/stadion-db');
 
 /**
- * Check if a team name is valid (not a single-digit placeholder)
+ * Check if a team name is valid
  * @param {string} teamName - Team name to validate
  * @returns {boolean} - True if valid team name
  */
 function isValidTeamName(teamName) {
   if (!teamName) return false;
-  // Reject single-digit numbers (common placeholder/invalid values in Sportlink)
-  if (/^\d$/.test(teamName)) return false;
   return true;
 }
 

@@ -3,13 +3,12 @@ require('varlock/auto-load');
 const { openDb, getLatestSportlinkResults } = require('./laposta-db');
 
 /**
- * Check if a team name is valid (not a single-digit placeholder)
+ * Check if a team name is valid
  * @param {string} teamName - Team name to validate
  * @returns {boolean} - True if valid team name
  */
 function isValidTeamName(teamName) {
-  // Reject single-digit numbers (common placeholder/invalid values in Sportlink)
-  if (/^\d$/.test(teamName)) return false;
+  if (!teamName) return false;
   return true;
 }
 
