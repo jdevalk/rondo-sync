@@ -75,10 +75,10 @@ Plans:
   1. Photo sync runs as part of `npm run sync-all` pipeline
   2. Email report includes photo sync statistics (downloaded, uploaded, deleted, errors)
   3. Photo sync failures do not block Laposta/Stadion member sync
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 12-01: TBD
+- [ ] 12-01-PLAN.md — Integrate photo sync into sync-all.js with email reporting
 
 ## Progress
 
@@ -94,10 +94,10 @@ Plans:
 | 9. Photo State Tracking | v1.4 | 1/1 | Complete | 2026-01-26 |
 | 10. Photo Download | v1.4 | 1/1 | Complete | 2026-01-26 |
 | 11. Photo Upload/Deletion | v1.4 | 1/1 | Complete | 2026-01-26 |
-| 12. Pipeline Integration | v1.4 | 0/? | Not started | - |
+| 12. Pipeline Integration | v1.4 | 0/1 | Planned | - |
 
-**Total:** 12 phases (11 complete, 1 remaining in v1.4)
+**Total:** 12 phases (11 complete, 1 planned in v1.4)
 
 ---
 *Roadmap created: 2026-01-25*
-*Last updated: 2026-01-26 after Phase 11 complete*
+*Last updated: 2026-01-26 after Phase 12 planning*
