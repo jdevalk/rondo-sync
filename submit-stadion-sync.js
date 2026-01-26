@@ -19,13 +19,6 @@ const {
 } = require('./lib/stadion-db');
 
 /**
- * Helper for rate limiting between API requests
- */
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
  * Sync a single member to Stadion (create or update)
  * Uses local stadion_id tracking - no API search needed
  * @param {Object} member - Member record from database
@@ -102,8 +95,6 @@ async function updateChildrenParentLinks(parentId, childStadionIds, options) {
       logVerbose(`Failed to link parent to child ${childId}: ${error.message}`);
       // Continue with other children
     }
-
-    await sleep(1000); // Rate limit
   }
 }
 
@@ -227,8 +218,6 @@ async function deleteOrphanParents(db, currentParentEmails, options) {
     } catch (error) {
       errors.push({ email: parent.email, message: error.message });
     }
-
-    await sleep(2000);
   }
 
   return { deleted, errors };
@@ -287,10 +276,6 @@ async function syncParents(db, knvbIdToStadionId, options = {}) {
     } catch (error) {
       result.errors.push({ email: parent.email, message: error.message });
     }
-
-    if (i < needsSync.length - 1) {
-      await sleep(2000);
-    }
   }
 
   // Delete orphan parents
@@ -337,9 +322,6 @@ async function deleteRemovedMembers(db, currentKnvbIds, options) {
     } catch (error) {
       errors.push({ knvb_id: member.knvb_id, message: error.message });
     }
-
-    // Rate limit
-    await sleep(2000);
   }
 
   return { deleted, errors };
@@ -413,11 +395,6 @@ async function runSync(options = {}) {
               email: member.email,
               message: error.message
             });
-          }
-
-          // Rate limit: 2 seconds between requests
-          if (i < needsSync.length - 1) {
-            await sleep(2000);
           }
         }
 
