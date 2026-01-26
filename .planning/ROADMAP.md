@@ -66,10 +66,10 @@ Plans:
   1. Team sync runs automatically as part of Stadion member sync
   2. Email report includes team sync statistics (teams created, members linked, changes detected)
   3. Team sync failures do not block Laposta or core Stadion member sync
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 15-01: Integrate team sync into sync-all with email reporting
+- [ ] 15-01-PLAN.md — Integrate team and work history sync into pipeline with email reporting
 
 ## Progress
 
@@ -88,10 +88,10 @@ Plans:
 | 12. Pipeline Integration | v1.4 | 1/1 | Complete | 2026-01-26 |
 | 13. Team Extraction | v1.5 | 1/1 | Complete | 2026-01-26 |
 | 14. Work History | v1.5 | 1/1 | Complete | 2026-01-26 |
-| 15. Pipeline Integration | v1.5 | 0/1 | Not started | - |
+| 15. Pipeline Integration | v1.5 | 0/1 | Ready | - |
 
-**Total:** 15 phases (14 complete, 1 remaining)
+**Total:** 15 phases (14 complete, 1 ready for execution)
 
 ---
 *Roadmap created: 2026-01-25*
-*Last updated: 2026-01-26 for Phase 14 complete*
+*Last updated: 2026-01-26 for Phase 15 planning*
