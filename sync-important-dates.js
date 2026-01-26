@@ -13,13 +13,6 @@ const {
 const { openDb: openLapostaDb, getLatestSportlinkResults } = require('./laposta-db');
 
 /**
- * Helper for rate limiting between API requests
- */
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
  * Load birthdays from Sportlink SQLite database and upsert to tracking table
  * @param {Object} db - Stadion database connection
  * @param {Object} options - Logger options
@@ -186,11 +179,6 @@ async function runSync(options = {}) {
           message: error.message
         });
       }
-
-      // Rate limit
-      if (i < needsSync.length - 1) {
-        await sleep(1000);
-      }
     }
 
     // Step 4: Delete orphan dates (members removed from Sportlink)
@@ -210,7 +198,6 @@ async function runSync(options = {}) {
           message: `Delete failed: ${error.message}`
         });
       }
-      await sleep(1000);
     }
 
     result.success = result.errors.length === 0;
