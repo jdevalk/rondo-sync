@@ -20,14 +20,14 @@ Requirements for photo sync milestone. Each maps to roadmap phases.
 
 ### Stadion Upload
 
-- [ ] **PHOTO-06**: System uploads photo to Stadion via `POST /stadion/v1/people/{id}/photo`
-- [ ] **PHOTO-07**: System matches person by KNVB ID before uploading
+- [x] **PHOTO-06**: System uploads photo to Stadion via `POST /stadion/v1/people/{id}/photo`
+- [x] **PHOTO-07**: System matches person by KNVB ID before uploading
 
 ### Photo Removal
 
-- [ ] **PHOTO-08**: System detects when PersonImageDate becomes empty
-- [ ] **PHOTO-09**: System deletes local photo file when removed in Sportlink
-- [ ] **PHOTO-10**: System deletes photo from Stadion when removed in Sportlink
+- [x] **PHOTO-08**: System detects when PersonImageDate becomes empty
+- [x] **PHOTO-09**: System deletes local photo file when removed in Sportlink
+- [x] **PHOTO-10**: System deletes photo from Stadion when removed in Sportlink
 
 ### Pipeline Integration
 
@@ -58,11 +58,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PHOTO-03 | Phase 10 | Complete |
 | PHOTO-04 | Phase 9 | Complete |
 | PHOTO-05 | Phase 9 | Complete |
-| PHOTO-06 | Phase 11 | Pending |
-| PHOTO-07 | Phase 11 | Pending |
-| PHOTO-08 | Phase 11 | Pending |
-| PHOTO-09 | Phase 11 | Pending |
-| PHOTO-10 | Phase 11 | Pending |
+| PHOTO-06 | Phase 11 | Complete |
+| PHOTO-07 | Phase 11 | Complete |
+| PHOTO-08 | Phase 11 | Complete |
+| PHOTO-09 | Phase 11 | Complete |
+| PHOTO-10 | Phase 11 | Complete |
 | PHOTO-11 | Phase 12 | Pending |
 | PHOTO-12 | Phase 12 | Pending |
 
@@ -73,4 +73,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-26 after Phase 10 complete*
+*Last updated: 2026-01-26 after Phase 11 complete*
