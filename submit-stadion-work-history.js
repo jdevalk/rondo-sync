@@ -71,7 +71,7 @@ function buildWorkHistoryEntry(teamStadionId, isBackfill, jobTitle = 'Speler') {
     is_current: true,
     start_date: isBackfill ? '' : formatDateForACF(new Date()),
     end_date: '',
-    post_object: teamStadionId
+    company: teamStadionId
   };
 }
 
@@ -213,7 +213,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
           newWorkHistory[index] = {
             ...newWorkHistory[index],
             job_title: jobTitle,
-            post_object: teamStadionId
+            company: teamStadionId
           };
           updatedCount++;
           modified = true;
@@ -221,7 +221,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
         }
       } else {
         // No tracked index - find existing entry by team or create new
-        const existingIndex = newWorkHistory.findIndex(e => e.post_object === teamStadionId);
+        const existingIndex = newWorkHistory.findIndex(e => e.company === teamStadionId);
         if (existingIndex >= 0) {
           // Update existing WordPress entry
           newWorkHistory[existingIndex] = {
