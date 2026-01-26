@@ -8,32 +8,28 @@ A CLI tool that synchronizes member data from Sportlink Club (a Dutch sports clu
 
 Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
 
-## Current Milestone: v1.4 Photo Sync
+## Current Milestone: v1.5 Team Sync
 
-**Goal:** Download member photos from Sportlink and sync them to both local storage and Stadion.
+**Goal:** Sync member teams from Sportlink to Stadion, creating teams and work history entries.
 
 **Target features:**
-- Download photos from Sportlink member detail pages via browser automation
-- Track PersonImageDate to detect new/changed photos
-- Save photos locally in `photos/` directory
-- Upload photos to Stadion via REST API
-- Delete photos from both locations when removed in Sportlink
-- Integrate into daily sync pipeline with email report statistics
+- Extract team from Sportlink `UnionTeams` field (fallback to `ClubTeams`)
+- Create teams in Stadion if they don't exist
+- Add work_history entry to persons linking them to their team
+- Track team assignments for change detection
+- Include team sync statistics in email report
 
-## Previous State (v1.3 Shipped)
+## Previous State (v1.4 Shipped)
 
-**Shipped:** 2026-01-25
+**Shipped:** 2026-01-26
 
-The sync pipeline is fully operational with dual-system sync:
-- Browser automation downloads member data from Sportlink
-- Field transformation and hash-based change detection
-- Sync to up to 4 Laposta lists with state tracking
-- Sync to Stadion WordPress via REST API with KNVB ID matching
-- Parent sync as separate person records with bidirectional relationship linking
-- Automated daily cron job at 6:00 AM Amsterdam time
-- HTML email reports via Postmark with dual-system statistics
-- Sender displays as "Sportlink SYNC" in recipient inbox
-- Retry mechanism at 8:00 AM on failure
+Photo sync is fully operational:
+- Photo state tracking via PersonImageDate in SQLite
+- Browser automation downloads photos from member detail pages
+- Photos saved locally in `photos/` directory
+- Photos uploaded to Stadion via REST API
+- Photo deletion when removed in Sportlink
+- Photo sync integrated into daily pipeline with email statistics
 
 ## Requirements
 
@@ -65,17 +61,22 @@ The sync pipeline is fully operational with dual-system sync:
 - ✓ Deduplicate parents across members — v1.3
 - ✓ Add Stadion sync to sync-all pipeline — v1.3
 - ✓ Include Stadion results in email report — v1.3
+- ✓ Download photos from Sportlink when PersonImageDate indicates presence — v1.4
+- ✓ Track PersonImageDate in SQLite for change detection — v1.4
+- ✓ Navigate to member detail page and extract photo from modal — v1.4
+- ✓ Save photos locally with PublicPersonId as filename — v1.4
+- ✓ Upload photos to Stadion via REST API endpoint — v1.4
+- ✓ Delete photos from local and Stadion when removed in Sportlink — v1.4
+- ✓ Integrate photo sync into sync-all pipeline — v1.4
+- ✓ Include photo sync statistics in email report — v1.4
 
 ### Active
 
-- [ ] Download photos from Sportlink when PersonImageDate indicates presence
-- [ ] Track PersonImageDate in SQLite for change detection
-- [ ] Navigate to member detail page and extract photo from modal
-- [ ] Save photos locally with PublicPersonId as filename
-- [ ] Upload photos to Stadion via REST API endpoint
-- [ ] Delete photos from local and Stadion when removed in Sportlink
-- [ ] Integrate photo sync into sync-all pipeline
-- [ ] Include photo sync statistics in email report
+- [ ] Extract team from Sportlink UnionTeams field (fallback to ClubTeams)
+- [ ] Create teams in Stadion if they don't exist
+- [ ] Add work_history entry to persons with team reference and "Speler" job title
+- [ ] Track team assignments in SQLite for change detection
+- [ ] Include team sync statistics in email report
 
 ### Out of Scope
 
@@ -85,8 +86,6 @@ The sync pipeline is fully operational with dual-system sync:
 - Slack/Discord notifications — Email reports are sufficient for now
 - Fallback to local mail — Postmark is reliable enough, no fallback needed
 - Fail sync on email failure — Email is secondary to the actual sync operation
-- Photo sync to Stadion — **moved to v1.4 Active**
-- Team/work_history sync — Sportlink doesn't provide team role data
 - Delete sync — Members removed from Sportlink stay in downstream systems
 
 ## Context
@@ -139,4 +138,4 @@ The sync pipeline is fully operational with dual-system sync:
 | Atomic state detection in ON CONFLICT | State transitions handled entirely in SQL ON CONFLICT clause | ✓ Good |
 
 ---
-*Last updated: 2026-01-26 after completing Phase 9 Plan 1*
+*Last updated: 2026-01-26 after starting milestone v1.5*
