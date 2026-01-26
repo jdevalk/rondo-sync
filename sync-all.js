@@ -5,6 +5,9 @@ const { runDownload } = require('./download-data-from-sportlink');
 const { runPrepare } = require('./prepare-laposta-members');
 const { runSubmit } = require('./submit-laposta-list');
 const { runSync: runStadionSync } = require('./submit-stadion-sync');
+const { runPhotoDownload } = require('./download-photos-from-sportlink');
+const { runPhotoSync } = require('./upload-photos-to-stadion');
+const { openDb } = require('./lib/stadion-db');
 
 /**
  * Parse CLI arguments
@@ -80,7 +83,39 @@ function printSummary(logger, stats) {
   }
   logger.log('');
 
-  const allErrors = [...stats.errors, ...stats.stadion.errors];
+  logger.log('PHOTO SYNC');
+  logger.log(minorDivider);
+  const photoDownloadText = stats.photos.download.total > 0
+    ? `${stats.photos.download.downloaded}/${stats.photos.download.total}`
+    : '0 changes';
+  logger.log(`Photos downloaded: ${photoDownloadText}`);
+  if (stats.photos.download.failed > 0) {
+    logger.log(`  Failed: ${stats.photos.download.failed}`);
+  }
+
+  const photoUploadText = stats.photos.upload.total > 0
+    ? `${stats.photos.upload.synced}/${stats.photos.upload.total}`
+    : '0 changes';
+  logger.log(`Photos uploaded: ${photoUploadText}`);
+  if (stats.photos.upload.skipped > 0) {
+    logger.log(`  Skipped: ${stats.photos.upload.skipped}`);
+  }
+
+  const photoDeleteText = stats.photos.delete.total > 0
+    ? `${stats.photos.delete.deleted}/${stats.photos.delete.total}`
+    : '0 changes';
+  logger.log(`Photos deleted: ${photoDeleteText}`);
+
+  logger.log(`Coverage: ${stats.photos.coverage.members_with_photos} of ${stats.photos.coverage.total_members} members have photos`);
+  logger.log('');
+
+  const allErrors = [
+    ...stats.errors,
+    ...stats.stadion.errors,
+    ...stats.photos.download.errors,
+    ...stats.photos.upload.errors,
+    ...stats.photos.delete.errors
+  ];
   if (allErrors.length > 0) {
     logger.log(`ERRORS (${allErrors.length})`);
     logger.log(minorDivider);
@@ -127,6 +162,30 @@ async function runSyncAll(options = {}) {
       skipped: 0,
       deleted: 0,
       errors: []
+    },
+    photos: {
+      download: {
+        total: 0,
+        downloaded: 0,
+        skipped: 0,
+        failed: 0,
+        errors: []
+      },
+      upload: {
+        total: 0,
+        synced: 0,
+        skipped: 0,
+        errors: []
+      },
+      delete: {
+        total: 0,
+        deleted: 0,
+        errors: []
+      },
+      coverage: {
+        members_with_photos: 0,
+        total_members: 0
+      }
     }
   };
 
@@ -244,6 +303,80 @@ async function runSyncAll(options = {}) {
       });
     }
 
+    // Step 5: Photo Download (NON-CRITICAL)
+    logger.verbose('Downloading photos from Sportlink...');
+    try {
+      const photoDownloadResult = await runPhotoDownload({ logger, verbose });
+
+      stats.photos.download = {
+        total: photoDownloadResult.total,
+        downloaded: photoDownloadResult.downloaded,
+        skipped: photoDownloadResult.skipped || 0,
+        failed: photoDownloadResult.failed,
+        errors: (photoDownloadResult.errors || []).map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'photo-download'
+        }))
+      };
+    } catch (err) {
+      logger.error(`Photo download failed: ${err.message}`);
+      stats.photos.download.errors.push({
+        message: `Photo download failed: ${err.message}`,
+        system: 'photo-download'
+      });
+    }
+
+    // Step 6: Photo Upload/Delete (NON-CRITICAL)
+    logger.verbose('Syncing photos to Stadion...');
+    try {
+      const photoSyncResult = await runPhotoSync({ logger, verbose });
+
+      stats.photos.upload = {
+        total: photoSyncResult.upload.total,
+        synced: photoSyncResult.upload.synced,
+        skipped: photoSyncResult.upload.skipped,
+        errors: (photoSyncResult.upload.errors || []).map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'photo-upload'
+        }))
+      };
+
+      stats.photos.delete = {
+        total: photoSyncResult.delete.total,
+        deleted: photoSyncResult.delete.deleted,
+        errors: (photoSyncResult.delete.errors || []).map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'photo-delete'
+        }))
+      };
+    } catch (err) {
+      logger.error(`Photo sync failed: ${err.message}`);
+      stats.photos.upload.errors.push({
+        message: `Photo sync failed: ${err.message}`,
+        system: 'photo-upload'
+      });
+    }
+
+    // Calculate photo coverage
+    try {
+      const db = openDb();
+      const totalMembers = db.prepare('SELECT COUNT(*) as count FROM stadion_members').get().count;
+      const membersWithPhotos = db.prepare(
+        "SELECT COUNT(*) as count FROM stadion_members WHERE photo_state = 'synced'"
+      ).get().count;
+      db.close();
+
+      stats.photos.coverage = {
+        members_with_photos: membersWithPhotos,
+        total_members: totalMembers
+      };
+    } catch (err) {
+      logger.verbose(`Could not calculate photo coverage: ${err.message}`);
+    }
+
     // Complete timing
     const endTime = Date.now();
     stats.completedAt = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
@@ -258,7 +391,11 @@ async function runSyncAll(options = {}) {
     logger.close();
 
     return {
-      success: stats.errors.length === 0 && stats.stadion.errors.length === 0,
+      success: stats.errors.length === 0 &&
+               stats.stadion.errors.length === 0 &&
+               stats.photos.download.errors.length === 0 &&
+               stats.photos.upload.errors.length === 0 &&
+               stats.photos.delete.errors.length === 0,
       stats
     };
   } catch (err) {
