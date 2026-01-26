@@ -22,8 +22,8 @@ async function syncTeam(team, db, options) {
   const logVerbose = options.logger?.verbose.bind(options.logger) || (options.verbose ? console.log : () => {});
 
   if (stadion_id) {
-    // Team exists - check if changed
-    if (source_hash === last_synced_hash) {
+    // Team exists - check if changed (unless force)
+    if (!options.force && source_hash === last_synced_hash) {
       logVerbose(`Team unchanged, skipping: ${team_name}`);
       return { action: 'skipped', id: stadion_id };
     }
