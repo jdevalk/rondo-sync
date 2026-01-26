@@ -249,12 +249,21 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
 
   // Update WordPress if modified
   if (modified) {
-    await stadionRequest(
-      `wp/v2/people/${stadion_id}`,
-      'PUT',
-      { acf: { work_history: newWorkHistory } },
-      options
-    );
+    try {
+      await stadionRequest(
+        `wp/v2/people/${stadion_id}`,
+        'PUT',
+        { acf: { work_history: newWorkHistory } },
+        options
+      );
+    } catch (error) {
+      logVerbose(`Error updating work_history for ${knvb_id}:`, error.message);
+      if (error.details) {
+        logVerbose('Error details:', JSON.stringify(error.details, null, 2));
+      }
+      logVerbose('Payload was:', JSON.stringify(newWorkHistory, null, 2));
+      throw error;
+    }
     return { action: 'updated', added: addedCount, ended: endedCount, updated: updatedCount };
   }
 
