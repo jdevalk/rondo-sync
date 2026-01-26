@@ -56,20 +56,41 @@ function loadBirthdaysFromSqlite(db, options = {}) {
 }
 
 /**
+ * Get the term ID for "birthday" date type
+ * @param {Object} options - Logger options
+ * @returns {Promise<number>} Term ID for birthday
+ */
+async function getBirthdayTermId(options = {}) {
+  const response = await stadionRequest(
+    'wp/v2/date_type?slug=birthday',
+    'GET',
+    null,
+    options
+  );
+
+  if (!response.body || response.body.length === 0) {
+    throw new Error('Birthday term not found in date_type taxonomy');
+  }
+
+  return response.body[0].id;
+}
+
+/**
  * Create a new important date in Stadion
  * @param {number} stadionPersonId - Stadion person post ID
  * @param {string} dateValue - Date in YYYY-MM-DD format
+ * @param {number} birthdayTermId - Term ID for birthday date type
  * @param {Object} options - Logger options
  * @returns {Promise<number>} Created important date post ID
  */
-async function createImportantDate(stadionPersonId, dateValue, options = {}) {
+async function createImportantDate(stadionPersonId, dateValue, birthdayTermId, options = {}) {
   const response = await stadionRequest(
     'wp/v2/important-dates',
     'POST',
     {
       status: 'publish',
       title: 'Birthday',
-      date_type: [{ slug: 'birthday' }],
+      date_type: [birthdayTermId],
       acf: {
         date_value: dateValue,
         related_people: [stadionPersonId],
@@ -155,6 +176,14 @@ async function runSync(options = {}) {
 
     logVerbose(`${needsSync.length} important dates need sync (${result.skipped} unchanged or no person)`);
 
+    // Step 2.5: Get the birthday term ID (only if we have dates to create)
+    let birthdayTermId = null;
+    if (needsSync.some(d => !d.stadion_date_id)) {
+      logVerbose('Fetching birthday term ID...');
+      birthdayTermId = await getBirthdayTermId(options);
+      logVerbose(`Birthday term ID: ${birthdayTermId}`);
+    }
+
     // Step 3: Sync each date
     for (let i = 0; i < needsSync.length; i++) {
       const date = needsSync[i];
@@ -168,7 +197,7 @@ async function runSync(options = {}) {
           result.updated++;
         } else {
           // Create new
-          const newId = await createImportantDate(date.stadion_id, date.date_value, options);
+          const newId = await createImportantDate(date.stadion_id, date.date_value, birthdayTermId, options);
           updateImportantDateSyncState(db, date.knvb_id, date.date_type, date.source_hash, newId);
           result.created++;
         }
