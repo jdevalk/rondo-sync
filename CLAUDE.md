@@ -14,10 +14,10 @@ npm run install-cron      # Set up automated daily sync with email reports
 
 ### Sync Pipeline
 
-1. **download-data-from-sportlink.js** - Browser automation downloads member CSV
+1. **download-data-from-sportlink.js** - Browser automation downloads member values to SQLite
 2. **prepare-laposta-members.js** - Transforms Sportlink fields for Laposta
-3. **submit-laposta-list.js** - Syncs to Laposta via API (hash-based change detection)
-4. **submit-stadion-sync.js** - Syncs to Stadion WordPress (reads from SQLite, not CSV)
+3. **submit-laposta-list.js** - Syncs to Laposta via API (hash-based change detection, reads from SQLite)
+4. **submit-stadion-sync.js** - Syncs to Stadion WordPress (reads from SQLite)
 5. **sync-all.js** - Orchestrates full pipeline, produces email-ready summary
 
 ### Supporting Files
@@ -32,7 +32,7 @@ npm run install-cron      # Set up automated daily sync with email reports
 ### Data Flow
 
 ```
-Sportlink Club (browser) → CSV → SQLite (state) → Laposta API
+Sportlink Club (browser) → JSON download → SQLite (state) → Laposta API
                                       ↓
                               Hash-based diff
                                       ↓
@@ -69,6 +69,14 @@ OPERATOR_EMAIL=           # Receives sync reports
 POSTMARK_API_KEY=         # Postmark server API token
 POSTMARK_FROM_EMAIL=      # Verified sender address
 ```
+
+## Remote server
+When checking current data, you can connect as root to the live sync server over SSH. It's details:
+
+IP: 46.202.155.16
+Remote path: /home/sportlink/
+
+You can login with the user's key. Get new code to the server by committing to GitHub and doing a `git pull` on the remote server in the `/home/sportlink/` directory. 
 
 ## Database
 
@@ -138,7 +146,9 @@ npm run show-sportlink-member   # Sportlink data lookup
 Stadion API documentation is at `~/Code/stadion/docs/`. Key files:
 - `api-leden-crud.md` - Person API (fields, work_history, relationships)
 - `api-teams.md` - Team API
+- `api-commissies.md` - Commissies API
 - `api-custom-fields.md` - Custom field definitions
+- `rest-api.md` - Full REST API docs, including important dates, used for birthdates
 - `data-model.md` - Data model overview
 
 Always check these docs for correct field names and formats before guessing.
