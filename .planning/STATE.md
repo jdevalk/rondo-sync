@@ -43,9 +43,7 @@ See PROJECT.md Key Decisions table (28 decisions total).
 
 ### Pending Todos
 
-1. **Refactor cron with granular sync schedules** (tooling)
-   - Split sync-all into people/photos/teams with different frequencies
-   - Simplify crontab to single-line entries using .env
+None — Add with `/gsd:add-todo`
 
 ### Known Blockers
 
