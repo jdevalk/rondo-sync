@@ -6,7 +6,9 @@ const {
   openDb,
   upsertTeams,
   getTeamsNeedingSync,
-  updateTeamSyncState
+  updateTeamSyncState,
+  getOrphanTeams,
+  deleteTeam
 } = require('./lib/stadion-db');
 
 /**
@@ -107,6 +109,7 @@ async function runSync(options = {}) {
     created: 0,
     updated: 0,
     skipped: 0,
+    deleted: 0,
     errors: []
   };
 
@@ -131,9 +134,8 @@ async function runSync(options = {}) {
 
       // Step 3: Get teams needing sync (hash changed or force)
       const needsSync = getTeamsNeedingSync(db, force);
-      result.skipped = result.total - needsSync.length;
 
-      logVerbose(`${needsSync.length} teams need sync (${result.skipped} unchanged)`);
+      logVerbose(`${needsSync.length} teams need sync`);
 
       // Step 4: Sync each team
       for (let i = 0; i < needsSync.length; i++) {
@@ -154,6 +156,39 @@ async function runSync(options = {}) {
             message: error.message
           });
           logError(`Error syncing team ${team.team_name}: ${error.message}`);
+        }
+      }
+
+      // Step 5: Delete orphan teams (in database but not in Sportlink)
+      const orphanTeams = getOrphanTeams(db, teams);
+      if (orphanTeams.length > 0) {
+        logVerbose(`Found ${orphanTeams.length} orphan teams to delete`);
+
+        for (const orphan of orphanTeams) {
+          logVerbose(`Deleting orphan team: ${orphan.team_name} (ID: ${orphan.stadion_id})`);
+
+          // Delete from WordPress if it has a stadion_id
+          if (orphan.stadion_id) {
+            try {
+              await stadionRequest(`wp/v2/teams/${orphan.stadion_id}`, 'DELETE', { force: true }, options);
+              logVerbose(`  Deleted from WordPress: ${orphan.stadion_id}`);
+            } catch (error) {
+              // Ignore 404 errors (already deleted)
+              if (error.details?.data?.status !== 404) {
+                logError(`  Error deleting from WordPress: ${error.message}`);
+                result.errors.push({
+                  team_name: orphan.team_name,
+                  message: `Delete failed: ${error.message}`
+                });
+                continue;
+              }
+              logVerbose(`  Already deleted from WordPress (404)`);
+            }
+          }
+
+          // Delete from tracking database
+          deleteTeam(db, orphan.team_name);
+          result.deleted++;
         }
       }
 
@@ -190,6 +225,9 @@ if (require.main === module) {
       console.log(`  Created: ${result.created}`);
       console.log(`  Updated: ${result.updated}`);
       console.log(`  Skipped: ${result.skipped}`);
+      if (result.deleted > 0) {
+        console.log(`  Deleted: ${result.deleted} (orphan teams)`);
+      }
       if (result.errors.length > 0) {
         console.error(`  Errors: ${result.errors.length}`);
         result.errors.forEach(e => console.error(`    - ${e.team_name}: ${e.message}`));
