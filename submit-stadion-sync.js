@@ -190,11 +190,16 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
         const parentFirstName = (data.acf.first_name || '').toLowerCase().trim();
         const parentLastName = (data.acf.last_name || '').toLowerCase().trim();
 
-        if (existingFirstName === parentFirstName && existingLastName === parentLastName) {
-          logVerbose(`Parent ${email} already exists as person ${existingId} with matching name, will merge`);
+        // Compare full names (first + last concatenated) to handle different name formats
+        // Parent names from Sportlink may be "John Doe" + "" while member names are "John" + "Doe"
+        const existingFullName = [existingFirstName, existingLastName].filter(Boolean).join(' ');
+        const parentFullName = [parentFirstName, parentLastName].filter(Boolean).join(' ');
+
+        if (existingFullName === parentFullName) {
+          logVerbose(`Parent ${email} already exists as person ${existingId} with matching name "${existingFullName}", will merge`);
           stadion_id = existingId;
         } else {
-          logVerbose(`Person ${existingId} has email ${email} but different name (${existingFirstName} ${existingLastName} vs ${parentFirstName} ${parentLastName}), will create separate parent record`);
+          logVerbose(`Person ${existingId} has email ${email} but different name ("${existingFullName}" vs "${parentFullName}"), will create separate parent record`);
         }
       } catch (error) {
         logVerbose(`Could not fetch person ${existingId} for name verification: ${error.message}`);
