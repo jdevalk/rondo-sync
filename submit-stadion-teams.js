@@ -1,14 +1,13 @@
 require('varlock/auto-load');
 
 const { stadionRequest } = require('./lib/stadion-client');
-const { runPrepare } = require('./prepare-stadion-teams');
 const {
   openDb,
-  upsertTeams,
   getTeamsNeedingSync,
   updateTeamSyncState,
-  getOrphanTeams,
-  deleteTeam
+  getOrphanTeamsBySportlinkId,
+  deleteTeam,
+  getAllTeamsForSync
 } = require('./lib/stadion-db');
 
 /**
@@ -91,14 +90,20 @@ async function syncTeam(team, db, options) {
 
 /**
  * Main sync orchestration for teams
+ *
+ * NOTE: This function reads team data that was already populated by download-teams-from-sportlink.js.
+ * It does NOT call prepare-stadion-teams.js because the team download provides sportlink_id
+ * which is required for proper team rename handling.
+ *
  * @param {Object} options
  * @param {Object} [options.logger] - Logger instance
  * @param {boolean} [options.verbose=false] - Verbose mode
  * @param {boolean} [options.force=false] - Force sync all teams
+ * @param {Array<string>} [options.currentSportlinkIds] - Current Sportlink team IDs for orphan detection
  * @returns {Promise<Object>} - Sync result
  */
 async function runSync(options = {}) {
-  const { logger, verbose = false, force = false } = options;
+  const { logger, verbose = false, force = false, currentSportlinkIds = null } = options;
   const logVerbose = logger?.verbose.bind(logger) || (verbose ? console.log : () => {});
   const logError = logger?.error.bind(logger) || console.error;
 
@@ -116,28 +121,23 @@ async function runSync(options = {}) {
   try {
     const db = openDb();
     try {
-      // Step 1: Prepare teams from Sportlink
-      const prepared = await runPrepare({ logger, verbose });
-      if (!prepared.success) {
-        result.success = false;
-        result.error = prepared.error;
+      // Get all teams from database (populated by download-teams-from-sportlink.js)
+      const allTeams = getAllTeamsForSync(db);
+      result.total = allTeams.length;
+
+      if (allTeams.length === 0) {
+        logVerbose('No teams in database. Run team download first.');
         return result;
       }
 
-      const teams = prepared.teams;
-      result.total = teams.length;
+      logVerbose(`Found ${allTeams.length} teams in database`);
 
-      logVerbose(`Preparing to sync ${teams.length} teams to Stadion`);
-
-      // Step 2: Upsert to tracking database
-      upsertTeams(db, teams);
-
-      // Step 3: Get teams needing sync (hash changed or force)
+      // Get teams needing sync (hash changed or force)
       const needsSync = getTeamsNeedingSync(db, force);
 
       logVerbose(`${needsSync.length} teams need sync`);
 
-      // Step 4: Sync each team
+      // Sync each team
       for (let i = 0; i < needsSync.length; i++) {
         const team = needsSync[i];
         logVerbose(`Syncing ${i + 1}/${needsSync.length}: ${team.team_name}`);
@@ -159,8 +159,10 @@ async function runSync(options = {}) {
         }
       }
 
-      // Step 5: Delete orphan teams (in database but not in Sportlink)
-      const orphanTeams = getOrphanTeams(db, teams);
+      // Delete orphan teams (in database but not in current Sportlink data)
+      // Use sportlink_id for comparison to handle renames correctly
+      const sportlinkIds = currentSportlinkIds || allTeams.filter(t => t.sportlink_id).map(t => t.sportlink_id);
+      const orphanTeams = getOrphanTeamsBySportlinkId(db, sportlinkIds);
       if (orphanTeams.length > 0) {
         logVerbose(`Found ${orphanTeams.length} orphan teams to delete`);
 

@@ -157,12 +157,20 @@ async function runTeamsSync(options = {}) {
     // Step 2: Sync teams to Stadion
     logger.verbose('Syncing teams to Stadion...');
     try {
-      const teamResult = await runTeamSync({ logger, verbose, force });
+      // Get sportlink IDs for orphan detection (teams we just downloaded)
+      const { openDb, getAllTeamsForSync } = require('./lib/stadion-db');
+      const db = openDb();
+      const allTeams = getAllTeamsForSync(db);
+      const currentSportlinkIds = allTeams.filter(t => t.sportlink_id).map(t => t.sportlink_id);
+      db.close();
+
+      const teamResult = await runTeamSync({ logger, verbose, force, currentSportlinkIds });
       stats.teams.total = teamResult.total;
       stats.teams.synced = teamResult.synced;
       stats.teams.created = teamResult.created;
       stats.teams.updated = teamResult.updated;
       stats.teams.skipped = teamResult.skipped;
+      stats.teams.deleted = teamResult.deleted || 0;
       if (teamResult.errors?.length > 0) {
         stats.teams.errors = teamResult.errors.map(e => ({
           team_name: e.team_name,
