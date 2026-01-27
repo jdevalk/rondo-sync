@@ -461,7 +461,7 @@ async function runSync(options = {}) {
         const prepared = await runPrepare({ logger, verbose });
         if (!prepared.success) {
           result.success = false;
-          result.error = prepared.error;
+          result.errors.push({ message: prepared.error || 'Prepare failed' });
           return result;
         }
 
@@ -529,7 +529,7 @@ async function runSync(options = {}) {
 
   } catch (error) {
     result.success = false;
-    result.error = error.message;
+    result.errors.push({ message: error.message });
     logError(`Sync error: ${error.message}`);
     return result;
   }
