@@ -113,7 +113,8 @@ async function loginToNikki(page, logger) {
   await page.click('button[type="submit"]');
 
   logger.verbose('Waiting for login to complete...');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForURL((url) => !url.includes('login'), { timeout: 15000 }).catch(() => null);
 
   // Verify login success by checking for a logged-in element
   try {
