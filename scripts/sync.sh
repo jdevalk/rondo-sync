@@ -77,7 +77,9 @@ case "$SYNC_TYPE" in
         SYNC_SCRIPT="sync-people.js"
         ;;
     photos)
-        SYNC_SCRIPT="sync-photos.js"
+        # Photos now integrated into people sync (Phase 19)
+        echo "Note: Photo sync is now integrated into people sync" >&2
+        SYNC_SCRIPT="sync-people.js"
         ;;
     teams)
         SYNC_SCRIPT="sync-teams.js"
