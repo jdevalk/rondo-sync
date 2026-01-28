@@ -2,6 +2,7 @@ require('varlock/auto-load');
 
 const { createSyncLogger } = require('./lib/logger');
 const { runDownload } = require('./download-data-from-sportlink');
+const { runTeamDownload } = require('./download-teams-from-sportlink');
 const { runPrepare } = require('./prepare-laposta-members');
 const { runSubmit } = require('./submit-laposta-list');
 const { runSync: runStadionSync } = require('./submit-stadion-sync');
@@ -387,10 +388,37 @@ async function runSyncAll(options = {}) {
       });
     }
 
-    // Step 4b: Team Sync (NON-CRITICAL)
+    // Step 4b: Team Download + Sync (NON-CRITICAL)
+    logger.verbose('Downloading teams from Sportlink...');
+    let teamDownloadSportlinkIds = [];
+    try {
+      const teamDownloadResult = await runTeamDownload({ logger, verbose });
+      if (teamDownloadResult.success) {
+        logger.verbose(`Downloaded ${teamDownloadResult.teamCount} teams with ${teamDownloadResult.memberCount} members`);
+        // Store the sportlink IDs for orphan detection
+        const { getAllTeamsForSync } = require('./lib/stadion-db');
+        const db = openDb();
+        const allTeams = getAllTeamsForSync(db);
+        teamDownloadSportlinkIds = allTeams.filter(t => t.sportlink_id).map(t => t.sportlink_id);
+        db.close();
+      } else {
+        logger.error(`Team download failed: ${teamDownloadResult.error}`);
+        stats.teams.errors.push({
+          message: `Team download failed: ${teamDownloadResult.error}`,
+          system: 'team-download'
+        });
+      }
+    } catch (err) {
+      logger.error(`Team download failed: ${err.message}`);
+      stats.teams.errors.push({
+        message: `Team download failed: ${err.message}`,
+        system: 'team-download'
+      });
+    }
+
     logger.verbose('Syncing teams to Stadion...');
     try {
-      const teamResult = await runTeamSync({ logger, verbose, force });
+      const teamResult = await runTeamSync({ logger, verbose, force, currentSportlinkIds: teamDownloadSportlinkIds });
       stats.teams.total = teamResult.total;
       stats.teams.synced = teamResult.synced;
       stats.teams.created = teamResult.created;

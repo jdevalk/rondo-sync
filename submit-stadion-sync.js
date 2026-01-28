@@ -233,7 +233,9 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
       existingKnvbId = existing.body.acf?.['knvb-id'] || null;
     } catch (e) {
       // Person was deleted from WordPress - reset tracking state and create fresh
+      console.error(`[DEBUG] GET failed for parent ${email}, stadion_id=${stadion_id}, error="${e.message}", has404=${e.message && e.message.includes('404')}`);
       if (e.message && e.message.includes('404')) {
+        console.error(`[DEBUG] Resetting parent ${email} due to 404`);
         logVerbose(`Person ${stadion_id} no longer exists (404) - will create fresh`);
         updateParentSyncState(db, email, null, null); // Clear stadion_id and hash
         stadion_id = null; // Trigger create path below
