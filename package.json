@@ -52,6 +52,9 @@
     "show-laposta-member": "node show-laposta-member.js",
     "show-sportlink-member": "node show-sportlink-member.js",
     "show-laposta-changes": "node show-laposta-changes.js",
+    "verify-stadion": "node scripts/verify-stadion-data.js",
+    "verify-stadion-verbose": "node scripts/verify-stadion-data.js --verbose",
+    "verify-stadion-fix": "node scripts/verify-stadion-data.js --fix --verbose",
     "install-cron": "bash scripts/install-cron.sh"
   },
   "dependencies": {
