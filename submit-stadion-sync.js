@@ -41,41 +41,48 @@ async function syncPerson(member, db, options) {
       updateSyncState(db, knvb_id, source_hash, stadion_id);
       return { action: 'updated', id: stadion_id };
     } catch (error) {
-      console.error(`API Error updating person "${knvb_id}" (ID: ${stadion_id}):`);
-      console.error(`  Status: ${error.message}`);
-      if (error.details) {
-        console.error(`  Code: ${error.details.code || 'unknown'}`);
-        console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
-        if (error.details.data) {
-          console.error(`  Data: ${JSON.stringify(error.details.data)}`);
+      // Person was deleted from WordPress - reset tracking state and create fresh
+      if (error.message && error.message.includes('404')) {
+        logVerbose(`Person ${stadion_id} no longer exists (404) - will create fresh`);
+        updateSyncState(db, knvb_id, null, null); // Clear stadion_id and hash
+        // Fall through to create path below
+      } else {
+        console.error(`API Error updating person "${knvb_id}" (ID: ${stadion_id}):`);
+        console.error(`  Status: ${error.message}`);
+        if (error.details) {
+          console.error(`  Code: ${error.details.code || 'unknown'}`);
+          console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
+          if (error.details.data) {
+            console.error(`  Data: ${JSON.stringify(error.details.data)}`);
+          }
         }
+        console.error(`  Payload: ${JSON.stringify(data, null, 2)}`);
+        throw error;
       }
-      console.error(`  Payload: ${JSON.stringify(data, null, 2)}`);
-      throw error;
     }
-  } else {
-    // CREATE new person
-    const endpoint = 'wp/v2/people';
-    logVerbose(`Creating new person for KNVB ID: ${knvb_id}`);
-    logVerbose(`  POST ${endpoint}`);
-    try {
-      const response = await stadionRequest(endpoint, 'POST', data, options);
-      const newId = response.body.id;
-      updateSyncState(db, knvb_id, source_hash, newId);
-      return { action: 'created', id: newId };
-    } catch (error) {
-      console.error(`API Error creating person "${knvb_id}":`);
-      console.error(`  Status: ${error.message}`);
-      if (error.details) {
-        console.error(`  Code: ${error.details.code || 'unknown'}`);
-        console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
-        if (error.details.data) {
-          console.error(`  Data: ${JSON.stringify(error.details.data)}`);
-        }
+  }
+
+  // CREATE new person (either never synced or was deleted from WordPress)
+  const endpoint = 'wp/v2/people';
+  logVerbose(`Creating new person for KNVB ID: ${knvb_id}`);
+  logVerbose(`  POST ${endpoint}`);
+  try {
+    const response = await stadionRequest(endpoint, 'POST', data, options);
+    const newId = response.body.id;
+    updateSyncState(db, knvb_id, source_hash, newId);
+    return { action: 'created', id: newId };
+  } catch (error) {
+    console.error(`API Error creating person "${knvb_id}":`);
+    console.error(`  Status: ${error.message}`);
+    if (error.details) {
+      console.error(`  Code: ${error.details.code || 'unknown'}`);
+      console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
+      if (error.details.data) {
+        console.error(`  Data: ${JSON.stringify(error.details.data)}`);
       }
-      console.error(`  Payload: ${JSON.stringify(data, null, 2)}`);
-      throw error;
     }
+    console.error(`  Payload: ${JSON.stringify(data, null, 2)}`);
+    throw error;
   }
 }
 
@@ -225,52 +232,64 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
       existingLastName = existing.body.acf?.last_name || '';
       existingKnvbId = existing.body.acf?.['knvb-id'] || null;
     } catch (e) {
-      logVerbose(`Could not fetch existing person: ${e.message}`);
-    }
-
-    // Merge: keep all existing relationships, add new child relationships (avoid duplicates)
-    const existingChildIds = existingRelationships
-      .filter(r => Array.isArray(r.relationship_type) && r.relationship_type.includes(9))
-      .map(r => r.related_person);
-    const newChildRelationships = childRelationships.filter(r =>
-      !existingChildIds.includes(r.related_person)
-    );
-    const mergedRelationships = [...existingRelationships, ...newChildRelationships];
-
-    // Determine name to use:
-    // - If person has KNVB ID, they're a member - preserve their properly-split name
-    // - If no KNVB ID, they're a pure parent - update name from Sportlink
-    const isMember = !!existingKnvbId;
-    const firstName = isMember ? existingFirstName : (data.acf.first_name || existingFirstName);
-    const lastName = isMember ? existingLastName : (data.acf.last_name || existingLastName);
-
-    if (!isMember) {
-      logVerbose(`Pure parent - updating name from Sportlink: "${firstName} ${lastName}"`);
-    }
-
-    const updateData = {
-      acf: {
-        first_name: firstName,
-        last_name: lastName,
-        relationships: mergedRelationships,
-        _visibility: existingVisibility
+      // Person was deleted from WordPress - reset tracking state and create fresh
+      if (e.message && e.message.includes('404')) {
+        logVerbose(`Person ${stadion_id} no longer exists (404) - will create fresh`);
+        updateParentSyncState(db, email, null, null); // Clear stadion_id and hash
+        stadion_id = null; // Trigger create path below
+      } else {
+        logVerbose(`Could not fetch existing person: ${e.message}`);
       }
-    };
+    }
 
-    await stadionRequest(
-      `wp/v2/people/${stadion_id}`,
-      'PUT',
-      updateData,
-      options
-    );
-    updateParentSyncState(db, email, source_hash, stadion_id);
+    // Only proceed with update if person still exists (stadion_id not cleared by 404)
+    if (stadion_id) {
+      // Merge: keep all existing relationships, add new child relationships (avoid duplicates)
+      const existingChildIds = existingRelationships
+        .filter(r => Array.isArray(r.relationship_type) && r.relationship_type.includes(9))
+        .map(r => r.related_person);
+      const newChildRelationships = childRelationships.filter(r =>
+        !existingChildIds.includes(r.related_person)
+      );
+      const mergedRelationships = [...existingRelationships, ...newChildRelationships];
 
-    // Update children's parent relationship (bidirectional)
-    await updateChildrenParentLinks(stadion_id, childStadionIds, options);
+      // Determine name to use:
+      // - If person has KNVB ID, they're a member - preserve their properly-split name
+      // - If no KNVB ID, they're a pure parent - update name from Sportlink
+      const isMember = !!existingKnvbId;
+      const firstName = isMember ? existingFirstName : (data.acf.first_name || existingFirstName);
+      const lastName = isMember ? existingLastName : (data.acf.last_name || existingLastName);
 
-    return { action: 'updated', id: stadion_id };
-  } else {
-    // CREATE new parent
+      if (!isMember) {
+        logVerbose(`Pure parent - updating name from Sportlink: "${firstName} ${lastName}"`);
+      }
+
+      const updateData = {
+        acf: {
+          first_name: firstName,
+          last_name: lastName,
+          relationships: mergedRelationships,
+          _visibility: existingVisibility
+        }
+      };
+
+      await stadionRequest(
+        `wp/v2/people/${stadion_id}`,
+        'PUT',
+        updateData,
+        options
+      );
+      updateParentSyncState(db, email, source_hash, stadion_id);
+
+      // Update children's parent relationship (bidirectional)
+      await updateChildrenParentLinks(stadion_id, childStadionIds, options);
+
+      return { action: 'updated', id: stadion_id };
+    }
+  }
+
+  if (!stadion_id) {
+    // CREATE new parent (either never synced or was deleted from WordPress)
     logVerbose(`Creating new parent: ${email}`);
     const createData = {
       ...data,
