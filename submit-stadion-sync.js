@@ -275,12 +275,14 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
         }
       };
 
+      console.error(`[DEBUG] About to PUT parent ${email} to stadion_id=${stadion_id}`);
       await stadionRequest(
         `wp/v2/people/${stadion_id}`,
         'PUT',
         updateData,
         options
       );
+      console.error(`[DEBUG] PUT succeeded for parent ${email}`);
       updateParentSyncState(db, email, source_hash, stadion_id);
 
       // Update children's parent relationship (bidirectional)
