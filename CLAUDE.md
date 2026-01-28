@@ -8,13 +8,15 @@ CLI tool that synchronizes member data from Sportlink Club to Laposta email mark
 # Sync commands (via unified wrapper)
 scripts/sync.sh people    # Hourly: members, parents, birthdays
 scripts/sync.sh photos    # Daily: photo download + upload
+scripts/sync.sh nikki     # Daily: Nikki contributions to Stadion
 scripts/sync.sh teams     # Weekly: team sync + work history
 scripts/sync.sh functions # Weekly: commissies + work history
-scripts/sync.sh all       # Full sync (all pipelines)
+scripts/sync.sh all       # Full sync (all pipelines + FreeScout)
 
 # Alternative: npm scripts
 npm run sync-people       # Same as scripts/sync.sh people
 npm run sync-photos       # Same as scripts/sync.sh photos
+npm run sync-nikki        # Same as scripts/sync.sh nikki
 npm run sync-teams        # Same as scripts/sync.sh teams
 npm run sync-functions    # Same as scripts/sync.sh functions
 npm run sync-all          # Full sync (all pipelines)
@@ -27,7 +29,7 @@ npm run install-cron      # Set up automated sync schedules with email reports
 
 ### Sync Architecture
 
-The sync is split into four independent pipelines, each with its own schedule:
+The sync is split into five independent pipelines, each with its own schedule:
 
 **1. People Pipeline (hourly via sync-people.js):**
 - download-data-from-sportlink.js - Browser automation downloads member data
@@ -40,18 +42,23 @@ The sync is split into four independent pipelines, each with its own schedule:
 - download-photos-from-sportlink.js - Browser automation downloads member photos
 - upload-photos-to-stadion.js - Uploads photos to Stadion via REST API
 
-**3. Team Pipeline (weekly via sync-teams.js):**
+**3. Nikki Pipeline (daily via sync-nikki.js):**
+- download-nikki-contributions.js - Downloads contribution data from Nikki
+- sync-nikki-to-stadion.js - Updates Stadion person ACF fields with contribution status
+- Produces email-ready HTML summary
+
+**4. Team Pipeline (weekly via sync-teams.js):**
 - download-teams-from-sportlink.js - Extracts team data from Sportlink
 - submit-stadion-teams.js - Creates/updates teams in Stadion
 - submit-stadion-work-history.js - Links persons to teams via work_history
 
-**4. Functions Pipeline (weekly via sync-functions.js):**
+**5. Functions Pipeline (weekly via sync-functions.js):**
 - download-functions-from-sportlink.js - Extracts commissie/function data
 - submit-stadion-commissies.js - Creates/updates commissies in Stadion
 - submit-stadion-commissie-work-history.js - Links persons to commissies
 
 **Full Sync (sync-all.js):**
-Runs all four pipelines sequentially. Used for manual full syncs or initial setup.
+Runs all five pipelines sequentially plus FreeScout customer sync. Used for manual full syncs or initial setup.
 
 ### Supporting Files
 
@@ -64,7 +71,7 @@ Runs all four pipelines sequentially. Used for manual full syncs or initial setu
 
 ### Data Flow
 
-Four parallel pipelines:
+Five parallel pipelines:
 
 ```
 People (hourly):
@@ -77,6 +84,9 @@ Sportlink Club → SQLite → Laposta API (hash-based diff)
 Photos (daily):
 Sportlink Club → downloads/ → Stadion WordPress API (media upload)
 
+Nikki (daily):
+Nikki API → nikki-sync.sqlite → Stadion WordPress API (ACF fields)
+
 Teams (weekly):
 Sportlink members → team extraction → Stadion Teams API
                                    ↓
@@ -86,6 +96,9 @@ Functions (weekly):
 Sportlink members → function extraction → Stadion Commissies API
                                        ↓
                            Stadion work_history field
+
+FreeScout (with full sync):
+Stadion members → freescout-sync.sqlite → FreeScout API (customers)
 ```
 
 ## Environment Variables
@@ -115,6 +128,14 @@ STADION_PERSON_TYPE=      # Custom post type (default: person)
 OPERATOR_EMAIL=           # Receives sync reports
 POSTMARK_API_KEY=         # Postmark server API token
 POSTMARK_FROM_EMAIL=      # Verified sender address
+
+# FreeScout (optional)
+FREESCOUT_API_KEY=        # FreeScout API key
+FREESCOUT_URL=            # FreeScout instance URL
+
+# Nikki (optional)
+NIKKI_API_KEY=            # Nikki API key
+NIKKI_URL=                # Nikki API URL
 ```
 
 ## Remote server
@@ -150,7 +171,7 @@ If duplicates occur, use `scripts/delete-duplicates.js` to clean up (keeps oldes
 
 ## Database
 
-Two SQLite databases track sync state (on the server only):
+Four SQLite databases track sync state (on the server only):
 
 **`laposta-sync.sqlite`** - Laposta sync tracking:
 - Member hashes for change detection
@@ -163,22 +184,47 @@ Two SQLite databases track sync state (on the server only):
 - `stadion_teams`, `stadion_commissies` - Team/committee mappings
 - `stadion_work_history` - Team membership history
 
+**`freescout-sync.sqlite`** - FreeScout customer sync tracking:
+- Maps `knvb_id` → `freescout_id` (FreeScout customer ID)
+- Tracks sync state and last update times
+- Supports hash-based change detection
+
+**`nikki-sync.sqlite`** - Nikki contribution sync tracking:
+- Contribution data from Nikki
+- Sync state for Stadion ACF field updates
+- Last sync timestamps
+
 The `stadion_id` mapping is critical: without it, sync creates new entries instead of updating existing ones.
 
 ## Cron Automation
 
-After `npm run install-cron`, four sync schedules are configured:
+After `npm run install-cron`, five sync schedules are configured:
 
 - **People sync:** Hourly (members, parents, birthdays)
 - **Photo sync:** Daily at 6:00 AM Amsterdam time
+- **Nikki sync:** Daily at 7:00 AM Amsterdam time (after photos)
 - **Team sync:** Weekly on Sunday at 6:00 AM
-- **Functions sync:** Weekly on Sunday at 7:00 AM
+- **Functions sync:** Weekly on Sunday at 7:00 AM (after teams)
 
 Each sync:
 - Runs via scripts/sync.sh wrapper
 - Sends email report via Postmark after completion
 - Uses flock to prevent overlapping executions (per sync type)
 - Logs to logs/cron/sync-{type}-{timestamp}.log
+
+## Documentation Maintenance
+
+**After making any functional change, update documentation:**
+- README.md - User-facing docs (features, usage, setup)
+- CLAUDE.md - AI assistant instructions (architecture, patterns, gotchas)
+
+Both files should stay in sync. Changes to add:
+- New sync pipelines or scripts
+- New environment variables
+- New database tables or files
+- New API integrations
+- Cron schedule changes
+- Important gotchas discovered
 
 ## Code Patterns
 
