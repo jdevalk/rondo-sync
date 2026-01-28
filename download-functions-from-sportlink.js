@@ -134,27 +134,47 @@ function parseFunctionsResponse(data, knvbId) {
 async function fetchMemberFunctions(page, knvbId, logger) {
   const functionsUrl = `https://club.sportlink.com/member/member-details/${knvbId}/functions`;
 
-  // Set up promises to wait for both responses
+  // Log all navajo requests to understand the API pattern
+  const seenUrls = [];
+  const requestHandler = req => {
+    if (req.url().includes('/navajo/')) {
+      seenUrls.push(`${req.method()} ${req.url()}`);
+    }
+  };
+  page.on('request', requestHandler);
+
+  // Set up promises to wait for both responses (no method filter - could be GET or POST)
   const functionsPromise = page.waitForResponse(
-    resp => resp.url().includes('/function/MemberFunctions') &&
-            resp.request().method() === 'GET',
+    resp => resp.url().includes('MemberFunctions'),
     { timeout: 15000 }
   ).catch(() => null);
 
   const committeesPromise = page.waitForResponse(
-    resp => resp.url().includes('/function/MemberCommittees') &&
-            resp.request().method() === 'GET',
+    resp => resp.url().includes('MemberCommittees'),
     { timeout: 15000 }
   ).catch(() => null);
 
   logger.verbose(`  Navigating to ${functionsUrl}...`);
-  await page.goto(functionsUrl, { waitUntil: 'commit' });
+  await page.goto(functionsUrl, { waitUntil: 'networkidle' });
 
   // Wait for both responses (or timeout)
   const [functionsResponse, committeesResponse] = await Promise.all([
     functionsPromise,
     committeesPromise
   ]);
+
+  // Clean up event listener
+  page.removeListener('request', requestHandler);
+
+  // Log what navajo requests we saw
+  if (seenUrls.length > 0) {
+    logger.verbose(`    Navajo requests seen: ${seenUrls.length}`);
+    for (const url of seenUrls) {
+      logger.verbose(`      ${url}`);
+    }
+  } else {
+    logger.verbose(`    No navajo requests seen`);
+  }
 
   // Parse the responses
   let functionsData = null;
@@ -167,6 +187,8 @@ async function fetchMemberFunctions(page, knvbId, logger) {
     } catch (err) {
       logger.verbose(`    Error parsing MemberFunctions: ${err.message}`);
     }
+  } else if (functionsResponse) {
+    logger.verbose(`    MemberFunctions response not ok: ${functionsResponse.status()}`);
   }
 
   if (committeesResponse && committeesResponse.ok()) {
@@ -176,6 +198,8 @@ async function fetchMemberFunctions(page, knvbId, logger) {
     } catch (err) {
       logger.verbose(`    Error parsing MemberCommittees: ${err.message}`);
     }
+  } else if (committeesResponse) {
+    logger.verbose(`    MemberCommittees response not ok: ${committeesResponse.status()}`);
   }
 
   // Combine the responses
