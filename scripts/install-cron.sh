@@ -8,10 +8,11 @@ PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 echo "Sportlink Sync - Cron Installation"
 echo "==================================="
 echo ""
-echo "This will set up three sync schedules:"
-echo "  - People sync: hourly (members, parents, birthdays)"
-echo "  - Photo sync:  daily at 6:00 AM"
-echo "  - Team sync:   weekly on Sunday at 6:00 AM"
+echo "This will set up four sync schedules:"
+echo "  - People sync:    hourly (members, parents, birthdays)"
+echo "  - Photo sync:     daily at 6:00 AM"
+echo "  - Team sync:      weekly on Sunday at 6:00 AM"
+echo "  - Functions sync: weekly on Sunday at 7:00 AM"
 echo ""
 
 # Check if .env exists and has Postmark config
@@ -110,6 +111,9 @@ CRON_TZ=Europe/Amsterdam
 
 # Team sync: weekly on Sunday at 6:00 AM
 0 6 * * 0 $PROJECT_DIR/scripts/sync.sh teams
+
+# Functions sync: weekly on Sunday at 7:00 AM (after teams)
+0 7 * * 0 $PROJECT_DIR/scripts/sync.sh functions
 "
 
 # Install crontab (remove old entries first)
@@ -118,9 +122,10 @@ CRON_TZ=Europe/Amsterdam
 echo "Cron jobs installed successfully!"
 echo ""
 echo "Scheduled jobs:"
-echo "  - People sync: every hour (members, parents, birthdays)"
-echo "  - Photo sync:  daily at 6:00 AM"
-echo "  - Team sync:   weekly on Sunday at 6:00 AM"
+echo "  - People sync:    every hour (members, parents, birthdays)"
+echo "  - Photo sync:     daily at 6:00 AM"
+echo "  - Team sync:      weekly on Sunday at 6:00 AM"
+echo "  - Functions sync: weekly on Sunday at 7:00 AM"
 echo ""
 echo "All times are Amsterdam timezone (Europe/Amsterdam)"
 echo ""
@@ -131,6 +136,6 @@ fi
 echo "Helpful commands:"
 echo "  View installed cron jobs:   crontab -l"
 echo "  View logs:                  ls -la $PROJECT_DIR/logs/cron/"
-echo "  Manual sync:                $PROJECT_DIR/scripts/sync.sh {people|photos|teams|all}"
+echo "  Manual sync:                $PROJECT_DIR/scripts/sync.sh {people|photos|teams|functions|all}"
 echo "  Remove all cron jobs:       crontab -r"
 echo ""
