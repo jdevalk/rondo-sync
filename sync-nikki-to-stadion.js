@@ -106,28 +106,42 @@ async function runNikkiStadionSync(options = {}) {
       const html = generateContributionHtml(contributions);
       const contentHash = computeContentHash(html);
 
-      // Check if we need to update (fetch current value from Stadion)
-      if (!force) {
-        try {
-          const response = await stadionRequest(
-            `wp/v2/people/${stadionId}?_fields=acf`,
-            'GET',
-            null,
-            { verbose: false }
-          );
+      // Fetch existing data from Stadion (needed for change detection AND name fields)
+      let existingFirstName = '';
+      let existingLastName = '';
+      let skipUpdate = false;
 
+      try {
+        const response = await stadionRequest(
+          `wp/v2/people/${stadionId}?_fields=acf`,
+          'GET',
+          null,
+          { verbose: false }
+        );
+
+        existingFirstName = response.body?.acf?.first_name || '';
+        existingLastName = response.body?.acf?.last_name || '';
+
+        // Check if we need to update (only if not forcing)
+        if (!force) {
           const currentValue = response.body?.acf?.['nikki-contributie-status'] || '';
           const currentHash = computeContentHash(currentValue);
 
           if (currentHash === contentHash) {
             logger.verbose(`[${processed}/${contributionsByMember.size}] ${knvbId}: No changes, skipping`);
             result.skipped++;
-            continue;
+            skipUpdate = true;
           }
-        } catch (error) {
-          // If fetch fails, proceed with update
-          logger.verbose(`[${processed}/${contributionsByMember.size}] ${knvbId}: Could not fetch current value, will update`);
         }
+      } catch (error) {
+        // If fetch fails, we can't update safely (need first_name for API)
+        logger.error(`[${processed}/${contributionsByMember.size}] ${knvbId}: Could not fetch current data: ${error.message}`);
+        result.errors++;
+        continue;
+      }
+
+      if (skipUpdate) {
+        continue;
       }
 
       if (dryRun) {
@@ -146,6 +160,8 @@ async function runNikkiStadionSync(options = {}) {
           'PUT',
           {
             acf: {
+              first_name: existingFirstName,
+              last_name: existingLastName,
               'nikki-contributie-status': html
             }
           },
