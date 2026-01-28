@@ -8,10 +8,9 @@ PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 echo "Sportlink Sync - Cron Installation"
 echo "==================================="
 echo ""
-echo "This will set up five sync schedules:"
-echo "  - People sync:    hourly (members, parents, birthdays)"
-echo "  - Photo sync:     daily at 6:00 AM"
-echo "  - Nikki sync:     daily at 7:00 AM (after photos)"
+echo "This will set up four sync schedules:"
+echo "  - People sync:    hourly (members, parents, birthdays, photos)"
+echo "  - Nikki sync:     daily at 7:00 AM"
 echo "  - Team sync:      weekly on Sunday at 6:00 AM"
 echo "  - Functions sync: weekly on Sunday at 7:00 AM"
 echo ""
@@ -104,13 +103,10 @@ CRON_ENTRIES="
 # Sportlink Sync automation (installed $(date +%Y-%m-%d))
 CRON_TZ=Europe/Amsterdam
 
-# People sync: hourly (download, laposta, stadion members, birthdays)
+# People sync: hourly (download, laposta, stadion members, birthdays, photos)
 0 * * * * $PROJECT_DIR/scripts/sync.sh people
 
-# Photo sync: daily at 6:00 AM
-0 6 * * * $PROJECT_DIR/scripts/sync.sh photos
-
-# Nikki sync: daily at 7:00 AM (after photos)
+# Nikki sync: daily at 7:00 AM
 0 7 * * * $PROJECT_DIR/scripts/sync.sh nikki
 
 # Team sync: weekly on Sunday at 6:00 AM
@@ -126,8 +122,7 @@ CRON_TZ=Europe/Amsterdam
 echo "Cron jobs installed successfully!"
 echo ""
 echo "Scheduled jobs:"
-echo "  - People sync:    every hour (members, parents, birthdays)"
-echo "  - Photo sync:     daily at 6:00 AM"
+echo "  - People sync:    every hour (members, parents, birthdays, photos)"
 echo "  - Nikki sync:     daily at 7:00 AM (nikki contributions)"
 echo "  - Team sync:      weekly on Sunday at 6:00 AM"
 echo "  - Functions sync: weekly on Sunday at 7:00 AM"
@@ -141,6 +136,6 @@ fi
 echo "Helpful commands:"
 echo "  View installed cron jobs:   crontab -l"
 echo "  View logs:                  ls -la $PROJECT_DIR/logs/cron/"
-echo "  Manual sync:                $PROJECT_DIR/scripts/sync.sh {people|photos|teams|functions|nikki|all}"
+echo "  Manual sync:                $PROJECT_DIR/scripts/sync.sh {people|teams|functions|nikki|all}"
 echo "  Remove all cron jobs:       crontab -r"
 echo ""
