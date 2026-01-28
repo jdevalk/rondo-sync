@@ -134,15 +134,6 @@ function parseFunctionsResponse(data, knvbId) {
 async function fetchMemberFunctions(page, knvbId, logger) {
   const functionsUrl = `https://club.sportlink.com/member/member-details/${knvbId}/functions`;
 
-  // Log all navajo requests to understand the API pattern
-  const seenUrls = [];
-  const requestHandler = req => {
-    if (req.url().includes('/navajo/')) {
-      seenUrls.push(`${req.method()} ${req.url()}`);
-    }
-  };
-  page.on('request', requestHandler);
-
   // Set up promises to wait for both responses
   // Use precise URL matching to avoid capturing UnionMemberFunctions instead of MemberFunctions
   const functionsPromise = page.waitForResponse(
@@ -164,19 +155,6 @@ async function fetchMemberFunctions(page, knvbId, logger) {
     committeesPromise
   ]);
 
-  // Clean up event listener
-  page.removeListener('request', requestHandler);
-
-  // Log what navajo requests we saw
-  if (seenUrls.length > 0) {
-    logger.verbose(`    Navajo requests seen: ${seenUrls.length}`);
-    for (const url of seenUrls) {
-      logger.verbose(`      ${url}`);
-    }
-  } else {
-    logger.verbose(`    No navajo requests seen`);
-  }
-
   // Parse the responses
   let functionsData = null;
   let committeesData = null;
@@ -184,23 +162,17 @@ async function fetchMemberFunctions(page, knvbId, logger) {
   if (functionsResponse && functionsResponse.ok()) {
     try {
       functionsData = await functionsResponse.json();
-      logger.verbose(`    Captured MemberFunctions response`);
     } catch (err) {
-      logger.verbose(`    Error parsing MemberFunctions: ${err.message}`);
+      logger.verbose(`  Error parsing MemberFunctions: ${err.message}`);
     }
-  } else if (functionsResponse) {
-    logger.verbose(`    MemberFunctions response not ok: ${functionsResponse.status()}`);
   }
 
   if (committeesResponse && committeesResponse.ok()) {
     try {
       committeesData = await committeesResponse.json();
-      logger.verbose(`    Captured MemberCommittees response`);
     } catch (err) {
-      logger.verbose(`    Error parsing MemberCommittees: ${err.message}`);
+      logger.verbose(`  Error parsing MemberCommittees: ${err.message}`);
     }
-  } else if (committeesResponse) {
-    logger.verbose(`    MemberCommittees response not ok: ${committeesResponse.status()}`);
   }
 
   // Combine the responses
@@ -282,15 +254,6 @@ async function runFunctionsDownload(options = {}) {
           const data = await fetchMemberFunctions(page, member.knvb_id, logger);
 
           if (data) {
-            // Debug: log the raw data structure
-            const funcData = data?.MemberFunctions;
-            const commData = data?.MemberCommittees;
-            logger.verbose(`    MemberFunctions keys: ${funcData ? Object.keys(funcData).join(', ') : 'null'}`);
-            logger.verbose(`    MemberCommittees keys: ${commData ? Object.keys(commData).join(', ') : 'null'}`);
-            if (funcData?.Function) {
-              logger.verbose(`    Function array length: ${funcData.Function.length}`);
-            }
-
             const parsed = parseFunctionsResponse(data, member.knvb_id);
 
             if (parsed.functions.length > 0 || parsed.committees.length > 0) {
