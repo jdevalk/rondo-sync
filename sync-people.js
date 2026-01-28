@@ -7,6 +7,8 @@ const { runPrepare } = require('./prepare-laposta-members');
 const { runSubmit } = require('./submit-laposta-list');
 const { runSync: runStadionSync } = require('./submit-stadion-sync');
 const { runSync: runBirthdaySync } = require('./sync-important-dates');
+const { runPhotoDownload } = require('./download-photos-from-api');
+const { runPhotoSync } = require('./upload-photos-to-stadion');
 
 /**
  * Format duration in human-readable format
@@ -62,10 +64,23 @@ function printSummary(logger, stats) {
   logger.log(`Birthdays synced: ${birthdaySyncText}`);
   logger.log('');
 
+  logger.log('PHOTO SYNC');
+  logger.log(minorDivider);
+  if (stats.photos.downloaded > 0 || stats.photos.uploaded > 0 || stats.photos.deleted > 0) {
+    logger.log(`Downloaded: ${stats.photos.downloaded}, Uploaded: ${stats.photos.uploaded}, Deleted: ${stats.photos.deleted}`);
+    if (stats.photos.skipped > 0) {
+      logger.log(`Skipped: ${stats.photos.skipped} (no local file)`);
+    }
+  } else {
+    logger.log('No photo changes');
+  }
+  logger.log('');
+
   const allErrors = [
     ...stats.errors,
     ...stats.stadion.errors,
-    ...stats.birthdays.errors
+    ...stats.birthdays.errors,
+    ...stats.photos.errors
   ];
   if (allErrors.length > 0) {
     logger.log(`ERRORS (${allErrors.length})`);
@@ -118,6 +133,13 @@ async function runPeopleSync(options = {}) {
       synced: 0,
       created: 0,
       updated: 0,
+      skipped: 0,
+      errors: []
+    },
+    photos: {
+      downloaded: 0,
+      uploaded: 0,
+      deleted: 0,
       skipped: 0,
       errors: []
     }
@@ -251,6 +273,58 @@ async function runPeopleSync(options = {}) {
       });
     }
 
+    // Step 6: Photo Download (API-based)
+    logger.verbose('Downloading photos from Sportlink API...');
+    try {
+      const photoDownloadResult = await runPhotoDownload({ logger, verbose, force });
+
+      stats.photos.downloaded = photoDownloadResult.downloaded;
+      if (photoDownloadResult.errors?.length > 0) {
+        stats.photos.errors.push(...photoDownloadResult.errors.map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'photo-download'
+        })));
+      }
+    } catch (err) {
+      logger.error(`Photo download failed: ${err.message}`);
+      stats.photos.errors.push({
+        message: `Photo download failed: ${err.message}`,
+        system: 'photo-download'
+      });
+    }
+
+    // Step 7: Photo Upload/Delete
+    logger.verbose('Syncing photos to Stadion...');
+    try {
+      const photoSyncResult = await runPhotoSync({ logger, verbose });
+
+      stats.photos.uploaded = photoSyncResult.upload.synced;
+      stats.photos.deleted = photoSyncResult.delete.deleted;
+      stats.photos.skipped = photoSyncResult.upload.skipped;
+
+      if (photoSyncResult.upload.errors?.length > 0) {
+        stats.photos.errors.push(...photoSyncResult.upload.errors.map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'photo-upload'
+        })));
+      }
+      if (photoSyncResult.delete.errors?.length > 0) {
+        stats.photos.errors.push(...photoSyncResult.delete.errors.map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'photo-delete'
+        })));
+      }
+    } catch (err) {
+      logger.error(`Photo sync failed: ${err.message}`);
+      stats.photos.errors.push({
+        message: `Photo sync failed: ${err.message}`,
+        system: 'photo-sync'
+      });
+    }
+
     // Complete
     stats.completedAt = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
     stats.duration = formatDuration(Date.now() - startTime);
@@ -262,7 +336,8 @@ async function runPeopleSync(options = {}) {
     return {
       success: stats.errors.length === 0 &&
                stats.stadion.errors.length === 0 &&
-               stats.birthdays.errors.length === 0,
+               stats.birthdays.errors.length === 0 &&
+               stats.photos.errors.length === 0,
       stats
     };
   } catch (err) {
