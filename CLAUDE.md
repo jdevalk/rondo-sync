@@ -5,40 +5,87 @@ CLI tool that synchronizes member data from Sportlink Club to Laposta email mark
 ## Quick Reference
 
 ```bash
-npm run sync-all          # Full sync pipeline (Sportlink → Laposta + Stadion)
-npm run sync-all-verbose  # Same with detailed logging
-npm run install-cron      # Set up automated daily sync with email reports
+# Sync commands (via unified wrapper)
+scripts/sync.sh people    # Hourly: members, parents, birthdays
+scripts/sync.sh photos    # Daily: photo download + upload
+scripts/sync.sh teams     # Weekly: team sync + work history
+scripts/sync.sh functions # Weekly: commissies + work history
+scripts/sync.sh all       # Full sync (all pipelines)
+
+# Alternative: npm scripts
+npm run sync-people       # Same as scripts/sync.sh people
+npm run sync-photos       # Same as scripts/sync.sh photos
+npm run sync-teams        # Same as scripts/sync.sh teams
+npm run sync-functions    # Same as scripts/sync.sh functions
+npm run sync-all          # Full sync (all pipelines)
+
+# Setup
+npm run install-cron      # Set up automated sync schedules with email reports
 ```
 
 ## Architecture
 
-### Sync Pipeline
+### Sync Architecture
 
-1. **download-data-from-sportlink.js** - Browser automation downloads member values to SQLite
-2. **prepare-laposta-members.js** - Transforms Sportlink fields for Laposta
-3. **submit-laposta-list.js** - Syncs to Laposta via API (hash-based change detection, reads from SQLite)
-4. **submit-stadion-sync.js** - Syncs to Stadion WordPress (reads from SQLite)
-5. **sync-all.js** - Orchestrates full pipeline, produces email-ready summary
+The sync is split into four independent pipelines, each with its own schedule:
+
+**1. People Pipeline (hourly via sync-people.js):**
+- download-data-from-sportlink.js - Browser automation downloads member data
+- prepare-laposta-members.js - Transforms Sportlink fields for Laposta
+- submit-laposta-list.js - Syncs to Laposta via API (hash-based change detection)
+- submit-stadion-sync.js - Syncs members to Stadion WordPress
+- sync-important-dates.js - Syncs birthdays to Stadion calendar
+
+**2. Photo Pipeline (daily via sync-photos.js):**
+- download-photos-from-sportlink.js - Browser automation downloads member photos
+- upload-photos-to-stadion.js - Uploads photos to Stadion via REST API
+
+**3. Team Pipeline (weekly via sync-teams.js):**
+- download-teams-from-sportlink.js - Extracts team data from Sportlink
+- submit-stadion-teams.js - Creates/updates teams in Stadion
+- submit-stadion-work-history.js - Links persons to teams via work_history
+
+**4. Functions Pipeline (weekly via sync-functions.js):**
+- download-functions-from-sportlink.js - Extracts commissie/function data
+- submit-stadion-commissies.js - Creates/updates commissies in Stadion
+- submit-stadion-commissie-work-history.js - Links persons to commissies
+
+**Full Sync (sync-all.js):**
+Runs all four pipelines sequentially. Used for manual full syncs or initial setup.
 
 ### Supporting Files
 
 - `lib/logger.js` - Dual-stream logger (stdout + date-based files in `logs/`)
 - `laposta-db.js` - SQLite operations for state tracking and change detection
 - `field-mapping.json` - Configurable Sportlink → Laposta field transformations
-- `scripts/cron-wrapper.sh` - Cron execution with flock locking and email delivery
+- `scripts/sync.sh` - Unified sync wrapper with flock locking and email delivery
 - `scripts/install-cron.sh` - Interactive cron setup with credential prompts
 - `scripts/send-email.js` - Postmark email delivery for sync reports
 
 ### Data Flow
 
+Four parallel pipelines:
+
 ```
-Sportlink Club (browser) → JSON download → SQLite (state) → Laposta API
-                                      ↓
-                              Hash-based diff
-                                      ↓
-                           Only changed members sync
-                                      ↓
-                              Stadion WordPress API
+People (hourly):
+Sportlink Club → SQLite → Laposta API (hash-based diff)
+                       ↓
+              Stadion WordPress API (members)
+                       ↓
+              Stadion Calendar API (birthdays)
+
+Photos (daily):
+Sportlink Club → downloads/ → Stadion WordPress API (media upload)
+
+Teams (weekly):
+Sportlink members → team extraction → Stadion Teams API
+                                   ↓
+                        Stadion work_history field
+
+Functions (weekly):
+Sportlink members → function extraction → Stadion Commissies API
+                                       ↓
+                           Stadion work_history field
 ```
 
 ## Environment Variables
@@ -87,7 +134,7 @@ You can login with the user's key. Get new code to the server by committing to G
 3. Local sync creates NEW WordPress entries instead of updating existing ones
 4. Result: hundreds of duplicate members in Stadion
 
-The sync scripts (`sync-all.js`, `sync-people.js`) enforce this with a server check that blocks local execution. If you see:
+The sync scripts (`sync-all.js`, `sync-people.js`, etc.) enforce this with a server check that blocks local execution. If you see:
 ```
 ERROR: Cannot run sync from local machine
 ```
@@ -96,7 +143,7 @@ This is intentional. Always sync from the server:
 ```bash
 ssh root@46.202.155.16
 cd /home/sportlink
-npm run sync-all
+scripts/sync.sh people    # or photos, teams, functions, all
 ```
 
 If duplicates occur, use `scripts/delete-duplicates.js` to clean up (keeps oldest entry per KNVB ID).
@@ -120,11 +167,18 @@ The `stadion_id` mapping is critical: without it, sync creates new entries inste
 
 ## Cron Automation
 
-After `npm run install-cron`:
-- Daily sync at 6:00 AM Amsterdam time
-- Retry at 8:00 AM if primary fails
-- Email report via Postmark after each run
-- flock prevents overlapping executions
+After `npm run install-cron`, four sync schedules are configured:
+
+- **People sync:** Hourly (members, parents, birthdays)
+- **Photo sync:** Daily at 6:00 AM Amsterdam time
+- **Team sync:** Weekly on Sunday at 6:00 AM
+- **Functions sync:** Weekly on Sunday at 7:00 AM
+
+Each sync:
+- Runs via scripts/sync.sh wrapper
+- Sends email report via Postmark after completion
+- Uses flock to prevent overlapping executions (per sync type)
+- Logs to logs/cron/sync-{type}-{timestamp}.log
 
 ## Code Patterns
 
@@ -163,10 +217,18 @@ logger.error('Error messages');
 npm install              # Install dependencies (includes Playwright)
 npx playwright install chromium  # Browser for Sportlink automation
 
-# Debug individual steps
+# Run individual pipelines
+scripts/sync.sh people    # People sync (hourly)
+scripts/sync.sh photos    # Photo sync (daily)
+scripts/sync.sh teams     # Team sync (weekly)
+scripts/sync.sh functions # Functions sync (weekly)
+scripts/sync.sh all       # Full sync (all pipelines)
+
+# Debug individual steps within people pipeline
 npm run download         # Just download from Sportlink
 npm run prepare-laposta  # Just prepare members
 npm run sync-laposta     # Just submit to Laposta
+npm run sync-stadion     # Just submit to Stadion
 
 # Inspect data
 npm run show-laposta-changes    # Pending changes
