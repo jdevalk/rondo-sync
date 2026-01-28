@@ -1,6 +1,7 @@
 require('varlock/auto-load');
 
 const { openDb, getLatestSportlinkResults } = require('./laposta-db');
+const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId } = require('./lib/stadion-db');
 
 /**
  * Map Sportlink gender codes to Stadion format
@@ -91,9 +92,10 @@ function buildAddresses(member) {
 /**
  * Transform a Sportlink member to Stadion person format
  * @param {Object} sportlinkMember - Raw Sportlink member record
+ * @param {Object} [freeFields] - Optional free fields from Sportlink /other tab
  * @returns {{knvb_id: string, email: string|null, data: Object}}
  */
-function preparePerson(sportlinkMember) {
+function preparePerson(sportlinkMember, freeFields = null) {
   const name = buildName(sportlinkMember);
   const gender = mapGender(sportlinkMember.GenderCode);
   const birthYear = extractBirthYear(sportlinkMember.DateOfBirth);
@@ -123,6 +125,17 @@ function preparePerson(sportlinkMember) {
   if (ageClass) acf['leeftijdsgroep'] = ageClass;
   if (personImageDate) acf['datum-foto'] = personImageDate;
   if (memberType) acf['type-lid'] = memberType;
+
+  // Free fields from Sportlink /other tab (FreeScout ID, VOG datum, financial block)
+  if (freeFields) {
+    if (freeFields.freescout_id) acf['freescout-id'] = freeFields.freescout_id;
+    if (freeFields.vog_datum) acf['datum-vog'] = freeFields.vog_datum;
+    // Financial block status (convert SQLite INTEGER 0/1 to boolean)
+    // Explicitly check for 1 to treat null/undefined/0 as "not blocked"
+    if (freeFields.has_financial_block !== undefined) {
+      acf['financiele-blokkade'] = (freeFields.has_financial_block === 1);
+    }
+  }
 
   return {
     knvb_id: sportlinkMember.PublicPersonId,
@@ -182,25 +195,42 @@ async function runPrepare(options = {}) {
     const members = Array.isArray(sportlinkData.Members) ? sportlinkData.Members : [];
     logVerbose(`Found ${members.length} Sportlink members in database`);
 
+    // Open Stadion DB to look up free fields
+    const stadionDb = openStadionDb();
+
     // Filter out invalid members and transform valid ones
     const validMembers = [];
     let skippedCount = 0;
+    let freeFieldsCount = 0;
 
-    members.forEach((member, index) => {
-      if (!isValidMember(member)) {
-        skippedCount++;
-        const reason = !member.PublicPersonId
-          ? 'missing KNVB ID'
-          : 'missing first name';
-        logVerbose(`Skipping member at index ${index}: ${reason}`);
-        return;
-      }
+    try {
+      members.forEach((member, index) => {
+        if (!isValidMember(member)) {
+          skippedCount++;
+          const reason = !member.PublicPersonId
+            ? 'missing KNVB ID'
+            : 'missing first name';
+          logVerbose(`Skipping member at index ${index}: ${reason}`);
+          return;
+        }
 
-      const prepared = preparePerson(member);
-      validMembers.push(prepared);
-    });
+        // Look up free fields (FreeScout ID, VOG datum) for this member
+        const freeFields = getMemberFreeFieldsByKnvbId(stadionDb, member.PublicPersonId);
+        if (freeFields && (freeFields.freescout_id || freeFields.vog_datum)) {
+          freeFieldsCount++;
+        }
+
+        const prepared = preparePerson(member, freeFields);
+        validMembers.push(prepared);
+      });
+    } finally {
+      stadionDb.close();
+    }
 
     logVerbose(`Prepared ${validMembers.length} members for Stadion sync (${skippedCount} skipped)`);
+    if (freeFieldsCount > 0) {
+      logVerbose(`  Including free fields for ${freeFieldsCount} members`);
+    }
 
     if (verbose && validMembers.length > 0) {
       logVerbose('Sample prepared member:');
