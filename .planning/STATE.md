@@ -19,8 +19,8 @@ Progress: [████████████████] 100% (16 of 16 phas
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
-- Total milestones shipped: 6
+- Total plans completed: 24
+- Total milestones shipped: 7
 
 **By Milestone:**
 

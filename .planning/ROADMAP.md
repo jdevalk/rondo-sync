@@ -8,7 +8,7 @@
 - ✅ **v1.3 Connect to Stadion** — Phases 5-8 (shipped 2026-01-25)
 - ✅ **v1.4 Photo Sync** — Phases 9-12 (shipped 2026-01-26)
 - ✅ **v1.5 Team Sync** — Phases 13-15 (shipped 2026-01-26)
-- 🚧 **v1.6 FreeScout Integration** — Phase 16 (in progress)
+- ✅ **v1.6 FreeScout Integration** — Phase 16 (shipped 2026-01-28)
 
 ## Phases
 
@@ -45,9 +45,9 @@ Archives:
 | 13. Team Extraction | v1.5 | 1/1 | Complete | 2026-01-26 |
 | 14. Work History | v1.5 | 1/1 | Complete | 2026-01-26 |
 | 15. Pipeline Integration | v1.5 | 1/1 | Complete | 2026-01-26 |
-| 16. FreeScout Sync | v1.6 | 0/2 | Planned | - |
+| 16. FreeScout Sync | v1.6 | 2/2 | Complete | 2026-01-28 |
 
-**Total:** 16 phases (15 complete, 1 planned)
+**Total:** 16 phases (16 complete)
 
 ---
 
@@ -79,9 +79,9 @@ Sync member data to FreeScout Customers:
 API: https://api-docs.freescout.net/
 
 Plans:
-- [ ] 16-01-PLAN.md — FreeScout foundation (database + API client)
-- [ ] 16-02-PLAN.md — FreeScout sync (prepare, submit, pipeline integration)
+- [x] 16-01-PLAN.md — FreeScout foundation (database + API client)
+- [x] 16-02-PLAN.md — FreeScout sync (prepare, submit, pipeline integration)
 
 ---
 *Roadmap created: 2026-01-25*
-*Last updated: 2026-01-28 — Phase 16 planned*
+*Last updated: 2026-01-28 — Phase 16 complete, v1.6 shipped*
