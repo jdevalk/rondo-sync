@@ -33,6 +33,11 @@ This milestone optimizes data capture and photo sync by using the MemberHeader A
 - Reuses existing browser navigation to `/other` page (no additional page loads)
 - Foundation for Phases 18 and 19
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 17-01-PLAN.md - Capture MemberHeader API and store financial block + photo metadata
+
 ---
 
 ### Phase 18: Financial Block Sync
@@ -55,6 +60,11 @@ This milestone optimizes data capture and photo sync by using the MemberHeader A
 **Notes:**
 - Extends existing Stadion sync flow (submit-stadion-sync.js)
 - Non-critical sync (failures don't block other operations)
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (created by /gsd:plan-phase 18)
 
 ---
 
@@ -83,15 +93,20 @@ This milestone optimizes data capture and photo sync by using the MemberHeader A
 - Reduces failure surface (no DOM selectors to break)
 - Photo upload and deletion logic stays the same (only download changes)
 
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (created by /gsd:plan-phase 19)
+
 ---
 
 ## Progress
 
 | Phase | Status | Requirements | Plans | Completed |
 |-------|--------|--------------|-------|-----------|
-| 17 - MemberHeader Data Capture | Pending | 4 | 0 | — |
-| 18 - Financial Block Sync | Pending | 3 | 0 | — |
-| 19 - Photo API Optimization | Pending | 5 | 0 | — |
+| 17 - MemberHeader Data Capture | Planning Complete | 4 | 1 | - |
+| 18 - Financial Block Sync | Pending | 3 | 0 | - |
+| 19 - Photo API Optimization | Pending | 5 | 0 | - |
 
 **Total:** 3 phases, 12 requirements
 
