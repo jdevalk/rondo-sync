@@ -85,7 +85,7 @@ async function loginToNikki(page, logger) {
       throw new Error('Missing NIKKI_OTP_SECRET - 2FA required but no secret configured');
     }
     logger.verbose('Generating OTP code...');
-    const otpCode = otplib.authenticator.generate(otpSecret);
+    const otpCode = await otplib.generate({ secret: otpSecret });
     if (!otpCode) {
       throw new Error('OTP generation failed');
     }
