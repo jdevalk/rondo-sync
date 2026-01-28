@@ -69,6 +69,7 @@ None - all phases complete.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 009 | Update README and CLAUDE.md with FreeScout, Nikki, and doc policy | 2026-01-28 | fc9fc0e | [009-update-readme-and-claude-md](./quick/009-update-readme-and-claude-md/) |
 | 008 | Document database schemas | 2026-01-28 | e1d7c35 | [008-document-databases](./quick/008-document-databases/) |
 | 007 | Add Nikki sync to cron | 2026-01-28 | 2b41119 | [007-add-nikki-sync-to-cron](./quick/007-add-nikki-sync-to-cron/) |
 | 006 | Update docs for sync split | 2026-01-28 | bf21321 | [006-update-docs-for-sync-split](./quick/006-update-docs-for-sync-split/) |
@@ -80,9 +81,9 @@ None - all phases complete.
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 16-02-PLAN.md (FreeScout customer sync)
-Resume with: Project complete - all phases delivered
+Stopped at: Completed quick task 009 (documentation updates)
+Resume with: Project complete - all phases delivered, documentation up to date
 Resume file: None
 
 ---
-*Last updated: 2026-01-28 (16-02 completed, v1.6 FreeScout complete)*
+*Last updated: 2026-01-28 (quick-009 completed, documentation synchronized)*
