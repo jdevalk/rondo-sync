@@ -143,14 +143,15 @@ async function fetchMemberFunctions(page, knvbId, logger) {
   };
   page.on('request', requestHandler);
 
-  // Set up promises to wait for both responses (no method filter - could be GET or POST)
+  // Set up promises to wait for both responses
+  // Use precise URL matching to avoid capturing UnionMemberFunctions instead of MemberFunctions
   const functionsPromise = page.waitForResponse(
-    resp => resp.url().includes('MemberFunctions'),
+    resp => resp.url().includes('/function/MemberFunctions?'),
     { timeout: 15000 }
   ).catch(() => null);
 
   const committeesPromise = page.waitForResponse(
-    resp => resp.url().includes('MemberCommittees'),
+    resp => resp.url().includes('/function/MemberCommittees?'),
     { timeout: 15000 }
   ).catch(() => null);
 
