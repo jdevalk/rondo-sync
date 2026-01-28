@@ -9,10 +9,10 @@ Requirements for MemberHeader API milestone. Each maps to roadmap phases.
 
 ### Data Capture
 
-- [ ] **DATA-01**: Capture MemberHeader API response when visiting `/other` page (alongside existing MemberFreeFields capture)
-- [ ] **DATA-02**: Extract `HasFinancialTransferBlockOwnClub` boolean from MemberHeader response
-- [ ] **DATA-03**: Extract `Photo.Url` and `Photo.PhotoDate` from MemberHeader response
-- [ ] **DATA-04**: Store captured data in SQLite database for downstream sync
+- [x] **DATA-01**: Capture MemberHeader API response when visiting `/other` page (alongside existing MemberFreeFields capture)
+- [x] **DATA-02**: Extract `HasFinancialTransferBlockOwnClub` boolean from MemberHeader response
+- [x] **DATA-03**: Extract `Photo.Url` and `Photo.PhotoDate` from MemberHeader response
+- [x] **DATA-04**: Store captured data in SQLite database for downstream sync
 
 ### Financial Block
 
@@ -51,10 +51,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 17 | Pending |
-| DATA-02 | Phase 17 | Pending |
-| DATA-03 | Phase 17 | Pending |
-| DATA-04 | Phase 17 | Pending |
+| DATA-01 | Phase 17 | Complete |
+| DATA-02 | Phase 17 | Complete |
+| DATA-03 | Phase 17 | Complete |
+| DATA-04 | Phase 17 | Complete |
 | FINB-01 | Phase 18 | Pending |
 | FINB-02 | Phase 18 | Pending |
 | FINB-03 | Phase 18 | Pending |
@@ -71,4 +71,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after roadmap creation*
+*Last updated: 2026-01-28 after Phase 17 completion*

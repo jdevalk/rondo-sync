@@ -13,7 +13,7 @@
 
 **Phase:** 17 - MemberHeader Data Capture
 **Plan:** 01 of 1 complete
-**Status:** Phase complete
+**Status:** Phase complete, verified ✓
 **Last activity:** 2026-01-28 - Completed 17-01-PLAN.md
 
 **Progress:**
@@ -128,17 +128,17 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 
 ### Context for Next Session
 
-**When planning Phase 17:**
-- Review `download-data-from-sportlink.js` for existing MemberFreeFields capture
-- Check browser network tab for MemberHeader API endpoint and response structure
-- Review `laposta-db.js` for SQLite schema and migration patterns
-- Confirm Photo object structure (when is it null vs populated)
+**When planning Phase 18 (Financial Block Sync):**
+- Financial block data now available in `sportlink_member_free_fields.has_financial_block`
+- Need to sync to Stadion ACF field `financiele-blokkade`
+- Include in member hash computation for change detection
+- Add to email report statistics
 
-**When executing Phase 17:**
-- Test with members who have photos vs members without photos
-- Verify financial block boolean is correctly extracted (true/false/null handling)
-- Validate SQLite storage (correct data types, null handling)
-- Ensure no performance regression (single API call, no extra page loads)
+**When planning Phase 19 (Photo API Optimization):**
+- Photo URL and date now available in `sportlink_member_free_fields`
+- Can replace browser-based photo download with direct HTTP fetch
+- Use `photo_date` for smarter change detection (skip unchanged photos)
+- Can remove `download-photos-from-sportlink.js` browser automation
 
 ---
 

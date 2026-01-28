@@ -36,7 +36,7 @@ This milestone optimizes data capture and photo sync by using the MemberHeader A
 **Plans:** 1 plan
 
 Plans:
-- [ ] 17-01-PLAN.md - Capture MemberHeader API and store financial block + photo metadata
+- [x] 17-01-PLAN.md - Capture MemberHeader API and store financial block + photo metadata
 
 ---
 
@@ -104,7 +104,7 @@ Plans:
 
 | Phase | Status | Requirements | Plans | Completed |
 |-------|--------|--------------|-------|-----------|
-| 17 - MemberHeader Data Capture | Planning Complete | 4 | 1 | - |
+| 17 - MemberHeader Data Capture | Complete | 4 | 1 | 2026-01-28 |
 | 18 - Financial Block Sync | Pending | 3 | 0 | - |
 | 19 - Photo API Optimization | Pending | 5 | 0 | - |
 
@@ -135,4 +135,4 @@ All 12 v1.7 requirements mapped:
 
 ---
 
-*Last updated: 2026-01-28*
+*Last updated: 2026-01-28 (Phase 17 complete)*
