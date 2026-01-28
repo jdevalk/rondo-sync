@@ -51,24 +51,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| DATA-04 | — | Pending |
-| FINB-01 | — | Pending |
-| FINB-02 | — | Pending |
-| FINB-03 | — | Pending |
-| PHOT-01 | — | Pending |
-| PHOT-02 | — | Pending |
-| PHOT-03 | — | Pending |
-| PHOT-04 | — | Pending |
-| PHOT-05 | — | Pending |
+| DATA-01 | Phase 17 | Pending |
+| DATA-02 | Phase 17 | Pending |
+| DATA-03 | Phase 17 | Pending |
+| DATA-04 | Phase 17 | Pending |
+| FINB-01 | Phase 18 | Pending |
+| FINB-02 | Phase 18 | Pending |
+| FINB-03 | Phase 18 | Pending |
+| PHOT-01 | Phase 19 | Pending |
+| PHOT-02 | Phase 19 | Pending |
+| PHOT-03 | Phase 19 | Pending |
+| PHOT-04 | Phase 19 | Pending |
+| PHOT-05 | Phase 19 | Pending |
 
 **Coverage:**
 - v1.7 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after initial definition*
+*Last updated: 2026-01-28 after roadmap creation*
