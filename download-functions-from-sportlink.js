@@ -115,7 +115,7 @@ function parseFunctionsResponse(data, knvbId) {
       committees.push({
         knvb_id: knvbId,
         committee_name: comm.CommitteeName,
-        sportlink_committee_id: comm.CommitteeId || null,
+        sportlink_committee_id: comm.PublicCommitteeId || comm.CommitteeId || null,
         role_name: comm.CommitteeFunctionName || comm.FunctionDescription || null,
         relation_start: comm.RelationStart || null,
         relation_end: comm.RelationEnd || null,
@@ -129,14 +129,20 @@ function parseFunctionsResponse(data, knvbId) {
 
 /**
  * Fetch functions for a single member
+ * Captures both MemberFunctions and MemberCommittees API responses
  */
 async function fetchMemberFunctions(page, knvbId, logger) {
   const functionsUrl = `https://club.sportlink.com/member/member-details/${knvbId}/functions`;
 
-  // Set up response listener before navigating
-  const responsePromise = page.waitForResponse(
-    resp => resp.url().includes('/navajo/entity/common/clubweb/member/') &&
-            resp.url().includes('functions') &&
+  // Set up promises to wait for both responses
+  const functionsPromise = page.waitForResponse(
+    resp => resp.url().includes('/function/MemberFunctions') &&
+            resp.request().method() === 'GET',
+    { timeout: 15000 }
+  ).catch(() => null);
+
+  const committeesPromise = page.waitForResponse(
+    resp => resp.url().includes('/function/MemberCommittees') &&
             resp.request().method() === 'GET',
     { timeout: 15000 }
   ).catch(() => null);
@@ -144,40 +150,44 @@ async function fetchMemberFunctions(page, knvbId, logger) {
   logger.verbose(`  Navigating to ${functionsUrl}...`);
   await page.goto(functionsUrl, { waitUntil: 'commit' });
 
-  // Wait for the API response
-  const response = await responsePromise;
+  // Wait for both responses (or timeout)
+  const [functionsResponse, committeesResponse] = await Promise.all([
+    functionsPromise,
+    committeesPromise
+  ]);
 
-  if (response && response.ok()) {
+  // Parse the responses
+  let functionsData = null;
+  let committeesData = null;
+
+  if (functionsResponse && functionsResponse.ok()) {
     try {
-      const data = await response.json();
-      logger.verbose(`  Got functions response for ${knvbId}`);
-      return data;
+      functionsData = await functionsResponse.json();
+      logger.verbose(`    Captured MemberFunctions response`);
     } catch (err) {
-      logger.verbose(`  Error parsing response for ${knvbId}: ${err.message}`);
-      return null;
+      logger.verbose(`    Error parsing MemberFunctions: ${err.message}`);
     }
   }
 
-  // Fallback: Try to extract from page state
-  logger.verbose(`  No API response captured, trying page extraction...`);
-
-  try {
-    // Wait for the page to load
-    await page.waitForLoadState('networkidle', { timeout: 10000 });
-
-    // Try to find any functions/committees data on the page
-    // This is a fallback in case the XHR interception doesn't work
-    const pageData = await page.evaluate(() => {
-      // Try to find React state or similar
-      const appContainer = document.querySelector('#root') || document.body;
-      return null; // This would need actual implementation based on page structure
-    });
-
-    return pageData;
-  } catch (err) {
-    logger.verbose(`  Page extraction failed: ${err.message}`);
-    return null;
+  if (committeesResponse && committeesResponse.ok()) {
+    try {
+      committeesData = await committeesResponse.json();
+      logger.verbose(`    Captured MemberCommittees response`);
+    } catch (err) {
+      logger.verbose(`    Error parsing MemberCommittees: ${err.message}`);
+    }
   }
+
+  // Combine the responses
+  if (functionsData || committeesData) {
+    return {
+      MemberFunctions: functionsData,
+      MemberCommittees: committeesData
+    };
+  }
+
+  logger.verbose(`  No API responses captured`);
+  return null;
 }
 
 /**
