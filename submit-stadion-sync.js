@@ -20,6 +20,38 @@ const {
 } = require('./lib/stadion-db');
 
 /**
+ * Log financial block status change as activity on person
+ * Uses Stadion's activity endpoint: POST /stadion/v1/people/{id}/activities
+ * @param {number} stadionId - WordPress person post ID
+ * @param {boolean} isBlocked - New financial block status
+ * @param {Object} options - Logger and verbose options
+ */
+async function logFinancialBlockActivity(stadionId, isBlocked, options) {
+  const logVerbose = options.logger?.verbose.bind(options.logger) || (options.verbose ? console.log : () => {});
+
+  const activityText = isBlocked
+    ? 'Financiele blokkade ingesteld'
+    : 'Financiele blokkade opgeheven';
+
+  try {
+    await stadionRequest(
+      `stadion/v1/people/${stadionId}/activities`,
+      'POST',
+      {
+        content: activityText,
+        activity_type: 'financial_block_change',
+        activity_date: new Date().toISOString().split('T')[0]  // YYYY-MM-DD
+      },
+      options
+    );
+    logVerbose(`  Logged activity: ${activityText}`);
+  } catch (error) {
+    // Activity logging is nice-to-have, don't fail sync
+    logVerbose(`  Warning: Could not log activity: ${error.message}`);
+  }
+}
+
+/**
  * Sync a single member to Stadion (create or update)
  * Uses local stadion_id tracking - no API search needed
  * @param {Object} member - Member record from database
@@ -28,7 +60,8 @@ const {
  * @returns {Promise<{action: string, id: number}>}
  */
 async function syncPerson(member, db, options) {
-  const { knvb_id, data, source_hash, stadion_id } = member;
+  const { knvb_id, data, source_hash } = member;
+  let { stadion_id } = member; // Use let so we can clear it on 404
   const logVerbose = options.logger?.verbose.bind(options.logger) || (options.verbose ? console.log : () => {});
 
   if (stadion_id) {
@@ -36,28 +69,56 @@ async function syncPerson(member, db, options) {
     const endpoint = `wp/v2/people/${stadion_id}`;
     logVerbose(`Updating existing person: ${stadion_id}`);
     logVerbose(`  PUT ${endpoint}`);
+
+    // Get existing person to compare financial block status
+    let previousBlockStatus = false;
     try {
-      const response = await stadionRequest(endpoint, 'PUT', data, options);
-      updateSyncState(db, knvb_id, source_hash, stadion_id);
-      return { action: 'updated', id: stadion_id };
-    } catch (error) {
-      // Person was deleted from WordPress - reset tracking state and create fresh
-      if (error.message && error.message.includes('404')) {
+      const existing = await stadionRequest(`wp/v2/people/${stadion_id}`, 'GET', null, options);
+      previousBlockStatus = existing.body.acf?.['financiele-blokkade'] || false;
+    } catch (fetchError) {
+      // If we can't fetch, continue with update but skip activity comparison
+      if (fetchError.message && fetchError.message.includes('404')) {
+        // Person was deleted - reset tracking state and create fresh
         logVerbose(`Person ${stadion_id} no longer exists (404) - will create fresh`);
         updateSyncState(db, knvb_id, null, null); // Clear stadion_id and hash
-        // Fall through to create path below
+        stadion_id = null; // Clear local variable to trigger CREATE path
       } else {
-        console.error(`API Error updating person "${knvb_id}" (ID: ${stadion_id}):`);
-        console.error(`  Status: ${error.message}`);
-        if (error.details) {
-          console.error(`  Code: ${error.details.code || 'unknown'}`);
-          console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
-          if (error.details.data) {
-            console.error(`  Data: ${JSON.stringify(error.details.data)}`);
-          }
+        logVerbose(`  Could not fetch existing person for activity comparison: ${fetchError.message}`);
+      }
+    }
+
+    // Only proceed with update if person still exists (not 404 above)
+    if (stadion_id) {
+      try {
+        const response = await stadionRequest(endpoint, 'PUT', data, options);
+        updateSyncState(db, knvb_id, source_hash, stadion_id);
+
+        // Compare financial block status and log activity if changed
+        const newBlockStatus = data.acf?.['financiele-blokkade'] || false;
+        if (previousBlockStatus !== newBlockStatus) {
+          await logFinancialBlockActivity(stadion_id, newBlockStatus, options);
         }
-        console.error(`  Payload: ${JSON.stringify(data, null, 2)}`);
-        throw error;
+
+        return { action: 'updated', id: stadion_id };
+      } catch (error) {
+        // Person was deleted from WordPress - reset tracking state and create fresh
+        if (error.message && error.message.includes('404')) {
+          logVerbose(`Person ${stadion_id} no longer exists (404) - will create fresh`);
+          updateSyncState(db, knvb_id, null, null); // Clear stadion_id and hash
+          stadion_id = null; // Clear local variable to trigger CREATE path
+        } else {
+          console.error(`API Error updating person "${knvb_id}" (ID: ${stadion_id}):`);
+          console.error(`  Status: ${error.message}`);
+          if (error.details) {
+            console.error(`  Code: ${error.details.code || 'unknown'}`);
+            console.error(`  Message: ${error.details.message || JSON.stringify(error.details)}`);
+            if (error.details.data) {
+              console.error(`  Data: ${JSON.stringify(error.details.data)}`);
+            }
+          }
+          console.error(`  Payload: ${JSON.stringify(data, null, 2)}`);
+          throw error;
+        }
       }
     }
   }
@@ -70,6 +131,13 @@ async function syncPerson(member, db, options) {
     const response = await stadionRequest(endpoint, 'POST', data, options);
     const newId = response.body.id;
     updateSyncState(db, knvb_id, source_hash, newId);
+
+    // Log initial block status for newly created persons
+    const newBlockStatus = data.acf?.['financiele-blokkade'] || false;
+    if (newBlockStatus) {
+      await logFinancialBlockActivity(newId, true, options);
+    }
+
     return { action: 'created', id: newId };
   } catch (error) {
     console.error(`API Error creating person "${knvb_id}":`);
