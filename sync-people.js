@@ -1,5 +1,6 @@
 require('varlock/auto-load');
 
+const { requireProductionServer } = require('./lib/server-check');
 const { createSyncLogger } = require('./lib/logger');
 const { runDownload } = require('./download-data-from-sportlink');
 const { runPrepare } = require('./prepare-laposta-members');
@@ -282,6 +283,12 @@ module.exports = { runPeopleSync };
 
 // CLI entry point
 if (require.main === module) {
+  // Prevent accidental local runs that cause duplicate entries
+  requireProductionServer({
+    allowLocal: true,
+    scriptName: 'sync-people.js'
+  });
+
   const verbose = process.argv.includes('--verbose');
   const force = process.argv.includes('--force');
 

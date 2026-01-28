@@ -1,5 +1,6 @@
 require('varlock/auto-load');
 
+const { requireProductionServer } = require('./lib/server-check');
 const { createSyncLogger } = require('./lib/logger');
 const { runDownload } = require('./download-data-from-sportlink');
 const { runTeamDownload } = require('./download-teams-from-sportlink');
@@ -753,6 +754,12 @@ module.exports = { runSyncAll };
 
 // CLI entry point
 if (require.main === module) {
+  // Prevent accidental local runs that cause duplicate entries
+  requireProductionServer({
+    allowLocal: true,
+    scriptName: 'sync-all.js'
+  });
+
   const { verbose, force, dryRun } = parseArgs(process.argv);
 
   runSyncAll({ verbose, force, dryRun })
