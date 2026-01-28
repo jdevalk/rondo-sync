@@ -11,6 +11,9 @@ const { runSync: runWorkHistorySync } = require('./submit-stadion-work-history')
 const { runPhotoDownload } = require('./download-photos-from-sportlink');
 const { runPhotoSync } = require('./upload-photos-to-stadion');
 const { runSync: runBirthdaySync } = require('./sync-important-dates');
+const { runFunctionsDownload } = require('./download-functions-from-sportlink');
+const { runSync: runCommissieSync } = require('./submit-stadion-commissies');
+const { runSync: runCommissieWorkHistorySync } = require('./submit-stadion-commissie-work-history');
 const { openDb } = require('./lib/stadion-db');
 
 /**
@@ -123,6 +126,49 @@ function printSummary(logger, stats) {
   }
   logger.log('');
 
+  logger.log('FUNCTIONS & COMMISSIES SYNC');
+  logger.log(minorDivider);
+  if (stats.functions.total > 0) {
+    logger.log(`Functions downloaded: ${stats.functions.downloaded}/${stats.functions.total} members`);
+    if (stats.functions.functionsCount > 0) {
+      logger.log(`  Club functions found: ${stats.functions.functionsCount}`);
+    }
+    if (stats.functions.committeesCount > 0) {
+      logger.log(`  Committee memberships found: ${stats.functions.committeesCount}`);
+    }
+  } else {
+    logger.log('Functions downloaded: 0 changes');
+  }
+  if (stats.commissies.total > 0) {
+    logger.log(`Commissies synced: ${stats.commissies.synced}/${stats.commissies.total}`);
+    if (stats.commissies.created > 0) {
+      logger.log(`  Created: ${stats.commissies.created}`);
+    }
+    if (stats.commissies.updated > 0) {
+      logger.log(`  Updated: ${stats.commissies.updated}`);
+    }
+    if (stats.commissies.deleted > 0) {
+      logger.log(`  Deleted: ${stats.commissies.deleted}`);
+    }
+  } else {
+    logger.log('Commissies synced: 0 changes');
+  }
+  if (stats.commissieWorkHistory.total > 0) {
+    logger.log(`Commissie work history: ${stats.commissieWorkHistory.synced}/${stats.commissieWorkHistory.total}`);
+    if (stats.commissieWorkHistory.created > 0) {
+      logger.log(`  Commissie assignments added: ${stats.commissieWorkHistory.created}`);
+    }
+    if (stats.commissieWorkHistory.ended > 0) {
+      logger.log(`  Commissie assignments ended: ${stats.commissieWorkHistory.ended}`);
+    }
+    if (stats.commissieWorkHistory.skipped > 0) {
+      logger.log(`  Skipped: ${stats.commissieWorkHistory.skipped} (not yet in Stadion)`);
+    }
+  } else {
+    logger.log('Commissie work history: 0 changes');
+  }
+  logger.log('');
+
   logger.log('PHOTO SYNC');
   logger.log(minorDivider);
   const photoDownloadText = stats.photos.download.total > 0
@@ -171,6 +217,9 @@ function printSummary(logger, stats) {
     ...stats.stadion.errors,
     ...stats.teams.errors,
     ...stats.workHistory.errors,
+    ...stats.functions.errors,
+    ...stats.commissies.errors,
+    ...stats.commissieWorkHistory.errors,
     ...stats.photos.download.errors,
     ...stats.photos.upload.errors,
     ...stats.photos.delete.errors,
@@ -265,6 +314,30 @@ async function runSyncAll(options = {}) {
       errors: []
     },
     workHistory: {
+      total: 0,
+      synced: 0,
+      created: 0,
+      ended: 0,
+      skipped: 0,
+      errors: []
+    },
+    functions: {
+      total: 0,
+      downloaded: 0,
+      functionsCount: 0,
+      committeesCount: 0,
+      errors: []
+    },
+    commissies: {
+      total: 0,
+      synced: 0,
+      created: 0,
+      updated: 0,
+      skipped: 0,
+      deleted: 0,
+      errors: []
+    },
+    commissieWorkHistory: {
       total: 0,
       synced: 0,
       created: 0,
@@ -463,6 +536,78 @@ async function runSyncAll(options = {}) {
       });
     }
 
+    // Step 4d: Functions Download from Sportlink (NON-CRITICAL)
+    logger.verbose('Downloading functions from Sportlink...');
+    try {
+      const functionsResult = await runFunctionsDownload({ logger, verbose });
+      stats.functions.total = functionsResult.total;
+      stats.functions.downloaded = functionsResult.downloaded;
+      stats.functions.functionsCount = functionsResult.functionsCount;
+      stats.functions.committeesCount = functionsResult.committeesCount;
+      if (functionsResult.errors?.length > 0) {
+        stats.functions.errors = functionsResult.errors.map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'functions-download'
+        }));
+      }
+    } catch (err) {
+      logger.error(`Functions download failed: ${err.message}`);
+      stats.functions.errors.push({
+        message: `Functions download failed: ${err.message}`,
+        system: 'functions-download'
+      });
+    }
+
+    // Step 4e: Commissie Sync (NON-CRITICAL)
+    logger.verbose('Syncing commissies to Stadion...');
+    try {
+      const commissieResult = await runCommissieSync({ logger, verbose, force });
+      stats.commissies.total = commissieResult.total;
+      stats.commissies.synced = commissieResult.synced;
+      stats.commissies.created = commissieResult.created;
+      stats.commissies.updated = commissieResult.updated;
+      stats.commissies.skipped = commissieResult.skipped;
+      stats.commissies.deleted = commissieResult.deleted;
+      if (commissieResult.errors?.length > 0) {
+        stats.commissies.errors = commissieResult.errors.map(e => ({
+          commissie_name: e.commissie_name,
+          message: e.message,
+          system: 'commissie-sync'
+        }));
+      }
+    } catch (err) {
+      logger.error(`Commissie sync failed: ${err.message}`);
+      stats.commissies.errors.push({
+        message: `Commissie sync failed: ${err.message}`,
+        system: 'commissie-sync'
+      });
+    }
+
+    // Step 4f: Commissie Work History Sync (NON-CRITICAL)
+    logger.verbose('Syncing commissie work history to Stadion...');
+    try {
+      const commissieWorkHistoryResult = await runCommissieWorkHistorySync({ logger, verbose, force });
+      stats.commissieWorkHistory.total = commissieWorkHistoryResult.total;
+      stats.commissieWorkHistory.synced = commissieWorkHistoryResult.synced;
+      stats.commissieWorkHistory.created = commissieWorkHistoryResult.created;
+      stats.commissieWorkHistory.ended = commissieWorkHistoryResult.ended;
+      stats.commissieWorkHistory.skipped = commissieWorkHistoryResult.skipped;
+      if (commissieWorkHistoryResult.errors?.length > 0) {
+        stats.commissieWorkHistory.errors = commissieWorkHistoryResult.errors.map(e => ({
+          knvb_id: e.knvb_id,
+          message: e.message,
+          system: 'commissie-work-history-sync'
+        }));
+      }
+    } catch (err) {
+      logger.error(`Commissie work history sync failed: ${err.message}`);
+      stats.commissieWorkHistory.errors.push({
+        message: `Commissie work history sync failed: ${err.message}`,
+        system: 'commissie-work-history-sync'
+      });
+    }
+
     // Step 5: Photo Download (NON-CRITICAL)
     logger.verbose('Downloading photos from Sportlink...');
     try {
@@ -581,6 +726,9 @@ async function runSyncAll(options = {}) {
                stats.stadion.errors.length === 0 &&
                stats.teams.errors.length === 0 &&
                stats.workHistory.errors.length === 0 &&
+               stats.functions.errors.length === 0 &&
+               stats.commissies.errors.length === 0 &&
+               stats.commissieWorkHistory.errors.length === 0 &&
                stats.photos.download.errors.length === 0 &&
                stats.photos.upload.errors.length === 0 &&
                stats.photos.delete.errors.length === 0 &&
