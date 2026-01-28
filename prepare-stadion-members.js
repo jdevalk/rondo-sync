@@ -93,7 +93,7 @@ function buildAddresses(member) {
  * Transform a Sportlink member to Stadion person format
  * @param {Object} sportlinkMember - Raw Sportlink member record
  * @param {Object} [freeFields] - Optional free fields from Sportlink /other tab
- * @returns {{knvb_id: string, email: string|null, data: Object}}
+ * @returns {{knvb_id: string, email: string|null, person_image_date: string|null, photo_url: string|null, photo_date: string|null, data: Object}}
  */
 function preparePerson(sportlinkMember, freeFields = null) {
   const name = buildName(sportlinkMember);
@@ -137,10 +137,17 @@ function preparePerson(sportlinkMember, freeFields = null) {
     }
   }
 
+  // Extract photo_url and photo_date from free fields (Phase 19: API-based photo sync)
+  // These come from MemberHeader API response captured during functions download
+  const photoUrl = freeFields?.photo_url || null;
+  const photoDate = freeFields?.photo_date || null;
+
   return {
     knvb_id: sportlinkMember.PublicPersonId,
     email: (sportlinkMember.Email || '').trim().toLowerCase() || null,
     person_image_date: personImageDate,
+    photo_url: photoUrl,
+    photo_date: photoDate,
     data: {
       status: 'publish',
       acf: acf
