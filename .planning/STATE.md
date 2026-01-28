@@ -11,20 +11,20 @@
 
 ## Current Position
 
-**Phase:** 18 - Financial Block Sync
-**Plan:** 01 of 1 complete
-**Status:** Phase complete, verified ✓
-**Last activity:** 2026-01-28 - Completed 18-01-PLAN.md
+**Phase:** 19 - Photo API Optimization
+**Plan:** 01 of 3 complete
+**Status:** In progress
+**Last activity:** 2026-01-28 - Completed 19-01-PLAN.md
 
 **Progress:**
 ```
-[██████████████░░░░░░] 67% (2/3 phases)
+[████████████████░░░░] 78% (2.33/3 phases)
 Phase 17: MemberHeader Data Capture     [█████] Complete
 Phase 18: Financial Block Sync          [█████] Complete
-Phase 19: Photo API Optimization        [░░░░░] Pending
+Phase 19: Photo API Optimization        [██░░░] Plan 01 complete (schema)
 ```
 
-**Next Action:** Plan Phase 19 (Photo API Optimization)
+**Next Action:** Execute Phase 19 Plan 02 (HTTP photo download) or Plan 03 (pipeline integration)
 
 ## Performance Metrics
 
@@ -52,6 +52,14 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 - Status: Complete
 - Duration: 2min 1s
 
+**Phase 19:**
+- Plans created: 3
+- Plans completed: 1
+- Tasks completed: 2
+- Requirements: 5 (PHOTO-01 through PHOTO-05)
+- Status: In progress
+- Duration: 3min (Plan 01)
+
 ## Accumulated Context
 
 ### Key Decisions
@@ -67,6 +75,9 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 | Activity logging as non-blocking enhancement | Activity POST failures caught and logged as warnings, field sync is critical | 2026-01-28 |
 | GET before PUT for change detection | Fetch previous financial block status to only log when status actually changes | 2026-01-28 |
 | Mutable stadion_id for 404 handling | Changed from const to let for clean fallthrough to CREATE path on 404 | 2026-01-28 |
+| Store photo_url/photo_date in stadion_members | Avoids JOIN complexity, keeps all photo state in one table | 2026-01-28 |
+| Hybrid photo change detection | Use photo_url/photo_date when available, fallback to person_image_date | 2026-01-28 |
+| Photo data flows through prepare step | Architectural choice: prepare-stadion-members.js (not download) has access to free_fields data | 2026-01-28 |
 
 ### Open Questions
 
@@ -83,9 +94,18 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 - [x] Determine SQLite schema changes for new fields
 - [x] Plan Phase 18 (Financial Block Sync) after Phase 17 completion
 - [x] Execute Phase 18-01 (Financial Block Sync)
-- [ ] Plan Phase 19 (Photo API Optimization) after Phase 17 completion
+- [x] Execute Phase 19-01 (Photo Schema Migration)
+- [ ] Execute Phase 19-02 (HTTP Photo Download)
+- [ ] Execute Phase 19-03 (Pipeline Integration)
 
 ### Recent Changes
+
+**2026-01-28 (Phase 19-01 completion):**
+- Added photo_url and photo_date columns to stadion_members table
+- Updated upsertMembers() to store photo data with hybrid change detection
+- Photo data flows from sportlink_member_free_fields through prepare step
+- Architectural deviation: used prepare-stadion-members.js instead of download script
+- Phase 19 Plan 01 complete (schema foundation ready)
 
 **2026-01-28 (Phase 18-01 completion):**
 - Financial block field syncs to Stadion `financiele-blokkade` ACF field
@@ -116,45 +136,38 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 - Replace browser-based photo download with direct URL fetch
 - Use Photo.PhotoDate for smarter change detection
 
-**Phase 17 scope:**
-- Capture MemberHeader API response during existing `/other` page visit
-- Extract `HasFinancialTransferBlockOwnClub` boolean
-- Extract `Photo.Url` and `Photo.PhotoDate` (handle null Photo object)
-- Store in SQLite for downstream phases
+**Phase 19 scope:**
+- Plan 01: Schema migration for photo_url/photo_date in stadion_members (COMPLETE)
+- Plan 02: HTTP fetch for photo download (replaces browser automation)
+- Plan 03: Pipeline integration, remove old scripts, update cron
 
 **Dependencies:**
-- Phase 18 depends on Phase 17 (needs financial block data)
-- Phase 19 depends on Phase 17 (needs photo URL and date data)
-- Phases 18 and 19 are independent of each other
+- Phase 19-01 is foundation for 19-02 and 19-03
+- Phase 19-02 and 19-03 can be executed sequentially
 
 ### What We're Tracking
 
-**For Phase 17 planning:**
-- Location of MemberHeader API call in existing code
-- Current database schema (which tables need new columns)
-- API response structure (field names and types)
-- Error handling for missing/null Photo object
+**For Phase 19-02:**
+- HTTP fetch implementation for photo download
+- Use photo_url directly instead of DOM scraping
+- Error handling for 404s, timeouts
+- Rate limiting considerations
 
-**For Phase 18 planning (future):**
-- Stadion ACF field name for financial block (`financiele-blokkade`)
-- Hash calculation changes (include new field)
-- Email report formatting for new field
-
-**For Phase 19 planning (future):**
-- Photo download replacement strategy (HTTP fetch vs browser)
-- Change detection migration (PersonImageDate → Photo.PhotoDate)
-- Cleanup scope (which files to remove)
+**For Phase 19-03:**
+- Pipeline integration (add photo steps to sync-people.js)
+- Script deletion (download-photos-from-sportlink.js, sync-photos.js)
+- Cron update (remove daily photo sync job)
 
 ### Context for Next Session
 
-**When planning Phase 19 (Photo API Optimization):**
-- Photo URL and date now available in `sportlink_member_free_fields`
-- Can replace browser-based photo download with direct HTTP fetch
-- Use `photo_date` for smarter change detection (skip unchanged photos)
-- Can remove `download-photos-from-sportlink.js` browser automation
+**When executing Phase 19-02:**
+- photo_url and photo_date now available in stadion_members
+- ~500 members have photo_url from MemberHeader API
+- ~200 members use person_image_date fallback (no photo_url)
+- HTTP fetch replaces browser DOM scraping
 
 ---
 
 *State tracking started: 2026-01-28*
-*Last session: 2026-01-28 16:16 UTC - Completed Phase 18 Plan 01*
+*Last session: 2026-01-28 20:20 UTC - Completed Phase 19 Plan 01*
 *Resume file: None*
