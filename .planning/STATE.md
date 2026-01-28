@@ -11,26 +11,26 @@
 
 ## Current Position
 
-**Phase:** 17 - MemberHeader Data Capture
+**Phase:** 18 - Financial Block Sync
 **Plan:** 01 of 1 complete
 **Status:** Phase complete, verified ✓
-**Last activity:** 2026-01-28 - Completed 17-01-PLAN.md
+**Last activity:** 2026-01-28 - Completed 18-01-PLAN.md
 
 **Progress:**
 ```
-[███████░░░░░░░░░░░░░] 33% (1/3 phases)
+[██████████████░░░░░░] 67% (2/3 phases)
 Phase 17: MemberHeader Data Capture     [█████] Complete
-Phase 18: Financial Block Sync          [░░░░░] Pending
+Phase 18: Financial Block Sync          [█████] Complete
 Phase 19: Photo API Optimization        [░░░░░] Pending
 ```
 
-**Next Action:** Plan Phase 18 (Financial Block Sync)
+**Next Action:** Plan Phase 19 (Photo API Optimization)
 
 ## Performance Metrics
 
 **Milestone v1.7:**
 - Phases planned: 3
-- Phases completed: 1
+- Phases completed: 2
 - Requirements: 12 total
 - Coverage: 12/12 (100%)
 - Started: 2026-01-28
@@ -44,6 +44,14 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 - Status: Complete
 - Duration: 1min 56s
 
+**Phase 18:**
+- Plans created: 1
+- Plans completed: 1
+- Tasks completed: 2
+- Requirements: 4 (FIN-01, FIN-02, FIN-03, FIN-04) - All complete
+- Status: Complete
+- Duration: 2min 1s
+
 ## Accumulated Context
 
 ### Key Decisions
@@ -56,6 +64,9 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 | Use INTEGER for has_financial_block | SQLite has no native boolean type, store as 0/1 integer | 2026-01-28 |
 | Capture MemberHeader during existing /other page visit | Avoid extra overhead by capturing in parallel with MemberFreeFields | 2026-01-28 |
 | Include all 6 fields in hash computation | Ensures proper change detection for both old and new fields | 2026-01-28 |
+| Activity logging as non-blocking enhancement | Activity POST failures caught and logged as warnings, field sync is critical | 2026-01-28 |
+| GET before PUT for change detection | Fetch previous financial block status to only log when status actually changes | 2026-01-28 |
+| Mutable stadion_id for 404 handling | Changed from const to let for clean fallthrough to CREATE path on 404 | 2026-01-28 |
 
 ### Open Questions
 
@@ -70,10 +81,18 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 - [x] Plan Phase 17 (MemberHeader Data Capture)
 - [x] Identify MemberHeader API response structure in browser network tab
 - [x] Determine SQLite schema changes for new fields
-- [ ] Plan Phase 18 (Financial Block Sync) after Phase 17 completion
+- [x] Plan Phase 18 (Financial Block Sync) after Phase 17 completion
+- [x] Execute Phase 18-01 (Financial Block Sync)
 - [ ] Plan Phase 19 (Photo API Optimization) after Phase 17 completion
 
 ### Recent Changes
+
+**2026-01-28 (Phase 18-01 completion):**
+- Financial block field syncs to Stadion `financiele-blokkade` ACF field
+- Activity logging for financial block status changes (Dutch: ingesteld/opgeheven)
+- GET before PUT pattern for change detection in UPDATE path
+- Activity logging failures non-blocking (field sync is critical)
+- Phase 18 complete (2/3 phases done, 67% milestone progress)
 
 **2026-01-28 (Phase 17-01 completion):**
 - Added has_financial_block, photo_url, photo_date columns to sportlink_member_free_fields
@@ -128,12 +147,6 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 
 ### Context for Next Session
 
-**When planning Phase 18 (Financial Block Sync):**
-- Financial block data now available in `sportlink_member_free_fields.has_financial_block`
-- Need to sync to Stadion ACF field `financiele-blokkade`
-- Include in member hash computation for change detection
-- Add to email report statistics
-
 **When planning Phase 19 (Photo API Optimization):**
 - Photo URL and date now available in `sportlink_member_free_fields`
 - Can replace browser-based photo download with direct HTTP fetch
@@ -143,5 +156,5 @@ Phase 19: Photo API Optimization        [░░░░░] Pending
 ---
 
 *State tracking started: 2026-01-28*
-*Last session: 2026-01-28 16:12 UTC - Completed Phase 17 Plan 01*
+*Last session: 2026-01-28 16:16 UTC - Completed Phase 18 Plan 01*
 *Resume file: None*
