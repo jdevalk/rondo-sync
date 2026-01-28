@@ -134,7 +134,7 @@ async function loginToNikki(page, logger) {
  */
 async function scrapeContributions(page, logger) {
   logger.verbose('Navigating to /leden page...');
-  const response = await page.goto('https://mijn.nikki-online.nl/leden', { waitUntil: 'networkidle' });
+  const response = await page.goto('https://mijn.nikki-online.nl/leden', { waitUntil: 'domcontentloaded' });
   if (response) {
     logger.verbose(`  /leden response: ${response.status()} ${response.url()}`);
   }
@@ -145,13 +145,19 @@ async function scrapeContributions(page, logger) {
   } catch (error) {
     logger.verbose(`  /leden title unavailable: ${error.message}`);
   }
+  try {
+    const htmlLength = await page.evaluate(() => document.documentElement?.outerHTML?.length || 0);
+    logger.verbose(`  /leden HTML size: ${htmlLength} chars`);
+  } catch (error) {
+    logger.verbose(`  /leden HTML size unavailable: ${error.message}`);
+  }
 
   // Wait for datatable to load
   logger.verbose('Waiting for member table...');
   let tableContext = page;
   let tableHandle = null;
   try {
-    tableHandle = await page.waitForSelector('table', { state: 'attached', timeout: 30000 });
+    tableHandle = await page.waitForSelector('table', { state: 'attached', timeout: 60000 });
   } catch (error) {
     const frames = page.frames();
     for (const frame of frames) {
