@@ -25,21 +25,20 @@ function formatDateForACF(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  return `${year}${month}${day}`;
+  return `${year}-${month}-${day}`;
 }
 
 /**
  * Convert Sportlink date format to ACF date format
  * Sportlink format: "2023-01-01" or similar
- * ACF format: "20230101"
+ * ACF work_history format: "Y-m-d" (e.g., "2023-01-01")
  * @param {string} dateStr - Sportlink date string
  * @returns {string} - ACF date string or empty
  */
 function convertDateForACF(dateStr) {
   if (!dateStr) return '';
-  // Remove any time component and dashes
-  const datePart = dateStr.split('T')[0];
-  return datePart.replace(/-/g, '');
+  // Remove any time component, keep Y-m-d format
+  return dateStr.split('T')[0];
 }
 
 /**
