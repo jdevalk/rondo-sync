@@ -122,12 +122,31 @@ function detectTeamChanges(db, knvbId, currentTeams) {
     stadion_work_history_id: h.stadion_work_history_id
   }));
 
-  const trackedTeamNames = new Set(trackedTeams.map(t => t.team_name));
+  // Build map of tracked team names with their sync status
+  const trackedTeamMap = new Map(trackedTeams.map(t => [t.team_name, t.stadion_work_history_id]));
   const currentTeamSet = new Set(currentTeams);
 
-  const added = currentTeams.filter(t => !trackedTeamNames.has(t));
+  // Teams that need to be added:
+  // 1. Not in tracked teams at all
+  // 2. In tracked teams but stadion_work_history_id is NULL (never synced to WordPress)
+  const added = currentTeams.filter(t => {
+    if (!trackedTeamMap.has(t)) {
+      return true; // Not tracked at all
+    }
+    const stadionWorkHistoryId = trackedTeamMap.get(t);
+    return stadionWorkHistoryId === null || stadionWorkHistoryId === undefined; // Tracked but never synced
+  });
+
   const removed = trackedTeams.filter(t => !currentTeamSet.has(t.team_name));
-  const unchanged = currentTeams.filter(t => trackedTeamNames.has(t));
+
+  // Only teams that are both tracked AND have a stadion_work_history_id are truly unchanged
+  const unchanged = currentTeams.filter(t => {
+    if (!trackedTeamMap.has(t)) {
+      return false; // Not tracked
+    }
+    const stadionWorkHistoryId = trackedTeamMap.get(t);
+    return stadionWorkHistoryId !== null && stadionWorkHistoryId !== undefined; // Tracked and synced
+  });
 
   return { added, removed, unchanged };
 }
