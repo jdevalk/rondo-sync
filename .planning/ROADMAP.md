@@ -123,12 +123,11 @@ Plans:
   5. Reverse sync runs on separate cron schedule every 15 minutes via scripts/sync.sh reverse
   6. Graceful degradation on failures (forward sync not blocked by reverse sync issues)
 
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 24-01: Free fields reverse sync implementation
-- [ ] 24-02: Financial toggle reverse sync implementation
-- [ ] 24-03: Integration and monitoring
+- [ ] 24-01-PLAN.md — Multi-page reverse sync core with session timeout detection
+- [ ] 24-02-PLAN.md — CLI entry point and 15-minute cron integration
 
 ## Progress
 
@@ -141,8 +140,8 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24
 | 21. Conflict Resolution | v2.0 | 1/1 | ✅ Complete | 2026-01-29 |
 | 22. Change Detection | v2.0 | 2/2 | ✅ Complete | 2026-01-29 |
 | 23. Contact Fields | v2.0 | 2/2 | ✅ Complete | 2026-01-29 |
-| 24. Free Fields & Toggle | v2.0 | 0/3 | Not started | - |
+| 24. Free Fields & Toggle | v2.0 | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase 23 complete)*
+*Last updated: 2026-01-29 (Phase 24 planned)*
