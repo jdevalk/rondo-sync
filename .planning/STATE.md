@@ -36,6 +36,11 @@
 - `submit-stadion-sync.js` - Activity logging for financial block
 - `sync-people.js` - Integrated photo sync (hourly)
 
+## Accumulated Context
+
+### Pending Todos
+- 1 pending todo in `.planning/todos/pending/`
+
 ## Next Steps
 
 **Start next milestone:**
