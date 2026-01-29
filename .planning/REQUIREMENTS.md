@@ -66,24 +66,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | — | Pending |
-| FOUND-02 | — | Pending |
-| FOUND-03 | — | Pending |
-| CONF-01 | — | Pending |
-| CONF-02 | — | Pending |
-| CONF-03 | — | Pending |
-| RSYNC-01 | — | Pending |
-| RSYNC-02 | — | Pending |
-| RSYNC-03 | — | Pending |
-| RSYNC-04 | — | Pending |
-| INTEG-01 | — | Pending |
-| INTEG-02 | — | Pending |
+| FOUND-01 | Phase 20 | Pending |
+| FOUND-02 | Phase 20 | Pending |
+| FOUND-03 | Phase 20 | Pending |
+| CONF-01 | Phase 21 | Pending |
+| CONF-02 | Phase 21 | Pending |
+| CONF-03 | Phase 21 | Pending |
+| RSYNC-01 | Phase 22 | Pending |
+| RSYNC-02 | Phase 23 | Pending |
+| RSYNC-03 | Phase 24 | Pending |
+| RSYNC-04 | Phase 24 | Pending |
+| INTEG-01 | Phase 22 | Pending |
+| INTEG-02 | Phase 24 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after initial definition*
+*Last updated: 2026-01-29 after roadmap creation*
