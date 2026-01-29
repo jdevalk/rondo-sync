@@ -678,6 +678,7 @@ async function runSync(options = {}) {
     updated: 0,
     skipped: 0,
     deleted: 0,
+    conflicts: 0,
     errors: []
   };
 
@@ -708,6 +709,7 @@ async function runSync(options = {}) {
         logVerbose(`${needsSync.length} members need sync (${result.skipped} unchanged)`);
 
         // Step 4: Sync each member
+        const allConflicts = [];
         for (let i = 0; i < needsSync.length; i++) {
           const member = needsSync[i];
           logVerbose(`Syncing ${i + 1}/${needsSync.length}: ${member.knvb_id}`);
@@ -717,6 +719,12 @@ async function runSync(options = {}) {
             result.synced++;
             if (syncResult.action === 'created') result.created++;
             if (syncResult.action === 'updated') result.updated++;
+            if (syncResult.action === 'skipped') result.skipped++;
+
+            // Aggregate conflicts from this member
+            if (syncResult.conflicts && syncResult.conflicts.length > 0) {
+              allConflicts.push(...syncResult.conflicts);
+            }
           } catch (error) {
             result.errors.push({
               knvb_id: member.knvb_id,
@@ -731,6 +739,16 @@ async function runSync(options = {}) {
         const deleteResult = await deleteRemovedMembers(db, currentKnvbIds, options);
         result.deleted = deleteResult.deleted.length;
         result.errors.push(...deleteResult.errors);
+
+        // Generate and log conflict summary for email report
+        if (allConflicts.length > 0) {
+          const summary = generateConflictSummary(allConflicts);
+          if (logger) {
+            logger.log(''); // Blank line separator
+            logger.log(summary); // "CONFLICTS DETECTED AND RESOLVED" section
+          }
+          result.conflicts = allConflicts.length;
+        }
       }
 
       // Parents sync
