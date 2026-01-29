@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 21 of 24 (Conflict Resolution Infrastructure)
-Plan: 0 of 1 in current phase
-Status: Ready to plan
-Last activity: 2026-01-29 — Phase 20 verified complete
+Plan: 1 of 1 in current phase
+Status: Phase complete
+Last activity: 2026-01-29 — Completed 21-01-PLAN.md
 
-Progress: [████████░░░░░░░░░░░░] 20/24 phases (83%)
+Progress: [█████████░░░░░░░░░░░] 21/24 phases (88%)
 
 ## Performance Metrics
 
@@ -29,10 +29,12 @@ Progress: [████████░░░░░░░░░░░░] 20/24 p
 | Phase | Plan | Duration | Tasks |
 |-------|------|----------|-------|
 | 20-01 | Bidirectional Timestamp Tracking | 3 min | 3/3 |
+| 21-01 | Conflict Resolution Infrastructure | 3 min | 3/3 |
 
 **Recent Trend:**
 - Phase 20-01 completed in 3 minutes
-- Trend: Baseline established
+- Phase 21-01 completed in 3 minutes
+- Trend: Consistent ~3 min per plan
 
 *Updated after each plan completion*
 
@@ -43,6 +45,9 @@ Progress: [████████░░░░░░░░░░░░] 20/24 p
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- Phase 21-01: Grace period (5s tolerance) - Sportlink wins on near-ties
+- Phase 21-01: NULL timestamp handling - system with history wins
+- Phase 21-01: Conflict audit trail in SQLite for debugging and metrics
 - Phase 20-01: NULL timestamps for untracked history (no backfilling)
 - Phase 20-01: 5-second clock drift tolerance for timestamp comparison
 - Phase 20-01: 7 tracked fields (email, email2, mobile, phone, datum_vog, freescout_id, financiele_blokkade)
@@ -66,11 +71,12 @@ None.
 **Architecture:**
 - Loop prevention (origin tracking) MUST be implemented before any reverse sync code runs [READY - sync_origin column added]
 - All timestamps must normalize to UTC to prevent timezone comparison errors [DONE - createTimestamp() uses UTC]
+- Conflict resolution infrastructure MUST be in place before reverse sync [READY - Phase 21 complete]
 
 ## Session Continuity
 
-Last session: 2026-01-29 15:45 UTC
-Stopped at: Completed Phase 20-01 (Bidirectional Timestamp Tracking)
+Last session: 2026-01-29 16:20 UTC
+Stopped at: Completed Phase 21-01 (Conflict Resolution Infrastructure)
 Resume file: None
 
 ---
