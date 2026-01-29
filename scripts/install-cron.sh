@@ -103,8 +103,8 @@ CRON_ENTRIES="
 # Sportlink Sync automation (installed $(date +%Y-%m-%d))
 CRON_TZ=Europe/Amsterdam
 
-# People sync: hourly (download, laposta, stadion members, birthdays, photos)
-0 * * * * $PROJECT_DIR/scripts/sync.sh people
+# People sync: 4x daily during work hours (members, parents, birthdays, photos)
+0 8,11,14,17 * * * $PROJECT_DIR/scripts/sync.sh people
 
 # Nikki sync: daily at 7:00 AM
 0 7 * * * $PROJECT_DIR/scripts/sync.sh nikki
@@ -122,7 +122,7 @@ CRON_TZ=Europe/Amsterdam
 echo "Cron jobs installed successfully!"
 echo ""
 echo "Scheduled jobs:"
-echo "  - People sync:    every hour (members, parents, birthdays, photos)"
+echo "  - People sync:    4x daily at 8am, 11am, 2pm, 5pm (members, parents, birthdays, photos)"
 echo "  - Nikki sync:     daily at 7:00 AM (nikki contributions)"
 echo "  - Team sync:      weekly on Sunday at 6:00 AM"
 echo "  - Functions sync: weekly on Sunday at 7:00 AM"

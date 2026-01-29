@@ -16,9 +16,10 @@
 #   - OPERATOR_EMAIL for report recipient
 #
 # Crontab example (single-line entries):
-#   0 * * * * /path/to/sync.sh people
-#   0 6 * * * /path/to/sync.sh photos
-#   0 6 * * 0 /path/to/sync.sh teams
+#   0 8,11,14,17 * * * /path/to/sync.sh people  # 4x daily
+#   0 7 * * * /path/to/sync.sh nikki            # daily
+#   0 6 * * 0 /path/to/sync.sh teams            # weekly Sunday
+#   0 7 * * 0 /path/to/sync.sh functions        # weekly Sunday
 #
 
 set -e

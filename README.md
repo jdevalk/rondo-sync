@@ -5,7 +5,7 @@ A CLI tool that synchronizes member data from Sportlink Club to Laposta email ma
 ## Features
 
 - **Multi-system sync**: Syncs to Laposta email lists, Stadion WordPress, and FreeScout helpdesk
-- **Automated scheduling**: Hourly, daily, and weekly cron jobs with email reports via Postmark
+- **Automated scheduling**: 4x daily, daily, and weekly cron jobs with email reports via Postmark
 - **Change detection**: Only submits members whose data actually changed (hash-based diff)
 - **Multi-list support**: Sync to up to 4 Laposta lists
 - **Parent deduplication**: Handles parent/child member associations
@@ -20,7 +20,7 @@ A CLI tool that synchronizes member data from Sportlink Club to Laposta email ma
 
 ```bash
 # Individual sync pipelines (recommended)
-scripts/sync.sh people    # Hourly sync: members, photos → Laposta + Stadion
+scripts/sync.sh people    # 4x daily sync: members, photos → Laposta + Stadion
 scripts/sync.sh photos    # Alias for people (photos integrated)
 scripts/sync.sh nikki     # Daily sync: Nikki contributions → Stadion
 scripts/sync.sh teams     # Weekly sync: team extraction + work history
@@ -40,7 +40,7 @@ npm run install-cron      # Set up automated sync schedules with email reports
 
 The sync is split into four independent pipelines, each with its own schedule:
 
-**1. People Pipeline (hourly via scripts/sync.sh people):**
+**1. People Pipeline (4x daily via scripts/sync.sh people):**
 - download-data-from-sportlink.js - Browser automation downloads member data (includes photo URLs)
 - prepare-laposta-members.js - Transforms Sportlink fields for Laposta
 - submit-laposta-list.js - Syncs to Laposta via API (hash-based change detection)
@@ -75,7 +75,7 @@ Runs all four pipelines sequentially plus FreeScout customer sync. Used for manu
 Four independent pipelines running on different schedules:
 
 ```
-People Pipeline (hourly):
+People Pipeline (4x daily):
 Sportlink Club → SQLite → Laposta API (hash-based diff)
                        ↓
               Stadion WordPress API (members)
@@ -172,7 +172,7 @@ DEBUG_LOG=false
 **Individual pipelines (recommended for production):**
 
 ```bash
-scripts/sync.sh people    # Hourly: members, parents, birthdays, photos
+scripts/sync.sh people    # 4x daily: members, parents, birthdays, photos
 scripts/sync.sh photos    # Alias for people (backwards compatible)
 scripts/sync.sh teams     # Weekly: team sync + work history
 scripts/sync.sh functions # Weekly: commissies + work history
@@ -235,7 +235,7 @@ The Stadion sync:
 
 ### Photo sync
 
-Photos are now integrated into the people pipeline and sync hourly. For backwards compatibility:
+Photos are now integrated into the people pipeline and sync 4x daily. For backwards compatibility:
 
 ```bash
 npm run download-photos           # Download photos via API (runs download-photos-from-api.js)
@@ -316,7 +316,7 @@ npm run install-cron
 This will:
 - Prompt for your operator email address and Postmark credentials
 - Install four crontab entries with different schedules:
-  - **People sync:** Hourly (members, parents, birthdays, photos)
+  - **People sync:** 4x daily (members, parents, birthdays, photos)
   - **Nikki sync:** Daily at 7:00 AM Amsterdam time
   - **Team sync:** Weekly on Sunday at 6:00 AM
   - **Functions sync:** Weekly on Sunday at 7:00 AM (after teams)

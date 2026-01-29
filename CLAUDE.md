@@ -6,7 +6,7 @@ CLI tool that synchronizes member data from Sportlink Club to Laposta email mark
 
 ```bash
 # Sync commands (via unified wrapper)
-scripts/sync.sh people    # Hourly: members, parents, birthdays, photos
+scripts/sync.sh people    # 4x daily: members, parents, birthdays, photos
 scripts/sync.sh photos    # Alias for people (photos integrated)
 scripts/sync.sh nikki     # Daily: Nikki contributions to Stadion
 scripts/sync.sh teams     # Weekly: team sync + work history
@@ -31,7 +31,7 @@ npm run install-cron      # Set up automated sync schedules with email reports
 
 The sync is split into four independent pipelines, each with its own schedule:
 
-**1. People Pipeline (hourly via sync-people.js):**
+**1. People Pipeline (4x daily via sync-people.js):**
 - download-data-from-sportlink.js - Browser automation downloads member data (includes photo URLs)
 - prepare-laposta-members.js - Transforms Sportlink fields for Laposta
 - submit-laposta-list.js - Syncs to Laposta via API (hash-based change detection)
@@ -72,7 +72,7 @@ Runs all four pipelines sequentially plus FreeScout customer sync. Used for manu
 Four parallel pipelines:
 
 ```
-People (hourly):
+People (4x daily):
 Sportlink Club → SQLite → Laposta API (hash-based diff)
                        ↓
               Stadion WordPress API (members)
@@ -197,7 +197,7 @@ The `stadion_id` mapping is critical: without it, sync creates new entries inste
 
 After `npm run install-cron`, four sync schedules are configured:
 
-- **People sync:** Hourly (members, parents, birthdays, photos)
+- **People sync:** 4x daily at 8am, 11am, 2pm, 5pm (members, parents, birthdays, photos)
 - **Nikki sync:** Daily at 7:00 AM Amsterdam time
 - **Team sync:** Weekly on Sunday at 6:00 AM
 - **Functions sync:** Weekly on Sunday at 7:00 AM (after teams)
