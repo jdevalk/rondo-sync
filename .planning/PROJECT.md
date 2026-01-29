@@ -8,7 +8,19 @@ A CLI tool that synchronizes member data from Sportlink Club (a Dutch sports clu
 
 Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
 
-## Current State (v1.7 Shipped)
+## Current Milestone: v2.0 Bidirectional Sync
+
+**Goal:** Enable pushing corrections made in Stadion back to Sportlink via browser automation, with last-edit-wins conflict resolution.
+
+**Target features:**
+- Reverse sync contact details (email, email2, mobile, phone) to Sportlink
+- Reverse sync datum-vog to Sportlink free field
+- Reverse sync freescout-id to Sportlink free field
+- Reverse sync financiele-blokkade toggle to Sportlink
+- Track modification times for last-edit-wins conflict resolution
+- Change detection for Stadion → Sportlink direction
+
+## Previous State (v1.7 Shipped)
 
 **Shipped:** 2026-01-28
 
@@ -81,7 +93,6 @@ Full sync pipeline operational with photo optimization:
 
 - Web UI — CLI tool is sufficient for operator use
 - Real-time sync — scheduled batch sync is appropriate for member data
-- Bidirectional sync — Sportlink is source of truth, downstream systems are read-only
 - Slack/Discord notifications — Email reports are sufficient for now
 - Fallback to local mail — Postmark is reliable enough, no fallback needed
 - Fail sync on email failure — Email is secondary to the actual sync operation
@@ -155,4 +166,4 @@ Full sync pipeline operational with photo optimization:
 | Delete obsolete browser photo scripts | Clean architecture, ~400 lines removed | ✓ Good |
 
 ---
-*Last updated: 2026-01-28 after v1.7 milestone*
+*Last updated: 2026-01-29 after v2.0 milestone start*
