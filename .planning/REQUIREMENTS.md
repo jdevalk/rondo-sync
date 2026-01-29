@@ -15,9 +15,9 @@ Requirements for bidirectional sync. Each maps to roadmap phases.
 
 ### Conflict Resolution
 
-- [ ] **CONF-01**: System compares modification timestamps to determine last-edit-wins
-- [ ] **CONF-02**: Conflict resolution operates at field level, not whole record
-- [ ] **CONF-03**: Operator receives notification when conflicts are detected and resolved
+- [x] **CONF-01**: System compares modification timestamps to determine last-edit-wins
+- [x] **CONF-02**: Conflict resolution operates at field level, not whole record
+- [x] **CONF-03**: Operator receives notification when conflicts are detected and resolved
 
 ### Reverse Sync
 
@@ -70,9 +70,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-01 | Phase 20 | Complete |
 | FOUND-02 | Phase 20 | Complete |
 | FOUND-03 | Phase 20 | Complete |
-| CONF-01 | Phase 21 | Pending |
-| CONF-02 | Phase 21 | Pending |
-| CONF-03 | Phase 21 | Pending |
+| CONF-01 | Phase 21 | Complete |
+| CONF-02 | Phase 21 | Complete |
+| CONF-03 | Phase 21 | Complete |
 | RSYNC-01 | Phase 22 | Pending |
 | RSYNC-02 | Phase 23 | Pending |
 | RSYNC-03 | Phase 24 | Pending |
@@ -88,4 +88,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 (Phase 20 complete)*
+*Last updated: 2026-01-29 (Phase 21 complete)*

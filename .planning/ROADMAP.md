@@ -64,7 +64,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 21-01-PLAN.md — Conflict detection and resolution module with audit trail
+- [x] 21-01-PLAN.md — Conflict detection and resolution module with audit trail
 
 #### Phase 22: Stadion Change Detection
 
@@ -136,11 +136,11 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 20. Foundation | v2.0 | 1/1 | ✅ Complete | 2026-01-29 |
-| 21. Conflict Resolution | v2.0 | 0/1 | Ready | - |
+| 21. Conflict Resolution | v2.0 | 1/1 | ✅ Complete | 2026-01-29 |
 | 22. Change Detection | v2.0 | 0/1 | Not started | - |
 | 23. Contact Fields | v2.0 | 0/1 | Not started | - |
 | 24. Free Fields & Toggle | v2.0 | 0/3 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase 20 complete)*
+*Last updated: 2026-01-29 (Phase 21 complete)*

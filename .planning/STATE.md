@@ -6,14 +6,14 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally
 
-**Current focus:** Phase 21 - Conflict Resolution Infrastructure
+**Current focus:** Phase 22 - Stadion Change Detection
 
 ## Current Position
 
-Phase: 21 of 24 (Conflict Resolution Infrastructure)
-Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-01-29 — Completed 21-01-PLAN.md
+Phase: 22 of 24 (Stadion Change Detection)
+Plan: 0 of 1 in current phase
+Status: Ready to plan
+Last activity: 2026-01-29 — Phase 21 verified complete
 
 Progress: [█████████░░░░░░░░░░░] 21/24 phases (88%)
 
