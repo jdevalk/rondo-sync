@@ -21,14 +21,14 @@ Requirements for bidirectional sync. Each maps to roadmap phases.
 
 ### Reverse Sync
 
-- [ ] **RSYNC-01**: System queries Stadion to detect members with modifications newer than Sportlink
+- [x] **RSYNC-01**: System queries Stadion to detect members with modifications newer than Sportlink
 - [ ] **RSYNC-02**: Contact fields (email, email2, mobile, phone) sync from Stadion to Sportlink /general page
 - [ ] **RSYNC-03**: Free fields (datum-vog, freescout-id) sync from Stadion to Sportlink /other page
 - [ ] **RSYNC-04**: Financial block toggle syncs from Stadion to Sportlink /financial page
 
 ### Integration
 
-- [ ] **INTEG-01**: All reverse sync operations logged with timestamps and field values for audit
+- [x] **INTEG-01**: All reverse sync operations logged with timestamps and field values for audit
 - [ ] **INTEG-02**: Email reports include reverse sync statistics (members updated, conflicts resolved)
 - [ ] **INTEG-03**: Reverse sync runs on separate cron schedule (every 15 minutes)
 
@@ -73,11 +73,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONF-01 | Phase 21 | Complete |
 | CONF-02 | Phase 21 | Complete |
 | CONF-03 | Phase 21 | Complete |
-| RSYNC-01 | Phase 22 | Pending |
+| RSYNC-01 | Phase 22 | Complete |
 | RSYNC-02 | Phase 23 | Pending |
 | RSYNC-03 | Phase 24 | Pending |
 | RSYNC-04 | Phase 24 | Pending |
-| INTEG-01 | Phase 22 | Pending |
+| INTEG-01 | Phase 22 | Complete |
 | INTEG-02 | Phase 24 | Pending |
 | INTEG-03 | Phase 24 | Pending |
 
@@ -88,4 +88,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 (Phase 21 complete)*
+*Last updated: 2026-01-29 (Phase 22 complete)*

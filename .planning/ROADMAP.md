@@ -84,7 +84,7 @@ Plans:
 
 Plans:
 - [x] 22-01-PLAN.md — Stadion change detection script with audit table and hash comparison
-- [ ] 22-02-PLAN.md — Fix field-level comparison (gap closure)
+- [x] 22-02-PLAN.md — Fix field-level comparison (gap closure)
 
 #### Phase 23: Contact Fields Reverse Sync
 
@@ -138,10 +138,10 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24
 |-------|-----------|----------------|--------|-----------|
 | 20. Foundation | v2.0 | 1/1 | ✅ Complete | 2026-01-29 |
 | 21. Conflict Resolution | v2.0 | 1/1 | ✅ Complete | 2026-01-29 |
-| 22. Change Detection | v2.0 | 1/2 | In progress | - |
+| 22. Change Detection | v2.0 | 2/2 | ✅ Complete | 2026-01-29 |
 | 23. Contact Fields | v2.0 | 0/1 | Not started | - |
 | 24. Free Fields & Toggle | v2.0 | 0/3 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29 (Phase 21 complete)*
+*Last updated: 2026-01-29 (Phase 22 complete)*
