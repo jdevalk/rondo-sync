@@ -42,10 +42,10 @@ Previous milestones completed. See git history for phase details.
   3. Timestamp comparison operations normalize all times to UTC before comparison
   4. Migration script successfully adds columns to existing stadion-sync.sqlite without data loss
 
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 20-01: Schema design and migration implementation
+- [ ] 20-01-PLAN.md — Add per-field timestamp columns and sync-origin utilities
 
 #### Phase 21: Conflict Resolution Infrastructure
 
@@ -135,7 +135,7 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 20. Foundation | v2.0 | 0/1 | Not started | - |
+| 20. Foundation | v2.0 | 0/1 | Ready | - |
 | 21. Conflict Resolution | v2.0 | 0/1 | Not started | - |
 | 22. Change Detection | v2.0 | 0/1 | Not started | - |
 | 23. Contact Fields | v2.0 | 0/1 | Not started | - |
