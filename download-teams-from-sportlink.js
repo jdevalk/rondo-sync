@@ -152,14 +152,14 @@ async function runTeamDownload(options = {}) {
 
         // Set up listeners for both players and non-players responses
         const playersResponsePromise = page.waitForResponse(
-          resp => resp.url().includes('/navajo/entity/common/clubweb/team/UnionTeamPlayers') &&
-                  resp.request().method() === 'POST',
+          resp => resp.url().includes('/UnionTeamPlayers') &&
+                  resp.request().method() === 'GET',
           { timeout: 10000 }
         ).catch(() => null);
 
         const nonPlayersResponsePromise = page.waitForResponse(
-          resp => resp.url().includes('/navajo/entity/common/clubweb/team/UnionTeamNonPlayers') &&
-                  resp.request().method() === 'POST',
+          resp => resp.url().includes('/UnionTeamNonPlayers') &&
+                  resp.request().method() === 'GET',
           { timeout: 10000 }
         ).catch(() => null);
 
