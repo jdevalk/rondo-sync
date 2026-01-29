@@ -18,6 +18,95 @@ const {
   resetParentStadionIds,
   getParentsNotInList
 } = require('./lib/stadion-db');
+const { resolveFieldConflicts, generateConflictSummary } = require('./lib/conflict-resolver');
+const { TRACKED_FIELDS } = require('./lib/sync-origin');
+const { extractFieldValue } = require('./lib/detect-stadion-changes');
+
+/**
+ * Extract tracked field values from member data.
+ * Handles both Sportlink format (data object from prepare-stadion-members.js)
+ * and Stadion format (ACF data from WordPress API).
+ *
+ * @param {Object} data - Member data with ACF fields
+ * @returns {Object} Object with field names as keys (using underscores)
+ */
+function extractTrackedFieldValues(data) {
+  const values = {};
+
+  for (const field of TRACKED_FIELDS) {
+    values[field] = extractFieldValue(data, field);
+  }
+
+  return values;
+}
+
+/**
+ * Apply conflict resolutions to update payload.
+ * Takes the original data object and modifies it with winning values from conflict resolution.
+ *
+ * @param {Object} originalData - Original update payload
+ * @param {Map} resolutions - Map of field -> {value, winner, reason}
+ * @returns {Object} Modified data with conflict resolutions applied
+ */
+function applyResolutions(originalData, resolutions) {
+  // Deep clone to avoid modifying original
+  const resolvedData = JSON.parse(JSON.stringify(originalData));
+
+  if (!resolvedData.acf) {
+    resolvedData.acf = {};
+  }
+
+  // Apply each resolution
+  for (const [field, resolution] of resolutions.entries()) {
+    const value = resolution.value;
+
+    // Convert field names: underscores to hyphens for ACF
+    // Contact fields need to be in contact_info array
+    if (['email', 'email2', 'mobile', 'phone'].includes(field)) {
+      if (!resolvedData.acf.contact_info) {
+        resolvedData.acf.contact_info = [];
+      }
+
+      const contactInfo = resolvedData.acf.contact_info;
+
+      if (field === 'email') {
+        const existing = contactInfo.findIndex(c => c.contact_type === 'email');
+        if (existing >= 0) {
+          contactInfo[existing].contact_value = value;
+        } else if (value !== null) {
+          contactInfo.push({ contact_type: 'email', contact_value: value });
+        }
+      } else if (field === 'email2') {
+        const existing = contactInfo.findIndex(c => c.contact_type === 'email2');
+        if (existing >= 0) {
+          contactInfo[existing].contact_value = value;
+        } else if (value !== null) {
+          contactInfo.push({ contact_type: 'email2', contact_value: value });
+        }
+      } else if (field === 'mobile') {
+        const existing = contactInfo.findIndex(c => c.contact_type === 'mobile');
+        if (existing >= 0) {
+          contactInfo[existing].contact_value = value;
+        } else if (value !== null) {
+          contactInfo.push({ contact_type: 'mobile', contact_value: value });
+        }
+      } else if (field === 'phone') {
+        const existing = contactInfo.findIndex(c => c.contact_type === 'phone');
+        if (existing >= 0) {
+          contactInfo[existing].contact_value = value;
+        } else if (value !== null) {
+          contactInfo.push({ contact_type: 'phone', contact_value: value });
+        }
+      }
+    } else {
+      // Direct ACF fields - convert underscores to hyphens
+      const acfFieldName = field.replace(/_/g, '-');
+      resolvedData.acf[acfFieldName] = value;
+    }
+  }
+
+  return resolvedData;
+}
 
 /**
  * Log financial block status change as activity on person
@@ -70,11 +159,15 @@ async function syncPerson(member, db, options) {
     logVerbose(`Updating existing person: ${stadion_id}`);
     logVerbose(`  PUT ${endpoint}`);
 
-    // Get existing person to compare financial block status
+    // Get existing person to compare financial block status and resolve conflicts
     let previousBlockStatus = false;
+    let existingData = null;
+    let conflicts = [];
+
     try {
       const existing = await stadionRequest(`wp/v2/people/${stadion_id}`, 'GET', null, options);
-      previousBlockStatus = existing.body.acf?.['financiele-blokkade'] || false;
+      existingData = existing.body;
+      previousBlockStatus = existingData.acf?.['financiele-blokkade'] || false;
     } catch (fetchError) {
       // If we can't fetch, continue with update but skip activity comparison
       if (fetchError.message && fetchError.message.includes('404')) {
@@ -88,18 +181,40 @@ async function syncPerson(member, db, options) {
     }
 
     // Only proceed with update if person still exists (not 404 above)
-    if (stadion_id) {
+    if (stadion_id && existingData) {
+      // Resolve conflicts between Sportlink and Stadion data
+      let updateData = data;
       try {
-        const response = await stadionRequest(endpoint, 'PUT', data, options);
+        const sportlinkData = extractTrackedFieldValues(data);
+        const stadionData = extractTrackedFieldValues(existingData);
+
+        const resolution = resolveFieldConflicts(member, sportlinkData, stadionData, db, options.logger);
+        conflicts = resolution.conflicts;
+
+        if (conflicts.length > 0) {
+          logVerbose(`  Resolved ${conflicts.length} conflict(s) for ${knvb_id}`);
+          updateData = applyResolutions(data, resolution.resolutions);
+        }
+      } catch (conflictError) {
+        // Skip member if conflict resolution fails
+        console.error(`ERROR: Conflict resolution failed for ${knvb_id}:`, conflictError.message);
+        if (options.logger) {
+          options.logger.error(`Skipping ${knvb_id} due to conflict resolution error: ${conflictError.message}`);
+        }
+        return { action: 'skipped', id: stadion_id, conflicts: [], error: conflictError.message };
+      }
+
+      try {
+        const response = await stadionRequest(endpoint, 'PUT', updateData, options);
         updateSyncState(db, knvb_id, source_hash, stadion_id);
 
         // Compare financial block status and log activity if changed
-        const newBlockStatus = data.acf?.['financiele-blokkade'] || false;
+        const newBlockStatus = updateData.acf?.['financiele-blokkade'] || false;
         if (previousBlockStatus !== newBlockStatus) {
           await logFinancialBlockActivity(stadion_id, newBlockStatus, options);
         }
 
-        return { action: 'updated', id: stadion_id };
+        return { action: 'updated', id: stadion_id, conflicts };
       } catch (error) {
         // Person was deleted from WordPress - reset tracking state and create fresh
         if (error.message && error.message.includes('404')) {
@@ -116,7 +231,7 @@ async function syncPerson(member, db, options) {
               console.error(`  Data: ${JSON.stringify(error.details.data)}`);
             }
           }
-          console.error(`  Payload: ${JSON.stringify(data, null, 2)}`);
+          console.error(`  Payload: ${JSON.stringify(updateData, null, 2)}`);
           throw error;
         }
       }
@@ -138,7 +253,7 @@ async function syncPerson(member, db, options) {
       await logFinancialBlockActivity(newId, true, options);
     }
 
-    return { action: 'created', id: newId };
+    return { action: 'created', id: newId, conflicts: [] };
   } catch (error) {
     console.error(`API Error creating person "${knvb_id}":`);
     console.error(`  Status: ${error.message}`);
