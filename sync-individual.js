@@ -65,7 +65,8 @@ async function syncIndividual(knvbId, options = {}) {
       return { success: false, error: 'No Sportlink data' };
     }
 
-    const members = JSON.parse(resultsJson);
+    const data = JSON.parse(resultsJson);
+    const members = data.Members || data;
     log(`Found ${members.length} members in Sportlink data`);
 
     // Find the specific member
