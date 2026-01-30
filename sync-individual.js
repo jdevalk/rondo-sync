@@ -69,8 +69,8 @@ async function syncIndividual(knvbId, options = {}) {
     const members = data.Members || data;
     log(`Found ${members.length} members in Sportlink data`);
 
-    // Find the specific member
-    const member = members.find(m => m.MemberId === knvbId);
+    // Find the specific member (KNVB ID is stored as PublicPersonId)
+    const member = members.find(m => m.PublicPersonId === knvbId);
     if (!member) {
       console.error(`Member with KNVB ID "${knvbId}" not found in Sportlink data`);
       return { success: false, error: 'Member not found' };
@@ -189,14 +189,15 @@ function findMemberByName(searchTerm) {
     const resultsJson = getLatestSportlinkResults(lapostaDb);
     if (!resultsJson) return [];
 
-    const members = JSON.parse(resultsJson);
+    const data = JSON.parse(resultsJson);
+    const members = data.Members || data;
     const search = searchTerm.toLowerCase();
 
     return members.filter(m => {
       const fullName = `${m.FirstName} ${m.Infix || ''} ${m.LastName}`.toLowerCase();
       return fullName.includes(search);
     }).map(m => ({
-      knvbId: m.MemberId,
+      knvbId: m.PublicPersonId,
       name: `${m.FirstName} ${m.Infix ? m.Infix + ' ' : ''}${m.LastName}`,
       email: m.Email
     }));
