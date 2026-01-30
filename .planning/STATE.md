@@ -60,12 +60,20 @@ None.
 - Update Sportlink page selectors with real browser inspection (placeholder selectors in use)
 - Watch for unexpected conflict patterns or resolution failures
 
+## Recent Quick Tasks
+
+**Quick Task 010: Fetch Local Teams from Sportlink** (2026-01-30)
+- Extended download-teams-from-sportlink.js to fetch ClubTeams alongside UnionTeams
+- Added AWC team filtering to exclude external teams
+- Duration: 1 min
+- Summary: .planning/quick/010-fetch-local-teams-from-sportlink/010-SUMMARY.md
+
 ## Session Continuity
 
-Last session: 2026-01-29
-Stopped at: v2.0 milestone complete and archived
+Last session: 2026-01-30
+Stopped at: Quick task 010 complete
 Resume file: None
 
 ---
 *State created: 2026-01-29*
-*Last updated: 2026-01-29 after v2.0 milestone completion*
+*Last updated: 2026-01-30 after quick task 010 completion*
