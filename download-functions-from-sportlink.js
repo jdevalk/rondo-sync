@@ -404,15 +404,6 @@ async function runFunctionsDownload(options = {}) {
 
               result.downloaded++;
               logger.verbose(`  Found ${parsed.functions.length} functions, ${parsed.committees.length} committees`);
-
-              // Fetch free fields and MemberHeader data from /other tab for members with functions/committees
-              // These members may have VOG certificates, FreeScout IDs, financial blocks, and photos
-              logger.verbose(`  Fetching member data from /other page...`);
-              const memberData = await fetchMemberDataFromOtherPage(page, member.knvb_id, logger);
-              if (memberData && (memberData.freescout_id || memberData.vog_datum || memberData.has_financial_block || memberData.photo_url)) {
-                allFreeFields.push(memberData);
-                logger.verbose(`  Found FreeScout ID: ${memberData.freescout_id || 'none'}, VOG datum: ${memberData.vog_datum || 'none'}`);
-              }
             } else {
               result.skipped++;
               logger.verbose(`  No functions or committees found`);
@@ -420,6 +411,16 @@ async function runFunctionsDownload(options = {}) {
           } else {
             result.skipped++;
             logger.verbose(`  No data returned`);
+          }
+
+          // Fetch free fields and MemberHeader data from /other tab for ALL members
+          // This captures VOG certificates, FreeScout IDs, financial blocks, and photos
+          // regardless of whether the member has functions/committees
+          logger.verbose(`  Fetching member data from /other page...`);
+          const memberData = await fetchMemberDataFromOtherPage(page, member.knvb_id, logger);
+          if (memberData && (memberData.freescout_id || memberData.vog_datum || memberData.has_financial_block || memberData.photo_url)) {
+            allFreeFields.push(memberData);
+            logger.verbose(`  Found FreeScout ID: ${memberData.freescout_id || 'none'}, VOG datum: ${memberData.vog_datum || 'none'}, Financial block: ${memberData.has_financial_block}`);
           }
         } catch (error) {
           result.errors.push({ knvb_id: member.knvb_id, message: error.message });
