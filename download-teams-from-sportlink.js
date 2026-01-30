@@ -121,14 +121,9 @@ async function runTeamDownload(options = {}) {
 
       const teamsData = await teamsResponse.json();
       const teams = Array.isArray(teamsData.Team) ? teamsData.Team : [];
-      logVerbose(`Found ${teams.length} teams`);
+      logVerbose(`Found ${teams.length} union teams`);
 
-      if (teams.length === 0) {
-        log('No teams found');
-        return { success: true, teamCount: 0, memberCount: 0 };
-      }
-
-      // Prepare team records with metadata
+      // Prepare team records with metadata for union teams
       const teamRecords = teams.map(team => ({
         team_name: team.TeamName || team.Name || '',
         sportlink_id: team.PublicTeamId || '',
@@ -136,8 +131,62 @@ async function runTeamDownload(options = {}) {
         game_activity: team.GameActivityDescription || '',
         gender: team.Gender || '',
         player_count: 0,
-        staff_count: 0
+        staff_count: 0,
+        source: 'union'
       })).filter(t => t.team_name && t.sportlink_id);
+
+      // Step 1b: Navigate to club teams page and capture club teams list
+      logVerbose('Fetching club teams list...');
+
+      const clubTeamsResponsePromise = page.waitForResponse(
+        resp => resp.url().includes('/navajo/entity/common/clubweb/team/ClubTeams') &&
+                !resp.url().includes('Players') &&
+                !resp.url().includes('NonPlayers') &&
+                resp.request().method() === 'GET',
+        { timeout: 60000 }
+      );
+
+      await page.goto('https://club.sportlink.com/teams/club-teams', { waitUntil: 'domcontentloaded' });
+
+      const clubTeamsResponse = await clubTeamsResponsePromise;
+      if (!clubTeamsResponse.ok()) {
+        const errorMsg = `Club teams request failed (${clubTeamsResponse.status()})`;
+        logError(errorMsg);
+        return { success: false, teamCount: 0, memberCount: 0, error: errorMsg };
+      }
+
+      const clubTeamsData = await clubTeamsResponse.json();
+      const clubTeams = Array.isArray(clubTeamsData.Team) ? clubTeamsData.Team : [];
+
+      // Filter out teams with TeamCode starting with "AWC " (external teams)
+      const filteredClubTeams = clubTeams.filter(team => {
+        const teamCode = team.TeamCode || '';
+        return !teamCode.startsWith('AWC ');
+      });
+
+      logVerbose(`Found ${filteredClubTeams.length} club teams (filtered ${clubTeams.length - filteredClubTeams.length} AWC teams)`);
+
+      // Add club team records to the team records array
+      const clubTeamRecords = filteredClubTeams.map(team => ({
+        team_name: team.TeamName || team.Name || '',
+        sportlink_id: team.PublicTeamId || '',
+        team_code: team.TeamCode || '',
+        game_activity: team.GameActivityDescription || '',
+        gender: team.Gender || '',
+        player_count: 0,
+        staff_count: 0,
+        source: 'club'
+      })).filter(t => t.team_name && t.sportlink_id);
+
+      // Combine union and club teams
+      teamRecords.push(...clubTeamRecords);
+
+      if (teamRecords.length === 0) {
+        log('No teams found');
+        return { success: true, teamCount: 0, memberCount: 0 };
+      }
+
+      logVerbose(`Total teams to process: ${teamRecords.length} (${teams.length} union + ${filteredClubTeams.length} club)`);
 
       // Step 2: Fetch players and staff for each team
       const allMembers = [];
@@ -145,20 +194,27 @@ async function runTeamDownload(options = {}) {
 
       for (let i = 0; i < teamRecords.length; i++) {
         const team = teamRecords[i];
-        logVerbose(`Fetching members for team ${i + 1}/${teamRecords.length}: ${team.team_name}`);
+        const teamType = team.source === 'club' ? 'club' : 'union';
+        logVerbose(`Fetching members for ${teamType} team ${i + 1}/${teamRecords.length}: ${team.team_name}`);
 
-        // Navigate to team details/members page
-        const teamMembersUrl = `https://club.sportlink.com/teams/team-details/${team.sportlink_id}/members`;
+        // Determine URLs and API patterns based on team source
+        const isClubTeam = team.source === 'club';
+        const teamMembersUrl = isClubTeam
+          ? `https://club.sportlink.com/teams/club-team-details/${team.sportlink_id}/members`
+          : `https://club.sportlink.com/teams/team-details/${team.sportlink_id}/members`;
+
+        const playersPattern = isClubTeam ? '/ClubTeamPlayers' : '/UnionTeamPlayers';
+        const nonPlayersPattern = isClubTeam ? '/ClubTeamNonPlayers' : '/UnionTeamNonPlayers';
 
         // Set up listeners for both players and non-players responses
         const playersResponsePromise = page.waitForResponse(
-          resp => resp.url().includes('/UnionTeamPlayers') &&
+          resp => resp.url().includes(playersPattern) &&
                   resp.request().method() === 'GET',
           { timeout: 10000 }
         ).catch(() => null);
 
         const nonPlayersResponsePromise = page.waitForResponse(
-          resp => resp.url().includes('/UnionTeamNonPlayers') &&
+          resp => resp.url().includes(nonPlayersPattern) &&
                   resp.request().method() === 'GET',
           { timeout: 10000 }
         ).catch(() => null);
@@ -225,9 +281,12 @@ async function runTeamDownload(options = {}) {
         // Clear existing team members and insert fresh data
         clearTeamMembers(db);
 
+        // Remove source field before storing (it was only needed for API routing)
+        const dbTeamRecords = teamRecords.map(({ source, ...rest }) => rest);
+
         // Upsert teams with metadata
-        if (teamRecords.length > 0) {
-          upsertTeamsWithMetadata(db, teamRecords);
+        if (dbTeamRecords.length > 0) {
+          upsertTeamsWithMetadata(db, dbTeamRecords);
         }
 
         // Upsert team members
