@@ -24,6 +24,23 @@ function isValidTeamName(teamName) {
 }
 
 /**
+ * Look up team stadion_id with fallback for short team names.
+ * Handles Sportlink inconsistency where UnionTeams field may lack club prefix.
+ * @param {string} teamName - Team name to look up
+ * @param {Map} teamMap - Exact match map (team_name -> stadion_id)
+ * @param {Map} teamMapNormalized - Normalized map (short name -> stadion_id)
+ * @returns {number|undefined} - Stadion ID or undefined if not found
+ */
+function lookupTeamStadionId(teamName, teamMap, teamMapNormalized) {
+  // Try exact match first
+  const exact = teamMap.get(teamName);
+  if (exact !== undefined) return exact;
+
+  // Try normalized (short name) lookup
+  return teamMapNormalized.get(teamName);
+}
+
+/**
  * Extract teams for a member from Sportlink data.
  * Priority: UnionTeams first, ClubTeams fallback.
  * Splits comma-separated values and filters invalid names.
@@ -158,12 +175,13 @@ function detectTeamChanges(db, knvbId, currentTeams) {
  * @param {Array<string>} currentTeams - Current team names
  * @param {Object} db - Stadion SQLite database
  * @param {Map} teamMap - Map<team_name, stadion_id>
+ * @param {Map} teamMapNormalized - Map<short_name, stadion_id> for fallback lookup
  * @param {Object} options - Logger and verbose options
  * @param {string} fallbackKernelGameActivities - Fallback KernelGameActivities for job title
  * @param {boolean} force - Force update even unchanged entries
  * @returns {Promise<{action: string, added: number, ended: number, updated: number}>}
  */
-async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, options, fallbackKernelGameActivities = '', force = false) {
+async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, teamMapNormalized, options, fallbackKernelGameActivities = '', force = false) {
   const { knvb_id, stadion_id } = member;
   const logVerbose = options.logger?.verbose.bind(options.logger) || (options.verbose ? console.log : () => {});
 
@@ -224,7 +242,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
 
   // Handle added teams
   for (const teamName of changes.added) {
-    const teamStadionId = teamMap.get(teamName);
+    const teamStadionId = lookupTeamStadionId(teamName, teamMap, teamMapNormalized);
     if (!teamStadionId) {
       logVerbose(`Warning: Team "${teamName}" not found in Stadion, skipping`);
       continue;
@@ -251,7 +269,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
   if (force) {
     const trackedHistory = getMemberWorkHistory(db, knvb_id);
     for (const teamName of changes.unchanged) {
-      const teamStadionId = teamMap.get(teamName);
+      const teamStadionId = lookupTeamStadionId(teamName, teamMap, teamMapNormalized);
       if (!teamStadionId) {
         logVerbose(`Warning: Team "${teamName}" not found in Stadion, skipping`);
         continue;
@@ -374,9 +392,22 @@ async function runSync(options = {}) {
       logVerbose(`Found ${members.length} Sportlink members`);
 
       // Load team mapping
+      // Build two maps: exact match and normalized (without club prefix)
+      // This handles Sportlink inconsistency where UnionTeams field may lack "AWC " prefix
       const teams = getAllTeams(stadionDb);
       const teamMap = new Map(teams.map(t => [t.team_name, t.stadion_id]));
-      logVerbose(`Loaded ${teams.length} teams from Stadion`);
+
+      // Build a secondary map for fuzzy matching: strip "AWC " prefix for lookup
+      // This allows "JO17-1" to match "AWC JO17-1"
+      const teamMapNormalized = new Map();
+      for (const t of teams) {
+        // If team name starts with "AWC ", also index by the name without prefix
+        if (t.team_name.startsWith('AWC ')) {
+          const shortName = t.team_name.substring(4); // Remove "AWC "
+          teamMapNormalized.set(shortName, t.stadion_id);
+        }
+      }
+      logVerbose(`Loaded ${teams.length} teams from Stadion (${teamMapNormalized.size} with short name aliases)`);
 
       // Build work history records for all members
       const workHistoryRecords = [];
@@ -444,6 +475,7 @@ async function runSync(options = {}) {
             currentTeams,
             stadionDb,
             teamMap,
+            teamMapNormalized,
             options,
             kernelGameActivities,
             force
