@@ -159,8 +159,8 @@ async function runPrepare(options = {}) {
           parentData.phones.add(String(phone).trim());
         }
 
-        // Track child KNVB ID for relationship linking
-        if (member.PublicPersonId) {
+        // Track child KNVB ID for relationship linking (avoid duplicates if same email in both parent fields)
+        if (member.PublicPersonId && !parentData.childKnvbIds.includes(member.PublicPersonId)) {
           parentData.childKnvbIds.push(member.PublicPersonId);
         }
       });

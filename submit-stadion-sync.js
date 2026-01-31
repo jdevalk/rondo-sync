@@ -292,6 +292,12 @@ async function updateChildrenParentLinks(parentId, childStadionIds, options) {
   const logVerbose = options.logger?.verbose.bind(options.logger) || (options.verbose ? console.log : () => {});
 
   for (const childId of childStadionIds) {
+    // Skip if child is the same as parent (prevent self-referential relationships)
+    if (childId === parentId) {
+      logVerbose(`Skipping self-referential parent link: ${parentId}`);
+      continue;
+    }
+
     try {
       // Get existing child record
       const childResponse = await stadionRequest(
@@ -372,10 +378,12 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
   let { stadion_id } = parent;
   const logVerbose = options.logger?.verbose.bind(options.logger) || (options.verbose ? console.log : () => {});
 
-  // Resolve child KNVB IDs to Stadion post IDs
-  const childStadionIds = childKnvbIds
-    .map(knvbId => knvbIdToStadionId.get(knvbId))
-    .filter(Boolean);
+  // Resolve child KNVB IDs to Stadion post IDs (deduplicate to prevent duplicate relationships)
+  const childStadionIds = [...new Set(
+    childKnvbIds
+      .map(knvbId => knvbIdToStadionId.get(knvbId))
+      .filter(Boolean)
+  )];
 
   // Build relationships array for children
   const childRelationships = childStadionIds.map(childId => ({
@@ -444,11 +452,12 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
 
     // Only proceed with update if person still exists (stadion_id not cleared by 404)
     if (stadion_id) {
-      // Merge: keep all existing relationships, add new child relationships (avoid duplicates)
+      // Merge: keep all existing relationships, add new child relationships (avoid duplicates and self-references)
       const existingChildIds = existingRelationships
         .filter(r => hasRelationshipType(r, 9)) // 9 = child type
         .map(r => r.related_person);
       const newChildRelationships = childRelationships.filter(r =>
+        r.related_person !== stadion_id && // Prevent self-referential relationships
         !existingChildIds.includes(r.related_person)
       );
       const mergedRelationships = [...existingRelationships, ...newChildRelationships];
