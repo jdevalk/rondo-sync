@@ -57,7 +57,14 @@ async function syncTeam(team, db, options) {
   const acfFields = {};
   if (sportlink_id) acfFields.publicteamid = sportlink_id;
   if (game_activity) acfFields.activiteit = game_activity;
-  if (gender) acfFields.gender = gender;
+
+  // Map Sportlink gender values to Stadion API values
+  const genderMap = {
+    'Mannen': 'male',
+    'Vrouwen': 'female'
+    // 'Gemengd' is not mapped - skip it as Stadion doesn't have a mixed option
+  };
+  if (gender && genderMap[gender]) acfFields.gender = genderMap[gender];
 
   if (stadion_id) {
     // Team exists - check if changed (unless force)
