@@ -270,6 +270,21 @@ async function syncPerson(member, db, options) {
 }
 
 /**
+ * Check if a relationship has a specific type.
+ * Handles both array format (what we write: [9]) and integer format (what API returns: 9).
+ * @param {Object} relationship - Relationship object with relationship_type
+ * @param {number} typeId - Relationship type ID to check for (8=parent, 9=child, 10=sibling)
+ * @returns {boolean}
+ */
+function hasRelationshipType(relationship, typeId) {
+  const type = relationship.relationship_type;
+  if (Array.isArray(type)) {
+    return type.includes(typeId);
+  }
+  return type === typeId;
+}
+
+/**
  * Update children's parents relationship field (bidirectional linking)
  * Preserves existing parent links, adds new one
  */
@@ -287,7 +302,9 @@ async function updateChildrenParentLinks(parentId, childStadionIds, options) {
       );
 
       const existingRelationships = childResponse.body.acf?.relationships || [];
-      const hasParentLink = existingRelationships.some(r => r.related_person === parentId);
+      const hasParentLink = existingRelationships.some(r =>
+        r.related_person === parentId && hasRelationshipType(r, 8) // 8 = parent type
+      );
 
       if (!hasParentLink) {
         const newRelationship = {
@@ -429,7 +446,7 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
     if (stadion_id) {
       // Merge: keep all existing relationships, add new child relationships (avoid duplicates)
       const existingChildIds = existingRelationships
-        .filter(r => Array.isArray(r.relationship_type) && r.relationship_type.includes(9))
+        .filter(r => hasRelationshipType(r, 9)) // 9 = child type
         .map(r => r.related_person);
       const newChildRelationships = childRelationships.filter(r =>
         !existingChildIds.includes(r.related_person)
