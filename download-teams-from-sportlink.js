@@ -200,9 +200,10 @@ async function runTeamDownload(options = {}) {
         // Use same URL pattern for both union and club teams
         const teamMembersUrl = `https://club.sportlink.com/teams/team-details/${team.sportlink_id}/members`;
 
-        // Both team types use the same API patterns for member data
-        const playersPattern = '/UnionTeamPlayers';
-        const nonPlayersPattern = '/UnionTeamNonPlayers';
+        // API response patterns differ by team type
+        const isClubTeam = team.source === 'club';
+        const playersPattern = isClubTeam ? '/ClubTeamPlayers' : '/UnionTeamPlayers';
+        const nonPlayersPattern = isClubTeam ? '/ClubTeamNonPlayers' : '/UnionTeamNonPlayers';
 
         // Set up listeners for both players and non-players responses
         const playersResponsePromise = page.waitForResponse(
