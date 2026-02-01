@@ -362,9 +362,20 @@ async function downloadAndParseCsv(page, logger) {
 
   logger.verbose(`Parsed ${records.length} rows from CSV`);
 
+  // Strip quotes from column names (quote:false makes them literal)
+  const cleanedRecords = records.map(row => {
+    const cleaned = {};
+    for (const [key, value] of Object.entries(row)) {
+      const cleanKey = key.replace(/^"|"$/g, '');
+      const cleanValue = typeof value === 'string' ? value.replace(/^"|"$/g, '') : value;
+      cleaned[cleanKey] = cleanValue;
+    }
+    return cleaned;
+  });
+
   // Log column names for debugging (first row)
-  if (records.length > 0) {
-    logger.verbose(`CSV columns: ${Object.keys(records[0]).join(', ')}`);
+  if (cleanedRecords.length > 0) {
+    logger.verbose(`CSV columns: ${Object.keys(cleanedRecords[0]).join(', ')}`);
   }
 
   // Clean up file after parsing
@@ -375,7 +386,7 @@ async function downloadAndParseCsv(page, logger) {
     logger.verbose(`Could not delete CSV file: ${e.message}`);
   }
 
-  return records;
+  return cleanedRecords;
 }
 
 /**
