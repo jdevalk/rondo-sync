@@ -10,30 +10,30 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 ## Current Position
 
 Phase: 28 of 29 (Per-Year SQLite Storage)
-Plan: 0 of 0 (planning not started)
-Status: Ready to plan
-Last activity: 2026-02-01 — Phase 27 complete and verified
+Plan: 1 of 1 (Complete)
+Status: Phase complete
+Last activity: 2026-02-01 — Completed 28-01-PLAN.md
 
-Progress: [█████████░] 93% (27 of 29 phases complete)
+Progress: [█████████░] 97% (28 of 29 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1 (v2.1 milestone)
-- Average duration: ~8 minutes
-- Total execution time: ~8 minutes
+- Total plans completed: 2 (v2.1 milestone)
+- Average duration: ~4.5 minutes
+- Total execution time: ~9 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 27 | 1 | 8m | 8m |
-| 28 | - | - | - |
+| 28 | 1 | 1m | 1m |
 | 29 | - | - | - |
 
 **Recent Trend:**
-- Last 5 plans: 27-01 (8m)
-- Trend: Baseline established
+- Last 5 plans: 27-01 (8m), 28-01 (1m)
+- Trend: Acceleration on focused changes
 
 ## Accumulated Context
 
@@ -42,11 +42,11 @@ Progress: [█████████░] 93% (27 of 29 phases complete)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [28-01]: Use 4-year retention window (current + 3 previous) for Nikki contributions
+- [28-01]: Upsert-before-prune pattern prevents data loss during sync
 - [27-01]: Use csv-parse library for CSV parsing (stream-based, handles BOM)
 - [v2.0]: Per-field timestamp tracking enables conflict detection (14 columns for 7 fields x 2 systems)
 - [v2.0]: 15-minute reverse sync schedule balances responsiveness vs Sportlink load
-- [v1.7]: Photo sync integrated into people pipeline (hourly vs daily)
-- [v1.7]: Store photo_url/photo_date in stadion_members table
 
 ### Pending Todos
 
@@ -58,6 +58,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-01 (phase 27 execution)
-Stopped at: Phase 27 complete and verified
+Last session: 2026-02-01 (phase 28 execution)
+Stopped at: Phase 28 complete (28-01-PLAN.md)
 Resume file: None
