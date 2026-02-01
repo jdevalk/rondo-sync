@@ -7,38 +7,6 @@ const { openDb: openStadionDb, getAllTrackedMembers } = require('./lib/stadion-d
 const { createSyncLogger } = require('./lib/logger');
 
 /**
- * Format currency as Euro (European format)
- * @param {number} amount - Amount in Euros
- * @returns {string} - Formatted string like "€123,45"
- */
-function formatEuro(amount) {
-  if (amount === null || amount === undefined) return '€0,00';
-  return '€' + amount.toFixed(2).replace('.', ',');
-}
-
-/**
- * Generate HTML content for a member's Nikki contributions.
- * Format: Unordered list with links to Nikki.
- *
- * @param {Array<{year: number, nikki_id: string, saldo: number, status: string}>} contributions
- * @returns {string} - HTML content
- */
-function generateContributionHtml(contributions) {
-  if (!contributions || contributions.length === 0) {
-    return '';
-  }
-
-  const items = contributions.map((c) => {
-    const url = `https://mijn.nikki-online.nl/leden/${c.nikki_id}`;
-    const saldoStr = formatEuro(c.saldo);
-    const statusStr = c.status || 'Onbekend';
-    return `<li><a href="${url}">${c.year} - ${statusStr} - ${saldoStr}</a></li>`;
-  });
-
-  return `<ul>\n${items.join('\n')}\n</ul>`;
-}
-
-/**
  * Build per-year ACF fields from contributions.
  * Creates fields like _nikki_2025_total, _nikki_2025_saldo, _nikki_2025_status
  *
@@ -56,10 +24,10 @@ function buildPerYearAcfFields(contributions) {
 }
 
 /**
- * Compute hash for HTML content (for change detection)
+ * Compute hash for change detection (serializes object to JSON)
  */
-function computeContentHash(html) {
-  return crypto.createHash('sha256').update(html || '').digest('hex');
+function computeFieldsHash(fields) {
+  return crypto.createHash('sha256').update(JSON.stringify(fields) || '').digest('hex');
 }
 
 /**
@@ -98,7 +66,7 @@ async function stadionRequestWithRetry(endpoint, method, body, options, maxRetri
 }
 
 /**
- * Sync Nikki contribution data to Stadion WYSIWYG field
+ * Sync Nikki contribution data to Stadion per-year ACF fields
  * @param {Object} options
  * @param {Object} [options.logger] - Logger instance
  * @param {boolean} [options.verbose=false] - Verbose mode
@@ -138,10 +106,6 @@ async function runNikkiStadionSync(options = {}) {
     }
     logger.verbose(`Loaded ${knvbIdToStadionId.size} KNVB → Stadion ID mappings`);
 
-    // Track current content hashes for change detection (in-memory for this run)
-    // In a full implementation, you'd store these in the database
-    const currentHashes = new Map();
-
     // Process each member with contributions
     let processed = 0;
     for (const [knvbId, contributions] of contributionsByMember) {
@@ -154,9 +118,9 @@ async function runNikkiStadionSync(options = {}) {
         continue;
       }
 
-      // Generate HTML content
-      const html = generateContributionHtml(contributions);
-      const contentHash = computeContentHash(html);
+      // Build per-year ACF fields for all contribution years
+      const perYearFields = buildPerYearAcfFields(contributions);
+      const newFieldsHash = computeFieldsHash(perYearFields);
 
       // Fetch existing data from Stadion (needed for change detection AND name fields)
       let existingFirstName = '';
@@ -176,10 +140,15 @@ async function runNikkiStadionSync(options = {}) {
 
         // Check if we need to update (only if not forcing)
         if (!force) {
-          const currentValue = response.body?.acf?.['nikki-contributie-status'] || '';
-          const currentHash = computeContentHash(currentValue);
+          // Extract existing per-year fields from response for comparison
+          const existingAcf = response.body?.acf || {};
+          const existingPerYearFields = {};
+          for (const key of Object.keys(perYearFields)) {
+            existingPerYearFields[key] = existingAcf[key] ?? null;
+          }
+          const existingFieldsHash = computeFieldsHash(existingPerYearFields);
 
-          if (currentHash === contentHash) {
+          if (existingFieldsHash === newFieldsHash) {
             logger.verbose(`[${processed}/${contributionsByMember.size}] ${knvbId}: No changes, skipping`);
             result.skipped++;
             skipUpdate = true;
@@ -197,8 +166,8 @@ async function runNikkiStadionSync(options = {}) {
       }
 
       if (dryRun) {
-        logger.log(`[DRY-RUN] Would update ${knvbId} (Stadion ID: ${stadionId})`);
-        logger.verbose(`  HTML: ${html.substring(0, 100)}...`);
+        const years = contributions.map(c => c.year).join(', ');
+        logger.log(`[DRY-RUN] Would update ${knvbId} (Stadion ID: ${stadionId}, years: ${years})`);
         result.updated++;
         continue;
       }
@@ -207,9 +176,6 @@ async function runNikkiStadionSync(options = {}) {
       try {
         logger.verbose(`[${processed}/${contributionsByMember.size}] ${knvbId}: Updating Stadion ID ${stadionId}`);
 
-        // Build per-year ACF fields for all contribution years
-        const perYearFields = buildPerYearAcfFields(contributions);
-
         await stadionRequestWithRetry(
           `wp/v2/people/${stadionId}`,
           'PUT',
@@ -217,7 +183,6 @@ async function runNikkiStadionSync(options = {}) {
             acf: {
               first_name: existingFirstName,
               last_name: existingLastName,
-              'nikki-contributie-status': html,
               ...perYearFields
             }
           },
@@ -260,7 +225,7 @@ async function runNikkiStadionSync(options = {}) {
   }
 }
 
-module.exports = { runNikkiStadionSync, generateContributionHtml, formatEuro, buildPerYearAcfFields };
+module.exports = { runNikkiStadionSync, buildPerYearAcfFields };
 
 // CLI entry point
 if (require.main === module) {
