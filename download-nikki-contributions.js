@@ -10,7 +10,7 @@ const {
   openDb,
   upsertContributions,
   getContributionCount,
-  clearContributions
+  pruneOldContributions
 } = require('./lib/nikki-db');
 const { createSyncLogger } = require('./lib/logger');
 
@@ -506,11 +506,15 @@ async function runNikkiDownload(options = {}) {
       logger.verbose(`Parsed ${contributions.length} valid contributions`);
 
       if (contributions.length > 0) {
-        // Clear existing data for fresh import
-        clearContributions(db);
-
-        // Store to database
+        // Store to database (upsert handles current year updates)
         upsertContributions(db, contributions);
+
+        // Prune data older than retention window (keeps 4 years)
+        const pruned = pruneOldContributions(db);
+        if (pruned > 0) {
+          logger.verbose(`Pruned ${pruned} old contribution records`);
+        }
+
         result.count = contributions.length;
       }
 
