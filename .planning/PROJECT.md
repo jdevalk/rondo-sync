@@ -8,6 +8,16 @@ A CLI tool that synchronizes member data bidirectionally between Sportlink Club 
 
 Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
 
+## Current Milestone: v2.1 Improved Nikki Import
+
+**Goal:** Enhance Nikki contribution sync with CSV data extraction and per-year ACF field storage.
+
+**Target features:**
+- Download CSV from Rapporten link after scraping /leden table
+- Extract hoofdsom (total amount) by matching nikki_id
+- Store 2-3 years of data per member
+- Sync individual ACF fields: `_nikki_{year}_total`, `_nikki_{year}_saldo`, `_nikki_{year}_status`
+
 ## Current State (v2.0 Shipped)
 
 **Shipped:** 2026-01-29
@@ -90,7 +100,11 @@ Full bidirectional sync pipeline operational:
 
 ### Active
 
-(None — ready for next milestone planning)
+- [ ] Download CSV from Nikki Rapporten link after /leden scrape
+- [ ] Parse CSV and extract hoofdsom (total amount) by nikki_id
+- [ ] Update SQLite schema to store per-year data (total, saldo, status)
+- [ ] Sync individual ACF fields to Stadion: `_nikki_{year}_total`, `_nikki_{year}_saldo`, `_nikki_{year}_status`
+- [ ] Support 2-3 years of historical data per member
 
 ### Out of Scope
 
@@ -186,4 +200,4 @@ Full bidirectional sync pipeline operational:
 | Separate lockfile per sync type | Allows parallel execution of different pipelines | ✓ Good |
 
 ---
-*Last updated: 2026-01-29 after v2.0 milestone*
+*Last updated: 2026-02-01 after v2.1 milestone start*

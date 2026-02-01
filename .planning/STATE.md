@@ -6,16 +6,16 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally
 
-**Current focus:** Planning next milestone
+**Current focus:** v2.1 Improved Nikki Import
 
 ## Current Position
 
-Phase: Milestone complete
-Plan: N/A
-Status: v2.0 Bidirectional Sync SHIPPED
-Last activity: 2026-01-29 — v2.0 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-01 — Milestone v2.1 started
 
-Progress: [████████████████████] v2.0 complete (7 phases, 10 plans)
+Progress: [░░░░░░░░░░░░░░░░░░░░] v2.1 starting
 
 ## Performance Metrics
 
@@ -70,10 +70,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-30
-Stopped at: Quick task 010 complete
+Last session: 2026-02-01
+Stopped at: Milestone v2.1 initialization
 Resume file: None
 
 ---
 *State created: 2026-01-29*
-*Last updated: 2026-01-30 after quick task 010 completion*
+*Last updated: 2026-02-01 after v2.1 milestone start*
