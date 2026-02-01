@@ -1,0 +1,68 @@
+# Requirements: Sportlink Sync v2.1
+
+**Defined:** 2026-02-01
+**Core Value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention
+
+## v2.1 Requirements
+
+Requirements for Improved Nikki Import milestone.
+
+### CSV Download
+
+- [ ] **CSV-01**: System downloads CSV when clicking Rapporten link after /leden scrape
+- [ ] **CSV-02**: System handles download via Playwright (wait for download, read file)
+- [ ] **CSV-03**: System parses CSV with columns: nikki_id, lid_nr, hoofdsom, saldo, etc.
+
+### Data Matching
+
+- [ ] **MATCH-01**: System matches CSV rows to /leden table rows by nikki_id
+- [ ] **MATCH-02**: System extracts hoofdsom (total amount) from matched CSV row
+- [ ] **MATCH-03**: System handles missing nikki_id gracefully (skip without error)
+
+### Per-Year Storage
+
+- [ ] **STORE-01**: SQLite schema stores per-year data: year, knvb_id, total, saldo, status
+- [ ] **STORE-02**: System retains 2-3 years of historical data per member
+- [ ] **STORE-03**: System replaces data for current year on each sync
+
+### Stadion Sync
+
+- [ ] **SYNC-01**: System syncs `_nikki_{year}_total` field to Stadion person ACF
+- [ ] **SYNC-02**: System syncs `_nikki_{year}_saldo` field to Stadion person ACF
+- [ ] **SYNC-03**: System syncs `_nikki_{year}_status` field to Stadion person ACF
+- [ ] **SYNC-04**: System syncs all years (2-3) for each member
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Bidirectional Nikki sync | Nikki is read-only source, corrections made there directly |
+| Real-time sync | Daily batch sync is sufficient for contribution data |
+| Additional CSV columns | Only hoofdsom needed now, can extend later |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| CSV-01 | Phase 27 | Pending |
+| CSV-02 | Phase 27 | Pending |
+| CSV-03 | Phase 27 | Pending |
+| MATCH-01 | Phase 27 | Pending |
+| MATCH-02 | Phase 27 | Pending |
+| MATCH-03 | Phase 27 | Pending |
+| STORE-01 | Phase 28 | Pending |
+| STORE-02 | Phase 28 | Pending |
+| STORE-03 | Phase 28 | Pending |
+| SYNC-01 | Phase 29 | Pending |
+| SYNC-02 | Phase 29 | Pending |
+| SYNC-03 | Phase 29 | Pending |
+| SYNC-04 | Phase 29 | Pending |
+
+**Coverage:**
+- v2.1 requirements: 13 total
+- Mapped to phases: 13
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-02-01*
+*Last updated: 2026-02-01 after initial definition*
