@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-01)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
-**Current focus:** Phase 29 - Stadion ACF Sync
+**Current focus:** v2.1 milestone complete
 
 ## Current Position
 
 Phase: 29 of 29 (Stadion ACF Sync)
-Plan: 0 of ? (not started)
-Status: Ready to plan
-Last activity: 2026-02-01 — Phase 28 complete and verified
+Plan: 1 of 1 (complete)
+Status: Phase complete - v2.1 milestone finished
+Last activity: 2026-02-01 — Completed 29-01-PLAN.md
 
-Progress: [█████████░] 97% (28 of 29 phases complete)
+Progress: [██████████] 100% (29 of 29 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2 (v2.1 milestone)
-- Average duration: ~4.5 minutes
-- Total execution time: ~9 minutes
+- Total plans completed: 3 (v2.1 milestone)
+- Average duration: ~4.7 minutes
+- Total execution time: ~14 minutes
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [█████████░] 97% (28 of 29 phases complete)
 |-------|-------|-------|----------|
 | 27 | 1 | 8m | 8m |
 | 28 | 1 | 1m | 1m |
-| 29 | - | - | - |
+| 29 | 1 | 5m | 5m |
 
 **Recent Trend:**
-- Last 5 plans: 27-01 (8m), 28-01 (1m)
-- Trend: Acceleration on focused changes
+- Last 5 plans: 27-01 (8m), 28-01 (1m), 29-01 (5m)
+- Trend: Consistent execution on focused changes
 
 ## Accumulated Context
 
@@ -42,6 +42,7 @@ Progress: [█████████░] 97% (28 of 29 phases complete)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [29-01]: ACF custom fields require registration via API (dynamic fields not supported)
 - [28-01]: Use 4-year retention window (current + 3 previous) for Nikki contributions
 - [28-01]: Upsert-before-prune pattern prevents data loss during sync
 - [27-01]: Use csv-parse library for CSV parsing (stream-based, handles BOM)
@@ -50,14 +51,14 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+None - v2.1 milestone complete.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Session Continuity
 
-Last session: 2026-02-01 (phase 28 verified)
-Stopped at: Phase 28 complete and verified
+Last session: 2026-02-01 14:50 UTC
+Stopped at: v2.1 milestone complete (all 29 phases done)
 Resume file: None
