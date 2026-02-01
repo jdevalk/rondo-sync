@@ -5,6 +5,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const otplib = require('otplib');
 const { chromium } = require('playwright');
+const { parse } = require('csv-parse');
 const {
   openDb,
   upsertContributions,
@@ -281,6 +282,154 @@ async function scrapeContributions(page, logger) {
 }
 
 /**
+ * Download CSV from Rapporten link and parse it.
+ * Returns array of { nikki_id, lid_nr, hoofdsom, ... }
+ */
+async function downloadAndParseCsv(page, logger) {
+  logger.verbose('Starting CSV download from Rapporten link...');
+
+  // Create downloads directory
+  const downloadsDir = path.join(process.cwd(), 'downloads');
+  await fs.mkdir(downloadsDir, { recursive: true });
+
+  // CRITICAL: Set up download listener BEFORE clicking (race condition prevention)
+  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
+
+  // Click the Rapporten link - try multiple selectors for robustness
+  const rapportenSelectors = [
+    'a:has-text("Rapporten")',
+    'button:has-text("Rapporten")',
+    '[href*="rapport"]',
+    'a[href*="export"]',
+    '.export-btn'
+  ];
+
+  let clicked = false;
+  for (const selector of rapportenSelectors) {
+    try {
+      const element = await page.$(selector);
+      if (element) {
+        await element.click();
+        clicked = true;
+        logger.verbose(`Clicked Rapporten using selector: ${selector}`);
+        break;
+      }
+    } catch (e) {
+      continue;
+    }
+  }
+
+  if (!clicked) {
+    logger.verbose('Could not find Rapporten link - CSV download skipped');
+    return null;
+  }
+
+  // Wait for download to complete
+  let download;
+  try {
+    download = await downloadPromise;
+  } catch (e) {
+    logger.verbose(`Download did not start within timeout: ${e.message}`);
+    return null;
+  }
+
+  // Save file
+  const suggestedFilename = download.suggestedFilename() || 'nikki-export.csv';
+  const filePath = path.join(downloadsDir, suggestedFilename);
+  await download.saveAs(filePath);
+  logger.verbose(`CSV downloaded to: ${filePath}`);
+
+  // Parse CSV
+  const records = await new Promise((resolve, reject) => {
+    const rows = [];
+    require('fs').createReadStream(filePath)
+      .pipe(parse({
+        columns: true,           // Use first row as column names
+        skip_empty_lines: true,
+        trim: true,
+        bom: true,               // Handle UTF-8 BOM
+        relax_column_count: true // Handle inconsistent column counts
+      }))
+      .on('data', (row) => rows.push(row))
+      .on('error', (err) => {
+        logger.error(`CSV parse error: ${err.message}`);
+        reject(err);
+      })
+      .on('end', () => resolve(rows));
+  });
+
+  logger.verbose(`Parsed ${records.length} rows from CSV`);
+
+  // Log column names for debugging (first row)
+  if (records.length > 0) {
+    logger.verbose(`CSV columns: ${Object.keys(records[0]).join(', ')}`);
+  }
+
+  // Clean up file after parsing
+  try {
+    await fs.unlink(filePath);
+    logger.verbose('Cleaned up CSV file');
+  } catch (e) {
+    logger.verbose(`Could not delete CSV file: ${e.message}`);
+  }
+
+  return records;
+}
+
+/**
+ * Merge HTML table data with CSV data by nikki_id.
+ * CSV provides hoofdsom (total amount) not available in HTML.
+ */
+function mergeHtmlAndCsvData(htmlRecords, csvRecords, logger) {
+  if (!csvRecords || csvRecords.length === 0) {
+    logger.verbose('No CSV data to merge - using HTML data only');
+    return htmlRecords.map(r => ({ ...r, hoofdsom: null }));
+  }
+
+  // Build lookup map from CSV (nikki_id -> row)
+  const csvMap = new Map();
+  for (const csvRow of csvRecords) {
+    // Try multiple possible column names for nikki_id
+    const key = csvRow.nikki_id || csvRow.nikkiId || csvRow.nikki || csvRow.NikkiId;
+    if (key) {
+      csvMap.set(key, csvRow);
+    }
+  }
+
+  logger.verbose(`Built CSV lookup map with ${csvMap.size} entries`);
+
+  // Merge data
+  let matchedCount = 0;
+  let unmatchedCount = 0;
+
+  const merged = htmlRecords.map(htmlRow => {
+    const csvData = csvMap.get(htmlRow.nikki_id);
+
+    if (csvData) {
+      // Extract hoofdsom from CSV - try multiple column names
+      const hoofdsomRaw = csvData.hoofdsom || csvData.Hoofdsom || csvData.total || csvData.Total || csvData.totaal || csvData.Totaal || '0';
+      const hoofdsom = parseEuroAmount(hoofdsomRaw);
+      matchedCount++;
+
+      return {
+        ...htmlRow,
+        hoofdsom: hoofdsom
+      };
+    } else {
+      // No match - gracefully set hoofdsom to null
+      unmatchedCount++;
+      return {
+        ...htmlRow,
+        hoofdsom: null
+      };
+    }
+  });
+
+  logger.verbose(`Merged: ${matchedCount} matched, ${unmatchedCount} unmatched (gracefully handled)`);
+  return merged;
+}
+
+/**
  * Main download orchestration
  * @param {Object} options
  * @param {Object} [options.logger] - Logger instance
@@ -304,6 +453,7 @@ async function runNikkiDownload(options = {}) {
     const debugEnabled = parseBool(readEnv('DEBUG_LOG', 'false'));
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({
+      acceptDownloads: true,  // REQUIRED for download operations
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
     });
     await context.route('**/*', (route) => {
@@ -333,8 +483,11 @@ async function runNikkiDownload(options = {}) {
 
       const rawContributions = await scrapeContributions(page, logger);
 
-      // Parse and validate contributions
-      const contributions = rawContributions.map((raw) => {
+      // Download and parse CSV for additional data (hoofdsom)
+      const csvRecords = await downloadAndParseCsv(page, logger);
+
+      // Parse and validate contributions from HTML
+      const htmlContributions = rawContributions.map((raw) => {
         const year = parseInt(raw.year, 10);
         const saldo = parseEuroAmount(raw.saldo_raw);
 
@@ -346,6 +499,9 @@ async function runNikkiDownload(options = {}) {
           status: raw.status || null
         };
       }).filter((c) => c.knvb_id && c.year > 0 && c.nikki_id);
+
+      // Merge with CSV data (adds hoofdsom field)
+      const contributions = mergeHtmlAndCsvData(htmlContributions, csvRecords, logger);
 
       logger.verbose(`Parsed ${contributions.length} valid contributions`);
 
