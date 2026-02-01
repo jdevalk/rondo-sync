@@ -225,7 +225,8 @@ async function runNikkiStadionSync(options = {}) {
         );
 
         result.updated++;
-        logger.verbose(`  Updated successfully`);
+        const years = contributions.map(c => c.year).join(', ');
+        logger.verbose(`  Updated successfully (years: ${years})`);
 
       } catch (error) {
         result.errors++;
@@ -259,7 +260,7 @@ async function runNikkiStadionSync(options = {}) {
   }
 }
 
-module.exports = { runNikkiStadionSync, generateContributionHtml, formatEuro };
+module.exports = { runNikkiStadionSync, generateContributionHtml, formatEuro, buildPerYearAcfFields };
 
 // CLI entry point
 if (require.main === module) {
