@@ -115,7 +115,7 @@ async function createCustomer(customer, options) {
   const payload = {
     firstName: customer.data.firstName,
     lastName: customer.data.lastName,
-    emails: [customer.email]  // FreeScout expects string array, not object array
+    emails: [{ value: customer.email, type: 'home' }]
   };
 
   // Add phones if available
