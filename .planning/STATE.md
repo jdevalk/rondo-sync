@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 30 of 32 (Download Discipline Cases)
-Plan: — (not yet planned)
-Status: Ready to plan
-Last activity: 2026-02-02 — Roadmap created for v2.2 milestone
+Plan: 01 of 01 complete
+Status: Phase complete
+Last activity: 2026-02-02 — Completed 30-01-PLAN.md (discipline download)
 
-Progress: [##########..........] 29/32 phases (v2.1 complete, v2.2 starting)
+Progress: [##########..........] 30/32 phases
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3 (v2.1 milestone)
-- Average duration: ~4.7 minutes
-- Total execution time: ~14 minutes
+- Total plans completed: 4 (v2.1 milestone + 30-01)
+- Average duration: ~4.5 minutes
+- Total execution time: ~18 minutes
 
 **By Phase:**
 
@@ -30,6 +30,7 @@ Progress: [##########..........] 29/32 phases (v2.1 complete, v2.2 starting)
 | 27 | 1 | 8m | 8m |
 | 28 | 1 | 1m | 1m |
 | 29 | 1 | 5m | 5m |
+| 30 | 1 | 4m | 4m |
 
 ## Accumulated Context
 
@@ -38,6 +39,8 @@ Progress: [##########..........] 29/32 phases (v2.1 complete, v2.2 starting)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting future work:
 
+- [30-01]: Store ChargeCodes as JSON string if array (flexible for unknown API structure)
+- [30-01]: Multiple tab selector strategies for resilience against UI changes
 - [29-01]: ACF custom fields require registration via API (dynamic fields not supported)
 - [28-01]: Use 4-year retention window (current + 3 previous) for Nikki contributions
 - [28-01]: Upsert-before-prune pattern prevents data loss during sync
@@ -66,5 +69,5 @@ None. Stadion UI work (DISC-07, DISC-08) deferred to Stadion codebase.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Roadmap created for v2.2 Discipline Cases milestone
+Stopped at: Completed 30-01-PLAN.md (discipline download)
 Resume file: None
