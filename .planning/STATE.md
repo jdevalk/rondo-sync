@@ -4,17 +4,17 @@
 
 See: .planning/PROJECT.md (updated 2026-02-02)
 
-**Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
-**Current focus:** v2.2 Discipline Cases
+**Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
+**Current focus:** v2.2 Discipline Cases - Phase 30 (Download)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements for v2.2
-Last activity: 2026-02-02 — Milestone v2.2 started
+Phase: 30 of 32 (Download Discipline Cases)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-02-02 — Roadmap created for v2.2 milestone
 
-Progress: Defining requirements
+Progress: [##########..........] 29/32 phases (v2.1 complete, v2.2 starting)
 
 ## Performance Metrics
 
@@ -55,7 +55,7 @@ Recent decisions affecting future work:
 
 ### Blockers/Concerns
 
-None.
+None. Stadion UI work (DISC-07, DISC-08) deferred to Stadion codebase.
 
 ### Quick Tasks Completed
 
@@ -66,5 +66,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: v2.1 milestone complete and archived
+Stopped at: Roadmap created for v2.2 Discipline Cases milestone
 Resume file: None

@@ -17,9 +17,7 @@ Requirements for discipline case sync. Each maps to roadmap phases.
 
 - [ ] **DISC-04**: Create/update discipline-cases as Stadion custom post type
 - [ ] **DISC-05**: Map all case fields to Stadion ACF fields
-- [ ] **DISC-06**: Link case to person via ACF relationship field (using PublicPersonId → stadion_id mapping)
-- [ ] **DISC-07**: Display player card on case detail page in Stadion
-- [ ] **DISC-08**: Display related cases on player detail page in Stadion
+- [ ] **DISC-06**: Link case to person via ACF relationship field (using PublicPersonId -> stadion_id mapping)
 
 ### Season Organization
 
@@ -41,31 +39,31 @@ Requirements for discipline case sync. Each maps to roadmap phases.
 | Case deletion | Cases persist in Stadion even if removed from Sportlink (historical record) |
 | Team discipline cases | Only individual cases ("Individuele tuchtzaken"), not team cases |
 | Real-time sync | Weekly batch sync sufficient for rare disciplinary events |
+| Player card on case page (DISC-07) | Stadion theme/plugin work, not sync code — deferred to Stadion codebase |
+| Cases list on player page (DISC-08) | Stadion theme/plugin work, not sync code — deferred to Stadion codebase |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DISC-01 | TBD | Pending |
-| DISC-02 | TBD | Pending |
-| DISC-03 | TBD | Pending |
-| DISC-04 | TBD | Pending |
-| DISC-05 | TBD | Pending |
-| DISC-06 | TBD | Pending |
-| DISC-07 | TBD | Pending |
-| DISC-08 | TBD | Pending |
-| DISC-09 | TBD | Pending |
-| DISC-10 | TBD | Pending |
-| DISC-11 | TBD | Pending |
-| DISC-12 | TBD | Pending |
-| DISC-13 | TBD | Pending |
-| DISC-14 | TBD | Pending |
+| DISC-01 | Phase 30 | Pending |
+| DISC-02 | Phase 30 | Pending |
+| DISC-03 | Phase 30 | Pending |
+| DISC-04 | Phase 31 | Pending |
+| DISC-05 | Phase 31 | Pending |
+| DISC-06 | Phase 31 | Pending |
+| DISC-09 | Phase 31 | Pending |
+| DISC-10 | Phase 31 | Pending |
+| DISC-11 | Phase 31 | Pending |
+| DISC-12 | Phase 32 | Pending |
+| DISC-13 | Phase 32 | Pending |
+| DISC-14 | Phase 32 | Pending |
 
 **Coverage:**
-- v2.2 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14
+- v2.2 requirements: 12 total (2 deferred to Stadion codebase)
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after initial definition*
+*Last updated: 2026-02-02 after deferring DISC-07, DISC-08 to Stadion codebase*
