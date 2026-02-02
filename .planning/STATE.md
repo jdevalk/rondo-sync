@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
-**Current focus:** Planning next milestone
+**Current focus:** v2.2 Discipline Cases
 
 ## Current Position
 
-Phase: 29 of 29 (All phases complete)
-Plan: N/A
-Status: v2.1 milestone archived, ready for next milestone
-Last activity: 2026-02-02 — Completed v2.1 milestone
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v2.2
+Last activity: 2026-02-02 — Milestone v2.2 started
 
-Progress: [██████████] 100% (29 of 29 phases complete)
+Progress: Defining requirements
 
 ## Performance Metrics
 

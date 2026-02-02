@@ -8,6 +8,18 @@ A CLI tool that synchronizes member data bidirectionally between Sportlink Club 
 
 Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
 
+## Current Milestone: v2.2 Discipline Cases
+
+**Goal:** Sync individual discipline cases from Sportlink to Stadion with season-based organization and person linking.
+
+**Target features:**
+- Download discipline cases from Sportlink via browser automation
+- Store cases in SQLite with DossierId as unique key
+- Sync to Stadion as `discipline-cases` post type with ACF fields
+- Link cases to persons via PublicPersonId → stadion_id mapping
+- Organize cases by season category (derived from date, Aug 1 boundary)
+- Weekly sync schedule integrated into pipeline
+
 ## Current State (v2.1 Shipped)
 
 **Shipped:** 2026-02-02
@@ -111,7 +123,12 @@ Full bidirectional sync pipeline operational:
 
 ### Active
 
-(None - ready for next milestone planning)
+- [ ] Download discipline cases from Sportlink `/competition-affairs/discipline-cases`
+- [ ] Store cases in SQLite with full field set (DossierId, PublicPersonId, MatchDate, etc.)
+- [ ] Sync cases to Stadion `discipline-cases` post type
+- [ ] Link cases to persons via existing PublicPersonId → stadion_id mapping
+- [ ] Organize by season category (auto-derived from date)
+- [ ] Weekly sync schedule with email reporting
 
 ### Out of Scope
 
@@ -211,4 +228,4 @@ Full bidirectional sync pipeline operational:
 | ACF field registration via API | WordPress/ACF requires field registration before values can be stored | ✓ Good |
 
 ---
-*Last updated: 2026-02-02 after v2.1 milestone complete*
+*Last updated: 2026-02-02 after starting v2.2 milestone*
