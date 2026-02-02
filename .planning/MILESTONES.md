@@ -1,5 +1,32 @@
 # Project Milestones: Sportlink Sync
 
+## v2.1 Improved Nikki Import (Shipped: 2026-02-02)
+
+**Delivered:** Enhanced Nikki contribution sync with CSV data extraction, per-year ACF field storage in Stadion, and 4-year historical retention.
+
+**Phases completed:** 27-29 (3 plans total)
+
+**Key accomplishments:**
+
+- CSV download from Nikki Rapporten link with Playwright download handling
+- Hoofdsom extraction and data merge by nikki_id mapping
+- 4-year historical retention via year-based pruning (replaces destructive clear)
+- Per-year ACF field sync to Stadion (_nikki_{year}_total/saldo/status)
+- Added csv-parse library for robust CSV parsing with BOM handling
+
+**Stats:**
+
+- 4 files created/modified
+- 18,934 lines of JavaScript (project total)
+- 3 phases, 3 plans
+- 2 days (2026-02-01 → 2026-02-02)
+
+**Git range:** `feat(27-01)` → `feat(29-01)`
+
+**What's next:** To be determined in next milestone planning.
+
+---
+
 ## v2.0 Bidirectional Sync (Shipped: 2026-01-29)
 
 **Delivered:** Bidirectional sync enabling corrections made in Stadion to flow back to Sportlink via browser automation, with last-edit-wins conflict resolution at field level.

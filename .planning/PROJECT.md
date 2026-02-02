@@ -8,15 +8,21 @@ A CLI tool that synchronizes member data bidirectionally between Sportlink Club 
 
 Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
 
-## Current Milestone: v2.1 Improved Nikki Import
+## Current State (v2.1 Shipped)
 
-**Goal:** Enhance Nikki contribution sync with CSV data extraction and per-year ACF field storage.
+**Shipped:** 2026-02-02
 
-**Target features:**
-- Download CSV from Rapporten link after scraping /leden table
-- Extract hoofdsom (total amount) by matching nikki_id
-- Store 2-3 years of data per member
-- Sync individual ACF fields: `_nikki_{year}_total`, `_nikki_{year}_saldo`, `_nikki_{year}_status`
+Full bidirectional sync pipeline operational with enhanced Nikki contribution tracking:
+- Member data downloads from Sportlink via browser automation
+- Members sync to Laposta email lists with hash-based change detection
+- Members and parents sync to Stadion WordPress with relationship linking
+- Financial block status syncs bidirectionally with activity audit trail
+- Photos download via HTTP (from MemberHeader API URLs) and upload to Stadion hourly
+- Teams extract from Sportlink and sync to Stadion with work history
+- FreeScout customer sync from Stadion and Nikki databases
+- Reverse sync pushes contact field corrections from Stadion to Sportlink
+- **Nikki contributions sync with CSV download, per-year ACF fields, and 4-year retention**
+- Five automated pipelines (people 4x daily, nikki daily, teams/functions weekly, reverse sync every 15 minutes)
 
 ## Current State (v2.0 Shipped)
 
@@ -97,14 +103,15 @@ Full bidirectional sync pipeline operational:
 - ✓ All reverse sync operations logged with timestamps and field values for audit — v2.0
 - ✓ Email reports include reverse sync statistics (members updated, conflicts resolved) — v2.0
 - ✓ Reverse sync runs on separate cron schedule (every 15 minutes) — v2.0
+- ✓ Download CSV from Nikki Rapporten link after /leden scrape — v2.1
+- ✓ Parse CSV and extract hoofdsom (total amount) by nikki_id — v2.1
+- ✓ SQLite schema stores per-year data (total, saldo, status) — v2.1
+- ✓ Sync individual ACF fields to Stadion: `_nikki_{year}_total`, `_nikki_{year}_saldo`, `_nikki_{year}_status` — v2.1
+- ✓ Support 4 years of historical data per member (current + 3 previous) — v2.1
 
 ### Active
 
-- [ ] Download CSV from Nikki Rapporten link after /leden scrape
-- [ ] Parse CSV and extract hoofdsom (total amount) by nikki_id
-- [ ] Update SQLite schema to store per-year data (total, saldo, status)
-- [ ] Sync individual ACF fields to Stadion: `_nikki_{year}_total`, `_nikki_{year}_saldo`, `_nikki_{year}_status`
-- [ ] Support 2-3 years of historical data per member
+(None - ready for next milestone planning)
 
 ### Out of Scope
 
@@ -125,7 +132,7 @@ Full bidirectional sync pipeline operational:
 ## Context
 
 **Codebase:**
-- ~17,500 lines of JavaScript + shell
+- ~18,900 lines of JavaScript + shell
 - Node.js with Playwright for browser automation
 - SQLite for state tracking (Laposta, Stadion, FreeScout, Nikki)
 - Shell scripts for cron automation
@@ -198,6 +205,10 @@ Full bidirectional sync pipeline operational:
 | Fail-fast per member | If any page fails, skip entire member | ✓ Good |
 | 15-minute reverse sync schedule | Balances responsiveness vs Sportlink load | ✓ Good |
 | Separate lockfile per sync type | Allows parallel execution of different pipelines | ✓ Good |
+| Use csv-parse library | Stream-based parsing, handles BOM, flexible column mapping | ✓ Good |
+| 4-year retention window | Current + 3 previous years, configurable default | ✓ Good |
+| Upsert-before-prune pattern | Prevents data loss during sync (upsert first, then prune old) | ✓ Good |
+| ACF field registration via API | WordPress/ACF requires field registration before values can be stored | ✓ Good |
 
 ---
-*Last updated: 2026-02-01 after v2.1 milestone start*
+*Last updated: 2026-02-02 after v2.1 milestone complete*

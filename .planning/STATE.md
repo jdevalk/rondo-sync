@@ -2,17 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-01)
+See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
-**Current focus:** v2.1 milestone complete
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 29 of 29 (Stadion ACF Sync)
-Plan: 1 of 1 (complete)
-Status: Phase complete - v2.1 milestone finished
-Last activity: 2026-02-02 — Completed quick task 011: Remove debug output and fix photo headers
+Phase: 29 of 29 (All phases complete)
+Plan: N/A
+Status: v2.1 milestone archived, ready for next milestone
+Last activity: 2026-02-02 — Completed v2.1 milestone
 
 Progress: [██████████] 100% (29 of 29 phases complete)
 
@@ -31,27 +31,27 @@ Progress: [██████████] 100% (29 of 29 phases complete)
 | 28 | 1 | 1m | 1m |
 | 29 | 1 | 5m | 5m |
 
-**Recent Trend:**
-- Last 5 plans: 27-01 (8m), 28-01 (1m), 29-01 (5m)
-- Trend: Consistent execution on focused changes
-
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Recent decisions affecting future work:
 
 - [29-01]: ACF custom fields require registration via API (dynamic fields not supported)
 - [28-01]: Use 4-year retention window (current + 3 previous) for Nikki contributions
 - [28-01]: Upsert-before-prune pattern prevents data loss during sync
 - [27-01]: Use csv-parse library for CSV parsing (stream-based, handles BOM)
-- [v2.0]: Per-field timestamp tracking enables conflict detection (14 columns for 7 fields x 2 systems)
-- [v2.0]: 15-minute reverse sync schedule balances responsiveness vs Sportlink load
 
 ### Pending Todos
 
-None - v2.1 milestone complete.
+4 pending — check with /gsd:check-todos
+
+### Active Debug Sessions
+
+2 active:
+- birthday-sync-404-errors.md
+- download-functions-no-api-response.md
 
 ### Blockers/Concerns
 
@@ -65,6 +65,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-01 14:50 UTC
-Stopped at: v2.1 milestone complete (all 29 phases done)
+Last session: 2026-02-02
+Stopped at: v2.1 milestone complete and archived
 Resume file: None

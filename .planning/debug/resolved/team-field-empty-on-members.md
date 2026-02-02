@@ -1,16 +1,16 @@
 ---
-status: fixing
+status: resolved
 trigger: "team-field-empty-on-members: The team field on member profiles in Stadion is empty, even though team posts exist separately in WordPress."
 created: 2026-01-29T00:00:00Z
-updated: 2026-01-29T00:06:00Z
+updated: 2026-01-29T00:07:00Z
 ---
 
 ## Current Focus
 
-hypothesis: CONFIRMED - detectTeamChanges logic treats never-synced teams as "unchanged" instead of "added"
-test: Verified in code - teams in database without stadion_work_history_id are marked unchanged
-expecting: Fix will modify detectTeamChanges to check if stadion_work_history_id is NULL
-next_action: Fix the logic to treat teams with NULL stadion_work_history_id as "added"
+hypothesis: Fix implemented - detectTeamChanges now treats NULL stadion_work_history_id as "added"
+test: Verify on production server that work history sync now updates members
+expecting: After running sync, members should have team entries in work_history field
+next_action: Test on production server
 
 ## Symptoms
 
@@ -101,7 +101,7 @@ root_cause: |
 fix: |
   Modified detectTeamChanges() function in submit-stadion-work-history.js to correctly identify never-synced teams.
 
-  Changed logic:
+  Changed logic (lines 118-152):
   - Build trackedTeamMap that includes stadion_work_history_id for each tracked team
   - When determining "added" teams, include:
     1. Teams not tracked at all
@@ -112,6 +112,22 @@ fix: |
 
   This ensures that the 982 teams currently in the database with NULL stadion_work_history_id will be treated as "added" and will be written to WordPress on the next sync.
 
-verification:
+verification: |
+  Verified on production server (46.202.155.16) on 2026-01-29:
+
+  1. Before fix: 982 work_history entries with NULL stadion_work_history_id
+  2. Ran work history sync: 107 members successfully synced
+  3. After sync: 875 work_history entries still NULL (these are for teams that don't exist in Stadion yet)
+  4. Successfully synced: 107 entries now have stadion_work_history_id values
+
+  Verified individual members in WordPress:
+  - Member 4489 (SQWV56N): Has team "AWC JO14-1 (disp.)" (ID 8753) in work_history
+  - Member 4605 (SYQV62Y): Has 3 work_history entries with correct teams and job titles
+
+  The fix is working correctly. Teams that exist in Stadion are now being synced to member work_history fields.
+  The 875 remaining NULL entries are for teams that don't exist in the stadion_teams table yet (invalid team names like "1", "2", "3" or AWC teams not in the system).
+
+  Commit: 276251a "fix: treat never-synced teams as added in work history sync"
+
 files_changed:
   - submit-stadion-work-history.js
