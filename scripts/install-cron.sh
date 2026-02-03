@@ -8,13 +8,14 @@ PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 echo "Sportlink Sync - Cron Installation"
 echo "==================================="
 echo ""
-echo "This will set up six sync schedules:"
-echo "  - People sync:    4x daily (members, parents, birthdays, photos)"
-echo "  - Nikki sync:     daily at 7:00 AM"
-echo "  - FreeScout sync: daily at 8:00 AM"
-echo "  - Team sync:      weekly on Sunday at 6:00 AM"
-echo "  - Functions sync: daily at 7:15 AM"
-echo "  - Reverse sync:   every 15 minutes (Stadion -> Sportlink)"
+echo "This will set up seven sync schedules:"
+echo "  - People sync:     4x daily (members, parents, birthdays, photos)"
+echo "  - Nikki sync:      daily at 7:00 AM"
+echo "  - FreeScout sync:  daily at 8:00 AM"
+echo "  - Team sync:       weekly on Sunday at 6:00 AM"
+echo "  - Functions sync:  daily at 7:15 AM"
+echo "  - Discipline sync: weekly on Monday at 11:30 PM"
+echo "  - Reverse sync:    every 15 minutes (Stadion -> Sportlink)"
 echo ""
 
 # Check if .env exists and has Postmark config
@@ -120,6 +121,9 @@ CRON_TZ=Europe/Amsterdam
 # Functions sync: daily at 7:15 AM (after Nikki sync)
 15 7 * * * $PROJECT_DIR/scripts/sync.sh functions
 
+# Discipline sync: weekly on Monday at 11:30 PM
+30 23 * * 1 $PROJECT_DIR/scripts/sync.sh discipline
+
 # Reverse sync: every 15 minutes (Stadion -> Sportlink)
 */15 * * * * $PROJECT_DIR/scripts/sync.sh reverse
 "
@@ -130,12 +134,13 @@ CRON_TZ=Europe/Amsterdam
 echo "Cron jobs installed successfully!"
 echo ""
 echo "Scheduled jobs:"
-echo "  - People sync:    4x daily at 8am, 11am, 2pm, 5pm (members, parents, birthdays, photos)"
-echo "  - Nikki sync:     daily at 7:00 AM (nikki contributions)"
-echo "  - FreeScout sync: daily at 8:00 AM (customer sync)"
-echo "  - Team sync:      weekly on Sunday at 6:00 AM"
-echo "  - Functions sync: daily at 7:15 AM"
-echo "  - Reverse sync:   every 15 minutes (Stadion -> Sportlink)"
+echo "  - People sync:     4x daily at 8am, 11am, 2pm, 5pm (members, parents, birthdays, photos)"
+echo "  - Nikki sync:      daily at 7:00 AM (nikki contributions)"
+echo "  - FreeScout sync:  daily at 8:00 AM (customer sync)"
+echo "  - Team sync:       weekly on Sunday at 6:00 AM"
+echo "  - Functions sync:  daily at 7:15 AM"
+echo "  - Discipline sync: weekly on Monday at 11:30 PM"
+echo "  - Reverse sync:    every 15 minutes (Stadion -> Sportlink)"
 echo ""
 echo "All times are Amsterdam timezone (Europe/Amsterdam)"
 echo ""
@@ -146,6 +151,6 @@ fi
 echo "Helpful commands:"
 echo "  View installed cron jobs:   crontab -l"
 echo "  View logs:                  ls -la $PROJECT_DIR/logs/cron/"
-echo "  Manual sync:                $PROJECT_DIR/scripts/sync.sh {people|teams|functions|nikki|freescout|reverse|all}"
+echo "  Manual sync:                $PROJECT_DIR/scripts/sync.sh {people|teams|functions|nikki|freescout|reverse|discipline|all}"
 echo "  Remove all cron jobs:       crontab -r"
 echo ""

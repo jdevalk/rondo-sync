@@ -17,6 +17,7 @@ const { runSync: runCommissieSync } = require('./submit-stadion-commissies');
 const { runSync: runCommissieWorkHistorySync } = require('./submit-stadion-commissie-work-history');
 const { runSubmit: runFreescoutSubmit } = require('./submit-freescout-sync');
 const { checkCredentials: checkFreescoutCredentials } = require('./lib/freescout-client');
+const { runDisciplineSync: runDisciplinePipelineSync } = require('./sync-discipline');
 const { openDb } = require('./lib/stadion-db');
 
 /**
@@ -237,6 +238,31 @@ function printSummary(logger, stats) {
   }
   logger.log('');
 
+  logger.log('DISCIPLINE SYNC');
+  logger.log(minorDivider);
+  if (stats.discipline.total > 0) {
+    const disciplineSyncText = `${stats.discipline.synced}/${stats.discipline.total}`;
+    logger.log(`Cases synced: ${disciplineSyncText}`);
+    if (stats.discipline.created > 0) {
+      logger.log(`  Created: ${stats.discipline.created}`);
+    }
+    if (stats.discipline.updated > 0) {
+      logger.log(`  Updated: ${stats.discipline.updated}`);
+    }
+    if (stats.discipline.skipped > 0) {
+      logger.log(`  Skipped: ${stats.discipline.skipped} (unchanged)`);
+    }
+    if (stats.discipline.linked > 0) {
+      logger.log(`  Linked to persons: ${stats.discipline.linked}`);
+    }
+    if (stats.discipline.skipped_no_person > 0) {
+      logger.log(`  Skipped (no person): ${stats.discipline.skipped_no_person}`);
+    }
+  } else {
+    logger.log('Cases synced: 0 changes');
+  }
+  logger.log('');
+
   const allErrors = [
     ...stats.errors,
     ...stats.stadion.errors,
@@ -249,7 +275,8 @@ function printSummary(logger, stats) {
     ...stats.photos.upload.errors,
     ...stats.photos.delete.errors,
     ...stats.birthdays.errors,
-    ...stats.freescout.errors
+    ...stats.freescout.errors,
+    ...stats.discipline.errors
   ];
   if (allErrors.length > 0) {
     logger.log(`ERRORS (${allErrors.length})`);
@@ -378,6 +405,16 @@ async function runSyncAll(options = {}) {
       updated: 0,
       skipped: 0,
       deleted: 0,
+      errors: []
+    },
+    discipline: {
+      total: 0,
+      synced: 0,
+      created: 0,
+      updated: 0,
+      skipped: 0,
+      linked: 0,
+      skipped_no_person: 0,
       errors: []
     }
   };
@@ -775,6 +812,31 @@ async function runSyncAll(options = {}) {
       logger.verbose('FreeScout sync skipped (credentials not configured)');
     }
 
+    // Step 9: Discipline Sync (NON-CRITICAL, weekly pipeline included for completeness)
+    logger.verbose('Syncing discipline cases to Stadion...');
+    try {
+      const disciplineResult = await runDisciplinePipelineSync({ verbose, force });
+
+      if (disciplineResult.stats) {
+        stats.discipline = {
+          total: disciplineResult.stats.sync.total,
+          synced: disciplineResult.stats.sync.synced,
+          created: disciplineResult.stats.sync.created,
+          updated: disciplineResult.stats.sync.updated,
+          skipped: disciplineResult.stats.sync.skipped,
+          linked: disciplineResult.stats.sync.linked || 0,
+          skipped_no_person: disciplineResult.stats.sync.skipped_no_person || 0,
+          errors: []
+        };
+      }
+    } catch (err) {
+      logger.error(`Discipline sync failed: ${err.message}`);
+      stats.discipline.errors.push({
+        message: `Discipline sync failed: ${err.message}`,
+        system: 'discipline'
+      });
+    }
+
     // Complete timing
     const endTime = Date.now();
     stats.completedAt = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
@@ -800,7 +862,8 @@ async function runSyncAll(options = {}) {
                stats.photos.upload.errors.length === 0 &&
                stats.photos.delete.errors.length === 0 &&
                stats.birthdays.errors.length === 0 &&
-               stats.freescout.errors.length === 0,
+               stats.freescout.errors.length === 0 &&
+               stats.discipline.errors.length === 0,
       stats
     };
   } catch (err) {
