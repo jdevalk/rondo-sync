@@ -45,7 +45,7 @@ Recent decisions affecting future work:
 
 ### Pending Todos
 
-4 pending — check with /gsd:check-todos
+None
 
 ### Active Debug Sessions
 
