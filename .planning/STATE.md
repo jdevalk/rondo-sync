@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
-**Current focus:** v2.2 Discipline Cases - Phase 31 (Sync to Stadion)
+**Current focus:** v2.2 Discipline Cases - Phase 32 (Pipeline Integration) ✓
 
 ## Current Position
 
-Phase: 31 of 32 (Sync Discipline Cases to Stadion) ✓
+Phase: 32 of 32 (Pipeline Integration) ✓
 Plan: 01 of 01 complete
-Status: Phase complete, ready for Phase 32
-Last activity: 2026-02-03 — Completed 31-01-PLAN.md (discipline case sync to Stadion)
+Status: Phase complete - v2.2 Discipline Cases milestone finished
+Last activity: 2026-02-03 — Completed 32-01-PLAN.md (discipline pipeline integration)
 
-Progress: [############........] 31/32 phases
+Progress: [################....] 32/32 phases
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5 (v2.1 milestone + phases 30-31)
-- Average duration: ~4 minutes
-- Total execution time: ~20 minutes
+- Total plans completed: 6 (v2.1 milestone + v2.2 discipline cases)
+- Average duration: ~3.5 minutes
+- Total execution time: ~23 minutes
 
 **By Phase:**
 
@@ -32,6 +32,7 @@ Progress: [############........] 31/32 phases
 | 29 | 1 | 5m | 5m |
 | 30 | 1 | 4m | 4m |
 | 31 | 1 | 2m | 2m |
+| 32 | 1 | 3m | 3m |
 
 ## Accumulated Context
 
@@ -40,6 +41,9 @@ Progress: [############........] 31/32 phases
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting future work:
 
+- [32-01]: Monday 11:30 PM schedule avoids overlap with weekend team sync and daytime syncs
+- [32-01]: Discipline sync treated as non-critical in sync-all.js (continues on failure)
+- [32-01]: Linked stat tracks all cases associated with persons (created + updated + skipped)
 - [31-01]: Season derived from match date using August 1 boundary (matches KNVB season cycles)
 - [30-01]: Store ChargeCodes as JSON string if array (flexible for unknown API structure)
 - [30-01]: Multiple tab selector strategies for resilience against UI changes
@@ -71,5 +75,6 @@ None. Stadion UI work (DISC-07, DISC-08) deferred to Stadion codebase.
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Phase 31 complete and verified, ready for Phase 32
+Stopped at: Phase 32 complete - v2.2 Discipline Cases milestone finished
 Resume file: None
+Next steps: Update documentation (README.md, CLAUDE.md) with discipline pipeline details
