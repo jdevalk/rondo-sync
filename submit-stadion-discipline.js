@@ -143,17 +143,17 @@ async function syncCase(caseData, personStadionId, seasonTermId, personName, db,
 
   // Build ACF fields payload
   const acfFields = {
-    'dossier-id': dossier_id,
+    'dossier_id': dossier_id,
     'person': personStadionId,
-    'match-date': match_date || '',
-    'match-description': match_description || '',
-    'team-name': caseData.team_name || '',
-    'charge-codes': caseData.charge_codes || '',
-    'charge-description': caseData.charge_description || '',
-    'sanction-description': caseData.sanction_description || '',
-    'processing-date': caseData.processing_date || '',
-    'administrative-fee': caseData.administrative_fee || '',
-    'is-charged': caseData.is_charged === 1
+    'match_date': match_date || '',
+    'match_description': match_description || '',
+    'team_name': caseData.team_name || '',
+    'charge_codes': caseData.charge_codes || '',
+    'charge_description': caseData.charge_description || '',
+    'sanction_description': caseData.sanction_description || '',
+    'processing_date': caseData.processing_date || '',
+    'administrative_fee': caseData.administrative_fee || '',
+    'is_charged': caseData.is_charged === 1
   };
 
   const title = buildCaseTitle(personName, match_description || 'Unknown Match', match_date || 'Unknown Date');
