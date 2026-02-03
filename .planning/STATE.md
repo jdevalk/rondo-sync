@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
-**Current focus:** v2.2 Discipline Cases - Phase 30 (Download)
+**Current focus:** v2.2 Discipline Cases - Phase 31 (Sync to Stadion)
 
 ## Current Position
 
-Phase: 30 of 32 (Download Discipline Cases) ✓
+Phase: 31 of 32 (Sync Discipline Cases to Stadion) ✓
 Plan: 01 of 01 complete
-Status: Phase verified, ready for Phase 31
-Last activity: 2026-02-02 — Phase 30 executed and verified (3/3 must-haves)
+Status: Phase complete, ready for Phase 32
+Last activity: 2026-02-03 — Completed 31-01-PLAN.md (discipline case sync to Stadion)
 
-Progress: [###########.........] 30/32 phases
+Progress: [############........] 31/32 phases
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4 (v2.1 milestone + 30-01)
-- Average duration: ~4.5 minutes
-- Total execution time: ~18 minutes
+- Total plans completed: 5 (v2.1 milestone + phases 30-31)
+- Average duration: ~4 minutes
+- Total execution time: ~20 minutes
 
 **By Phase:**
 
@@ -31,6 +31,7 @@ Progress: [###########.........] 30/32 phases
 | 28 | 1 | 1m | 1m |
 | 29 | 1 | 5m | 5m |
 | 30 | 1 | 4m | 4m |
+| 31 | 1 | 2m | 2m |
 
 ## Accumulated Context
 
@@ -39,6 +40,7 @@ Progress: [###########.........] 30/32 phases
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting future work:
 
+- [31-01]: Season derived from match date using August 1 boundary (matches KNVB season cycles)
 - [30-01]: Store ChargeCodes as JSON string if array (flexible for unknown API structure)
 - [30-01]: Multiple tab selector strategies for resilience against UI changes
 - [29-01]: ACF custom fields require registration via API (dynamic fields not supported)
@@ -68,6 +70,6 @@ None. Stadion UI work (DISC-07, DISC-08) deferred to Stadion codebase.
 
 ## Session Continuity
 
-Last session: 2026-02-02
-Stopped at: Phase 30 complete and verified, ready for Phase 31
+Last session: 2026-02-03
+Stopped at: Phase 31 complete and verified, ready for Phase 32
 Resume file: None
