@@ -112,19 +112,18 @@ async function runDownload(options = {}) {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Set up response listener BEFORE clicking the tab
-      // Note: The exact API endpoint URL is uncertain - use partial match
+      // Match specific API endpoint for discipline cases (GET request)
       logDebug('Setting up response listener for discipline cases API...');
       const responsePromise = page.waitForResponse(
         resp => {
           const url = resp.url();
-          const isPost = resp.request().method() === 'POST';
-          const isMatch = url.includes('DisciplineClubCasesPlayer') ||
-                          url.includes('discipline') ||
-                          url.includes('Discipline');
+          const isGet = resp.request().method() === 'GET';
+          // Match the specific API endpoint, not broad patterns that catch analytics
+          const isMatch = url.includes('/DisciplineClubCasesPlayer');
           if (debugEnabled && isMatch) {
             logDebug('Matched response URL:', url, 'Method:', resp.request().method());
           }
-          return isMatch && isPost;
+          return isMatch && isGet;
         },
         { timeout: 60000 }
       );
