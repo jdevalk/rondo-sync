@@ -15,15 +15,15 @@ Requirements for discipline case sync. Each maps to roadmap phases.
 
 ### Stadion Sync
 
-- [ ] **DISC-04**: Create/update discipline-cases as Stadion custom post type
-- [ ] **DISC-05**: Map all case fields to Stadion ACF fields
-- [ ] **DISC-06**: Link case to person via ACF relationship field (using PublicPersonId -> stadion_id mapping)
+- [x] **DISC-04**: Create/update discipline-cases as Stadion custom post type
+- [x] **DISC-05**: Map all case fields to Stadion ACF fields
+- [x] **DISC-06**: Link case to person via ACF relationship field (using PublicPersonId -> stadion_id mapping)
 
 ### Season Organization
 
-- [ ] **DISC-09**: Derive season from case date (Aug 1 = new season boundary)
-- [ ] **DISC-10**: Create season category if it doesn't exist (e.g., "2025-2026")
-- [ ] **DISC-11**: Assign cases to appropriate season category
+- [x] **DISC-09**: Derive season from case date (Aug 1 = new season boundary)
+- [x] **DISC-10**: Create season category if it doesn't exist (e.g., "2025-2026")
+- [x] **DISC-11**: Assign cases to appropriate season category
 
 ### Pipeline Integration
 
@@ -49,12 +49,12 @@ Requirements for discipline case sync. Each maps to roadmap phases.
 | DISC-01 | Phase 30 | Complete |
 | DISC-02 | Phase 30 | Complete |
 | DISC-03 | Phase 30 | Complete |
-| DISC-04 | Phase 31 | Pending |
-| DISC-05 | Phase 31 | Pending |
-| DISC-06 | Phase 31 | Pending |
-| DISC-09 | Phase 31 | Pending |
-| DISC-10 | Phase 31 | Pending |
-| DISC-11 | Phase 31 | Pending |
+| DISC-04 | Phase 31 | Complete |
+| DISC-05 | Phase 31 | Complete |
+| DISC-06 | Phase 31 | Complete |
+| DISC-09 | Phase 31 | Complete |
+| DISC-10 | Phase 31 | Complete |
+| DISC-11 | Phase 31 | Complete |
 | DISC-12 | Phase 32 | Pending |
 | DISC-13 | Phase 32 | Pending |
 | DISC-14 | Phase 32 | Pending |
@@ -66,4 +66,4 @@ Requirements for discipline case sync. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after deferring DISC-07, DISC-08 to Stadion codebase*
+*Last updated: 2026-02-03 after Phase 31 completion (DISC-04 through DISC-11 complete)*
