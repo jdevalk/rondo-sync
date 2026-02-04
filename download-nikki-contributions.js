@@ -246,8 +246,30 @@ async function scrapeContributions(page, logger) {
     logger.verbose(`  /leden HTML size unavailable: ${error.message}`);
   }
 
-  logger.verbose('Scraping table data from response HTML...');
-  const html = response ? await response.text() : await page.content();
+  // CRITICAL: Wait for DataTables to populate via AJAX before scraping
+  logger.verbose('Waiting for DataTables to load data...');
+  try {
+    // Wait for table to exist
+    await page.waitForSelector('#datatable, table', { timeout: 10000 });
+
+    // Wait for table rows to be present (DataTables loads via AJAX)
+    await page.waitForSelector('#datatable tbody tr, table tbody tr', { timeout: 15000 });
+
+    // Give DataTables additional time to finish rendering all rows
+    await page.waitForTimeout(2000);
+
+    const rowCount = await page.evaluate(() => {
+      const table = document.querySelector('#datatable') || document.querySelector('table');
+      return table ? table.querySelectorAll('tbody tr').length : 0;
+    });
+    logger.verbose(`Table loaded with ${rowCount} rows`);
+  } catch (error) {
+    logger.verbose(`Warning: Could not wait for table rows: ${error.message}`);
+  }
+
+  logger.verbose('Scraping table data from live DOM...');
+  // IMPORTANT: Scrape from live DOM (after AJAX), not from initial response HTML
+  const html = await page.content();
   const rows = await page.evaluate((rawHtml) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(rawHtml, 'text/html');
