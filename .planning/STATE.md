@@ -45,7 +45,8 @@ Recent decisions affecting future work:
 
 ### Pending Todos
 
-None
+1 pending:
+- [fetch-invoice-addresses-from-sportlink](./todos/pending/2026-02-04-fetch-invoice-addresses-from-sportlink.md) - Fetch invoice addresses and email from Sportlink financial tab
 
 ### Active Debug Sessions
 
