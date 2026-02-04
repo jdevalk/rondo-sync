@@ -8,7 +8,7 @@ const {
   clearTeamMembers
 } = require('./lib/stadion-db');
 const { loginToSportlink } = require('./lib/sportlink-login');
-const { createLoggerAdapter, createDebugLogger } = require('./lib/log-adapters');
+const { createLoggerAdapter, createDebugLogger, isDebugEnabled } = require('./lib/log-adapters');
 
 /**
  * Download team data from Sportlink including player/staff roles
@@ -32,7 +32,7 @@ async function runTeamDownload(options = {}) {
     const page = await context.newPage();
 
     try {
-      if (debugEnabled) {
+      if (isDebugEnabled()) {
         page.on('request', r => logDebug('>>', r.method(), r.url()));
         page.on('response', r => logDebug('<<', r.status(), r.url()));
       }

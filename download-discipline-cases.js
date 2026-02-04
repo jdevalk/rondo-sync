@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
 const { openDb, upsertCases, getCaseCount } = require('./lib/discipline-db');
 const { createSyncLogger } = require('./lib/logger');
 const { loginToSportlink } = require('./lib/sportlink-login');
-const { createLoggerAdapter, createDebugLogger } = require('./lib/log-adapters');
+const { createLoggerAdapter, createDebugLogger, isDebugEnabled } = require('./lib/log-adapters');
 
 /**
  * Download discipline case data from Sportlink
@@ -56,7 +56,7 @@ async function runDownload(options = {}) {
           const isGet = resp.request().method() === 'GET';
           // Match the specific API endpoint, not broad patterns that catch analytics
           const isMatch = url.includes('/DisciplineClubCasesPlayer');
-          if (debugEnabled && isMatch) {
+          if (isDebugEnabled() && isMatch) {
             logDebug('Matched response URL:', url, 'Method:', resp.request().method());
           }
           return isMatch && isGet;
