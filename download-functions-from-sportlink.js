@@ -10,7 +10,9 @@ const {
   clearMemberFunctions,
   clearMemberCommittees,
   upsertMemberFreeFields,
-  clearMemberFreeFields
+  clearMemberFreeFields,
+  upsertMemberInvoiceData,
+  clearMemberInvoiceData
 } = require('./lib/stadion-db');
 const { createSyncLogger } = require('./lib/logger');
 const { loginToSportlink } = require('./lib/sportlink-login');
@@ -204,6 +206,119 @@ async function fetchMemberDataFromOtherPage(page, knvbId, logger) {
 }
 
 /**
+ * Parse MemberPaymentInvoiceAddress API response
+ * @param {Object} data - API response
+ * @returns {Object} - Parsed address fields
+ */
+function parseInvoiceAddressResponse(data) {
+  const address = data?.Address || {};
+  return {
+    invoice_street: address.StreetName || null,
+    invoice_house_number: address.AddressNumber ? String(address.AddressNumber) : null,
+    invoice_house_number_addition: address.AddressNumberAppendix || null,
+    invoice_postal_code: address.ZipCode || null,
+    invoice_city: address.City || null,
+    invoice_country: address.CountryName || null,
+    invoice_address_is_default: address.IsDefault === true ? 1 : 0
+  };
+}
+
+/**
+ * Parse MemberPaymentInvoiceInformation API response
+ * @param {Object} data - API response
+ * @returns {Object} - Parsed invoice contact fields
+ */
+function parseInvoiceInfoResponse(data) {
+  const info = data?.PaymentInvoiceInformation || {};
+  return {
+    invoice_last_name: info.LastName || null,
+    invoice_infix: info.Infix || null,
+    invoice_initials: info.Initials || null,
+    invoice_email: info.EmailAddress || null,
+    invoice_external_code: info.ExternalInvoiceCode || null
+  };
+}
+
+/**
+ * Fetch member financial/invoice data from the /financial tab
+ * Captures MemberPaymentInvoiceAddress and MemberPaymentInvoiceInformation API responses
+ * @param {Object} page - Playwright page object
+ * @param {string} knvbId - Member KNVB ID
+ * @param {Object} logger - Logger instance
+ * @returns {Promise<Object|null>} - Combined invoice data or null
+ */
+async function fetchMemberFinancialData(page, knvbId, logger) {
+  const financialUrl = `https://club.sportlink.com/member/member-details/${knvbId}/financial`;
+
+  // Set up promises BEFORE navigation to capture API responses
+  const invoiceAddressPromise = page.waitForResponse(
+    resp => resp.url().includes('/MemberPaymentInvoiceAddress'),
+    { timeout: 15000 }
+  ).catch(() => null);
+
+  const invoiceInfoPromise = page.waitForResponse(
+    resp => resp.url().includes('/MemberPaymentInvoiceInformation'),
+    { timeout: 15000 }
+  ).catch(() => null);
+
+  logger.verbose(`  Navigating to ${financialUrl}...`);
+  await page.goto(financialUrl, { waitUntil: 'networkidle' });
+
+  // Await both responses
+  const [addressResponse, infoResponse] = await Promise.all([
+    invoiceAddressPromise,
+    invoiceInfoPromise
+  ]);
+
+  // Parse invoice address response
+  let addressData = null;
+  if (addressResponse && addressResponse.ok()) {
+    try {
+      addressData = await addressResponse.json();
+    } catch (err) {
+      logger.verbose(`  Error parsing MemberPaymentInvoiceAddress: ${err.message}`);
+    }
+  }
+
+  // Parse invoice info response
+  let infoData = null;
+  if (infoResponse && infoResponse.ok()) {
+    try {
+      infoData = await infoResponse.json();
+    } catch (err) {
+      logger.verbose(`  Error parsing MemberPaymentInvoiceInformation: ${err.message}`);
+    }
+  }
+
+  // If no data captured, return null
+  if (!addressData && !infoData) {
+    logger.verbose(`  No financial API responses captured`);
+    return null;
+  }
+
+  // Combine parsed data
+  const addressParsed = addressData ? parseInvoiceAddressResponse(addressData) : {};
+  const infoParsed = infoData ? parseInvoiceInfoResponse(infoData) : {};
+
+  const result = {
+    knvb_id: knvbId,
+    ...addressParsed,
+    ...infoParsed
+  };
+
+  // Log what we found
+  const hasCustomAddress = result.invoice_address_is_default === 0;
+  const hasEmail = !!result.invoice_email;
+  const hasExternalCode = !!result.invoice_external_code;
+
+  if (hasCustomAddress || hasEmail || hasExternalCode) {
+    logger.verbose(`  Invoice data: custom address=${hasCustomAddress}, email=${hasEmail}, external code=${hasExternalCode}`);
+  }
+
+  return result;
+}
+
+/**
  * Fetch functions for a single member
  * Captures both MemberFunctions and MemberCommittees API responses
  */
@@ -281,6 +396,7 @@ async function runFunctionsDownload(options = {}) {
     functionsCount: 0,
     committeesCount: 0,
     freeFieldsCount: 0,
+    invoiceDataCount: 0,
     skipped: 0,
     errors: []
   };
@@ -315,6 +431,7 @@ async function runFunctionsDownload(options = {}) {
     const allFunctions = [];
     const allCommittees = [];
     const allFreeFields = [];
+    const allInvoiceData = [];
     const uniqueCommitteeNames = new Set();
 
     try {
@@ -358,6 +475,15 @@ async function runFunctionsDownload(options = {}) {
             allFreeFields.push(memberData);
             logger.verbose(`  Found FreeScout ID: ${memberData.freescout_id || 'none'}, VOG datum: ${memberData.vog_datum || 'none'}, Financial block: ${memberData.has_financial_block}`);
           }
+
+          // Fetch invoice data from /financial tab for ALL members
+          // This captures custom invoice addresses and invoice emails
+          logger.verbose(`  Fetching invoice data from /financial page...`);
+          const invoiceData = await fetchMemberFinancialData(page, member.knvb_id, logger);
+          if (invoiceData) {
+            // Always store invoice data - we track is_default to know if custom address is set
+            allInvoiceData.push(invoiceData);
+          }
         } catch (error) {
           result.errors.push({ knvb_id: member.knvb_id, message: error.message });
           logger.verbose(`  Error: ${error.message}`);
@@ -396,6 +522,13 @@ async function runFunctionsDownload(options = {}) {
         upsertMemberFreeFields(db, allFreeFields);
       }
       result.freeFieldsCount = allFreeFields.length;
+
+      // Clear and replace invoice data
+      clearMemberInvoiceData(db);
+      if (allInvoiceData.length > 0) {
+        upsertMemberInvoiceData(db, allInvoiceData);
+      }
+      result.invoiceDataCount = allInvoiceData.length;
     });
 
     atomicReplace();
@@ -420,6 +553,7 @@ async function runFunctionsDownload(options = {}) {
     logger.log(`  Committee memberships found: ${result.committeesCount}`);
     logger.log(`  Unique commissies: ${commissies.length}`);
     logger.log(`  Free fields (VOG/FreeScout): ${result.freeFieldsCount}`);
+    logger.log(`  Invoice data records: ${result.invoiceDataCount}`);
 
     if (result.errors.length > 0) {
       logger.log(`  Errors: ${result.errors.length}`);
@@ -437,8 +571,11 @@ module.exports = {
   runFunctionsDownload,
   fetchMemberFunctions,
   fetchMemberDataFromOtherPage,
+  fetchMemberFinancialData,
   parseFunctionsResponse,
-  parseFreeFieldsResponse
+  parseFreeFieldsResponse,
+  parseInvoiceAddressResponse,
+  parseInvoiceInfoResponse
 };
 
 // CLI entry point

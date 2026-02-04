@@ -1,7 +1,7 @@
 require('varlock/auto-load');
 
 const { openDb, getLatestSportlinkResults } = require('./laposta-db');
-const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId } = require('./lib/stadion-db');
+const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId, getMemberInvoiceDataByKnvbId } = require('./lib/stadion-db');
 const { createLoggerAdapter } = require('./lib/log-adapters');
 
 /**
@@ -91,12 +91,48 @@ function buildAddresses(member) {
 }
 
 /**
+ * Format invoice address from invoice data
+ * Combines street, house number, postal code, city into single formatted string
+ * @param {Object} invoiceData - Invoice data from database
+ * @returns {string} - Formatted address string or empty string if no data
+ */
+function formatInvoiceAddress(invoiceData) {
+  const parts = [];
+
+  // Build street with house number
+  const streetParts = [invoiceData.invoice_street];
+  if (invoiceData.invoice_house_number) {
+    streetParts.push(invoiceData.invoice_house_number);
+  }
+  if (invoiceData.invoice_house_number_addition) {
+    streetParts.push(invoiceData.invoice_house_number_addition);
+  }
+  const street = streetParts.filter(Boolean).join(' ');
+  if (street) parts.push(street);
+
+  // Add postal code and city
+  const locationParts = [];
+  if (invoiceData.invoice_postal_code) locationParts.push(invoiceData.invoice_postal_code);
+  if (invoiceData.invoice_city) locationParts.push(invoiceData.invoice_city);
+  const location = locationParts.join(' ');
+  if (location) parts.push(location);
+
+  // Add country if not Netherlands
+  if (invoiceData.invoice_country && invoiceData.invoice_country !== 'Nederland') {
+    parts.push(invoiceData.invoice_country);
+  }
+
+  return parts.join(', ');
+}
+
+/**
  * Transform a Sportlink member to Stadion person format
  * @param {Object} sportlinkMember - Raw Sportlink member record
  * @param {Object} [freeFields] - Optional free fields from Sportlink /other tab
+ * @param {Object} [invoiceData] - Optional invoice data from Sportlink /financial tab
  * @returns {{knvb_id: string, email: string|null, person_image_date: string|null, photo_url: string|null, photo_date: string|null, data: Object}}
  */
-function preparePerson(sportlinkMember, freeFields = null) {
+function preparePerson(sportlinkMember, freeFields = null, invoiceData = null) {
   const name = buildName(sportlinkMember);
   const gender = mapGender(sportlinkMember.GenderCode);
   const birthYear = extractBirthYear(sportlinkMember.DateOfBirth);
@@ -142,6 +178,26 @@ function preparePerson(sportlinkMember, freeFields = null) {
   // These come from MemberHeader API response captured during functions download
   const photoUrl = freeFields?.photo_url || null;
   const photoDate = freeFields?.photo_date || null;
+
+  // Invoice data from Sportlink /financial tab
+  // Only include if custom invoice address is set (not using member's default address)
+  if (invoiceData) {
+    // Check if a custom invoice address is set (is_default = 0 means custom address)
+    if (invoiceData.invoice_address_is_default === 0) {
+      const formattedAddress = formatInvoiceAddress(invoiceData);
+      if (formattedAddress) {
+        acf['factuur-adres'] = formattedAddress;
+      }
+    }
+    // Invoice email (always include if present)
+    if (invoiceData.invoice_email) {
+      acf['factuur-email'] = invoiceData.invoice_email;
+    }
+    // External invoice code/reference (always include if present)
+    if (invoiceData.invoice_external_code) {
+      acf['factuur-referentie'] = invoiceData.invoice_external_code;
+    }
+  }
 
   return {
     knvb_id: sportlinkMember.PublicPersonId,
@@ -207,6 +263,7 @@ async function runPrepare(options = {}) {
     const validMembers = [];
     let skippedCount = 0;
     let freeFieldsCount = 0;
+    let invoiceDataCount = 0;
 
     try {
       members.forEach((member, index) => {
@@ -225,7 +282,13 @@ async function runPrepare(options = {}) {
           freeFieldsCount++;
         }
 
-        const prepared = preparePerson(member, freeFields);
+        // Look up invoice data for this member
+        const invoiceData = getMemberInvoiceDataByKnvbId(stadionDb, member.PublicPersonId);
+        if (invoiceData && (invoiceData.invoice_email || invoiceData.invoice_address_is_default === 0)) {
+          invoiceDataCount++;
+        }
+
+        const prepared = preparePerson(member, freeFields, invoiceData);
         validMembers.push(prepared);
       });
     } finally {
@@ -235,6 +298,9 @@ async function runPrepare(options = {}) {
     logVerbose(`Prepared ${validMembers.length} members for Stadion sync (${skippedCount} skipped)`);
     if (freeFieldsCount > 0) {
       logVerbose(`  Including free fields for ${freeFieldsCount} members`);
+    }
+    if (invoiceDataCount > 0) {
+      logVerbose(`  Including invoice data for ${invoiceDataCount} members`);
     }
 
     if (verbose && validMembers.length > 0) {
