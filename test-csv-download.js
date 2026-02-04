@@ -63,6 +63,15 @@ async function downloadCsv(page) {
   const downloadsDir = path.join(process.cwd(), 'downloads');
   await fs.mkdir(downloadsDir, { recursive: true });
 
+  // First, check what elements are available
+  console.log('Looking for Rapporten elements...');
+  const allLinks = await page.$$eval('a, button', elements =>
+    elements.map(el => ({ tag: el.tagName, text: el.textContent?.trim(), href: el.href }))
+  );
+  console.log('Links containing "rapport" or "export":',
+    allLinks.filter(l => l.text?.toLowerCase().includes('rapport') || l.text?.toLowerCase().includes('export') || l.href?.includes('rapport') || l.href?.includes('export'))
+  );
+
   console.log('Setting up download listener...');
   const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
 
@@ -71,7 +80,9 @@ async function downloadCsv(page) {
     'a:has-text("Rapporten")',
     'button:has-text("Rapporten")',
     '[href*="rapport"]',
-    'a[href*="export"]'
+    'a[href*="export"]',
+    'a:has-text("Export")',
+    'button:has-text("Export")'
   ];
 
   let clicked = false;
@@ -79,12 +90,18 @@ async function downloadCsv(page) {
     try {
       const element = await page.$(selector);
       if (element) {
+        console.log(`Found element with selector: ${selector}`);
+        const text = await element.textContent();
+        const href = await element.getAttribute('href');
+        console.log(`  Text: ${text}, Href: ${href}`);
+
         await element.click();
         clicked = true;
         console.log(`Clicked: ${selector}`);
         break;
       }
     } catch (e) {
+      console.log(`Selector ${selector} failed: ${e.message}`);
       continue;
     }
   }
