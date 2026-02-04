@@ -1,143 +1,51 @@
 require('varlock/auto-load');
 
-const https = require('https');
-const { readEnv } = require('./lib/utils');
+const {
+  fetchMembers,
+  deleteMember,
+  waitForRateLimit,
+  getListConfig
+} = require('./lib/laposta-client');
+const { normalizeEmail } = require('./lib/parent-dedupe');
 
-const ENV_KEYS = ['LAPOSTA_LIST', 'LAPOSTA_LIST2', 'LAPOSTA_LIST3', 'LAPOSTA_LIST4'];
+const RATE_LIMIT_DELAY_DELETE = 1500; // Slightly shorter for delete operations
 
-function getListConfig(listIndex) {
-  const envKey = ENV_KEYS[listIndex - 1];
-  if (!envKey) {
-    throw new Error(`Invalid list index ${listIndex}. Use 1-4.`);
-  }
-  return {
-    envKey,
-    listId: readEnv(envKey)
-  };
-}
-
-function normalizeEmail(value) {
-  if (!value) return '';
-  return String(value).trim().toLowerCase();
-}
-
-function extractMembers(payload) {
-  if (!payload) return [];
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload.members)) return payload.members;
-  if (Array.isArray(payload.data)) {
-    return payload.data.map((item) => item.member || item);
-  }
-  if (payload.member) return [payload.member];
-  return [];
-}
-
+/**
+ * Get last name from member object, checking various possible field locations.
+ * @param {Object} member - Member object from Laposta
+ * @returns {string} Last name or empty string
+ */
 function getLastName(member) {
   if (!member) return '';
+
+  // Check standard fields
   if (member.last_name) return String(member.last_name).trim();
   if (member.lastname) return String(member.lastname).trim();
   if (member.LastName) return String(member.LastName).trim();
+
+  // Check custom fields
   const custom = member.custom_fields || member.customFields || {};
   if (custom.achternaam) return String(custom.achternaam).trim();
   if (custom.last_name) return String(custom.last_name).trim();
   if (custom.lastname) return String(custom.lastname).trim();
+
   return '';
 }
 
+/**
+ * Check if member is a parent (has no last name).
+ * @param {Object} member - Member object
+ * @returns {boolean}
+ */
 function isParentMember(member) {
   return getLastName(member) === '';
 }
 
-function parseTimestamp(value) {
-  if (!value) return 0;
-  const parsed = Date.parse(value);
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function getMemberTimestamp(member) {
-  return Math.max(
-    parseTimestamp(member.modified),
-    parseTimestamp(member.signup_date),
-    parseTimestamp(member.created_at)
-  );
-}
-
-function lapostaRequest(method, url, body = null) {
-  return new Promise((resolve, reject) => {
-    const apiKey = readEnv('LAPOSTA_API_KEY');
-    if (!apiKey) {
-      reject(new Error('LAPOSTA_API_KEY not found in .env file'));
-      return;
-    }
-
-    const payload = body ? JSON.stringify(body) : '';
-    const options = {
-      hostname: url.hostname,
-      port: url.port || 443,
-      path: url.pathname + url.search,
-      method,
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${apiKey}:`).toString('base64')}`
-      }
-    };
-
-    if (body) {
-      options.headers['Content-Type'] = 'application/json';
-      options.headers['Content-Length'] = Buffer.byteLength(payload);
-    }
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      res.on('end', () => {
-        let parsed = null;
-        try {
-          parsed = JSON.parse(data);
-        } catch {
-          parsed = data;
-        }
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve({ status: res.statusCode, body: parsed });
-        } else {
-          const error = new Error(`Laposta API error (${res.statusCode})`);
-          error.details = parsed;
-          reject(error);
-        }
-      });
-    });
-
-    req.on('error', (err) => reject(err));
-    if (body) {
-      req.write(payload);
-    }
-    req.end();
-  });
-}
-
-async function fetchMembers(listId, state) {
-  const baseUrl = 'https://api.laposta.nl';
-  const url = new URL('/v2/member', baseUrl);
-  url.searchParams.set('list_id', listId);
-  if (state) {
-    url.searchParams.set('state', state);
-  }
-  const response = await lapostaRequest('GET', url);
-  return extractMembers(response.body);
-}
-
-async function deleteMember(listId, member) {
-  const baseUrl = 'https://api.laposta.nl';
-  const identifier = member.member_id || member.email || member.EmailAddress;
-  if (!identifier) {
-    throw new Error('Cannot delete member without member_id or email');
-  }
-  const url = new URL(`/v2/member/${encodeURIComponent(identifier)}`, baseUrl);
-  url.searchParams.set('list_id', listId);
-  return lapostaRequest('DELETE', url);
-}
-
+/**
+ * Parse CLI arguments.
+ * @param {string[]} argv - Command line arguments
+ * @returns {{listIndex: number, apply: boolean, state: string}}
+ */
 function parseArgs(argv) {
   const listIndex = Number.parseInt(argv[2] || '0', 10);
   const apply = argv.includes('--apply') || argv.includes('--delete');
@@ -146,8 +54,15 @@ function parseArgs(argv) {
   return { listIndex, apply, state };
 }
 
+/**
+ * Fetch members from a list with configuration validation.
+ * @param {number} listIndex - List index (1-4)
+ * @param {string} state - Member state filter
+ * @returns {Promise<{listIndex: number, listId: string, members: Array}|null>}
+ */
 async function fetchListMembers(listIndex, state) {
   const { envKey, listId } = getListConfig(listIndex);
+
   if (!listId) {
     console.log(`Skipping list ${listIndex}: ${envKey} not found in .env.`);
     return null;
@@ -157,15 +72,117 @@ async function fetchListMembers(listIndex, state) {
   return { listIndex, listId, members };
 }
 
+/**
+ * Build email-to-members mapping across all lists.
+ * @param {Array} listResults - Array of {listIndex, listId, members}
+ * @returns {Map<string, Array>} Map of normalized email to member entries
+ */
+function buildEmailMap(listResults) {
+  const byEmail = new Map();
+
+  listResults.forEach(({ listIndex, listId, members }) => {
+    if (!members || members.length === 0) {
+      console.log(`List ${listIndex}: no members returned from Laposta.`);
+      return;
+    }
+
+    members.forEach(member => {
+      const normalized = normalizeEmail(member.email || member.EmailAddress || '');
+      if (!normalized) return;
+
+      if (!byEmail.has(normalized)) {
+        byEmail.set(normalized, []);
+      }
+      byEmail.get(normalized).push({ listIndex, listId, member });
+    });
+  });
+
+  return byEmail;
+}
+
+/**
+ * Find duplicate parent entries across lists.
+ * Keeps the entry in the lowest-numbered list.
+ * @param {Map<string, Array>} emailMap - Email to member entries mapping
+ * @returns {Array<{email: string, keep: Object, remove: Array}>}
+ */
+function findDuplicateParents(emailMap) {
+  const duplicates = [];
+
+  emailMap.forEach((items, email) => {
+    if (items.length <= 1) return;
+
+    // Only consider parent members
+    const parentItems = items.filter(item => isParentMember(item.member));
+    if (parentItems.length <= 1) return;
+
+    // Sort by list index, keep the lowest
+    const sorted = [...parentItems].sort((a, b) => a.listIndex - b.listIndex);
+    const keep = sorted[0];
+    const remove = sorted.slice(1);
+
+    if (remove.length > 0) {
+      duplicates.push({ email, keep, remove });
+    }
+  });
+
+  return duplicates;
+}
+
+/**
+ * Get member identifier for display.
+ * @param {Object} item - {listIndex, member} object
+ * @returns {string}
+ */
+function getMemberDisplayId(item) {
+  const id = item.member.member_id || item.member.email || item.member.EmailAddress;
+  return `${item.listIndex}:${id}`;
+}
+
+/**
+ * Print dry run summary of duplicates to remove.
+ * @param {Array} duplicates - Duplicate entries
+ */
+function printDryRunSummary(duplicates) {
+  console.log('Dry run only. Re-run with --apply to delete.');
+
+  const maxDisplay = 10;
+  duplicates.slice(0, maxDisplay).forEach(entry => {
+    const ids = entry.remove.map(getMemberDisplayId).join(', ');
+    console.log(`Duplicate ${entry.email}: remove ${ids}`);
+  });
+
+  if (duplicates.length > maxDisplay) {
+    console.log(`(Showing first ${maxDisplay} duplicates of ${duplicates.length}.)`);
+  }
+}
+
+/**
+ * Delete duplicate members.
+ * @param {Array} duplicates - Duplicate entries to process
+ */
+async function deleteDuplicates(duplicates) {
+  for (const entry of duplicates) {
+    for (const item of entry.remove) {
+      await deleteMember(item.listId, item.member);
+      await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY_DELETE));
+
+      const id = item.member.member_id || item.member.email || item.member.EmailAddress;
+      console.log(`Deleted duplicate ${entry.email} from list ${item.listIndex} (${id})`);
+    }
+  }
+}
+
 async function main() {
   const { listIndex, apply, state } = parseArgs(process.argv);
-  const listIndexes = listIndex >= 1 && listIndex <= 4
-    ? [listIndex]
-    : [1, 2, 3, 4];
 
+  // Determine which lists to check
+  const isValidListIndex = listIndex >= 1 && listIndex <= 4;
+  const listIndexes = isValidListIndex ? [listIndex] : [1, 2, 3, 4];
+
+  // Fetch members from all lists
   const listResults = [];
   for (const index of listIndexes) {
-    // eslint-disable-next-line no-await-in-loop
     const result = await fetchListMembers(index, state);
     if (result) {
       listResults.push(result);
@@ -177,36 +194,9 @@ async function main() {
     return;
   }
 
-  const byEmail = new Map();
-  listResults.forEach(({ listIndex: index, listId, members }) => {
-    if (!members || members.length === 0) {
-      console.log(`List ${index}: no members returned from Laposta.`);
-      return;
-    }
-    members.forEach((member) => {
-      const normalized = normalizeEmail(member.email || member.EmailAddress || '');
-      if (!normalized) return;
-      if (!byEmail.has(normalized)) {
-        byEmail.set(normalized, []);
-      }
-      byEmail.get(normalized).push({ listIndex: index, listId, member });
-    });
-  });
-
-  const duplicates = Array.from(byEmail.entries())
-    .filter(([, items]) => items.length > 1)
-    .map(([email, items]) => {
-      const parentItems = items.filter(item => isParentMember(item.member));
-      if (parentItems.length <= 1) {
-        return null;
-      }
-      const sorted = [...parentItems].sort((a, b) => a.listIndex - b.listIndex);
-      const keep = sorted[0];
-      const remove = sorted.slice(1);
-      return { email, keep, remove };
-    })
-    .filter(Boolean)
-    .filter(entry => entry.remove.length > 0);
+  // Build email mapping and find duplicates
+  const emailMap = buildEmailMap(listResults);
+  const duplicates = findDuplicateParents(emailMap);
 
   if (duplicates.length === 0) {
     console.log('No duplicate parent emails found across lists.');
@@ -217,31 +207,14 @@ async function main() {
   console.log(`Found ${duplicates.length} duplicate parent emails across lists (${totalRemovals} entries to remove).`);
 
   if (!apply) {
-    console.log('Dry run only. Re-run with --apply to delete.');
-    duplicates.slice(0, 10).forEach((entry) => {
-      const ids = entry.remove
-        .map(item => `${item.listIndex}:${item.member.member_id || item.member.email || item.member.EmailAddress}`)
-        .join(', ');
-      console.log(`Duplicate ${entry.email}: remove ${ids}`);
-    });
-    if (duplicates.length > 10) {
-      console.log(`(Showing first 10 duplicates of ${duplicates.length}.)`);
-    }
+    printDryRunSummary(duplicates);
     return;
   }
 
-  for (const entry of duplicates) {
-    for (const item of entry.remove) {
-      // eslint-disable-next-line no-await-in-loop
-      await deleteMember(item.listId, item.member);
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log(`Deleted duplicate ${entry.email} from list ${item.listIndex} (${item.member.member_id || item.member.email || item.member.EmailAddress})`);
-    }
-  }
+  await deleteDuplicates(duplicates);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('Error:', err.message);
   if (err.details) {
     console.error('Details:', JSON.stringify(err.details, null, 2));
