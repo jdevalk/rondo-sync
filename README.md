@@ -24,7 +24,8 @@ scripts/sync.sh people    # 4x daily sync: members, photos → Laposta + Stadion
 scripts/sync.sh photos    # Alias for people (photos integrated)
 scripts/sync.sh nikki     # Daily sync: Nikki contributions → Stadion
 scripts/sync.sh teams     # Weekly sync: team extraction + work history
-scripts/sync.sh functions # Weekly sync: commissies + work history
+scripts/sync.sh functions       # Daily sync: commissies + work history (recent updates)
+scripts/sync.sh functions --all # Weekly sync: commissies + work history (all members)
 
 # Full sync (all pipelines)
 scripts/sync.sh all       # Run all syncs sequentially (includes FreeScout)
@@ -61,11 +62,15 @@ The sync is split into four independent pipelines, each with its own schedule:
 - submit-stadion-work-history.js - Links persons to teams via work_history
 - Produces email-ready HTML summary
 
-**4. Functions Pipeline (weekly via scripts/sync.sh functions):**
+**4. Functions Pipeline (daily recent, weekly full via scripts/sync.sh functions):**
 - download-functions-from-sportlink.js - Extracts commissie/function data
+  * Daily: processes only members updated in Sportlink within last 2 days (--all flag not used)
+  * Weekly: full sync of all tracked members (--all flag)
 - submit-stadion-commissies.js - Creates/updates commissies in Stadion
 - submit-stadion-commissie-work-history.js - Links persons to commissies
 - Produces email-ready HTML summary
+
+Note: The LastUpdate filter optimization significantly reduces sync time for daily runs.
 
 **Full Sync (scripts/sync.sh all or npm run sync-all):**
 Runs all four pipelines sequentially plus FreeScout customer sync. Used for manual full syncs or initial setup.
@@ -324,11 +329,15 @@ npm run install-cron
 
 This will:
 - Prompt for your operator email address and Postmark credentials
-- Install four crontab entries with different schedules:
-  - **People sync:** 4x daily (members, parents, birthdays, photos)
+- Install eight crontab entries with different schedules:
+  - **People sync:** 4x daily at 8am, 11am, 2pm, 5pm (members, parents, birthdays, photos)
   - **Nikki sync:** Daily at 7:00 AM Amsterdam time
+  - **FreeScout sync:** Daily at 8:00 AM Amsterdam time
   - **Team sync:** Weekly on Sunday at 6:00 AM
-  - **Functions sync:** Weekly on Sunday at 7:00 AM (after teams)
+  - **Functions sync (recent):** Daily at 7:15 AM (processes only recently updated members)
+  - **Functions sync (full):** Weekly on Sunday at 1:00 AM (processes all members with --all flag)
+  - **Discipline sync:** Weekly on Monday at 11:30 PM
+  - **Reverse sync:** Every 15 minutes (Stadion -> Sportlink)
 - Send HTML email reports via Postmark after each sync
 - Use flock to prevent overlapping executions (per sync type)
 

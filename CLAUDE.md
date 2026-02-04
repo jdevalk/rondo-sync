@@ -11,7 +11,8 @@ scripts/sync.sh photos    # Alias for people (photos integrated)
 scripts/sync.sh nikki     # Daily: Nikki contributions to Stadion
 scripts/sync.sh freescout # Daily: FreeScout customer sync
 scripts/sync.sh teams     # Weekly: team sync + work history
-scripts/sync.sh functions # Weekly: commissies + work history
+scripts/sync.sh functions       # Daily: commissies + work history (recent updates)
+scripts/sync.sh functions --all # Weekly: full commissies sync (all members)
 scripts/sync.sh all       # Full sync (all pipelines)
 
 # Alternative: npm scripts
@@ -52,10 +53,14 @@ The sync is split into four independent pipelines, each with its own schedule:
 - submit-stadion-teams.js - Creates/updates teams in Stadion
 - submit-stadion-work-history.js - Links persons to teams via work_history
 
-**4. Functions Pipeline (weekly via sync-functions.js):**
+**4. Functions Pipeline (daily recent, weekly full via sync-functions.js):**
 - download-functions-from-sportlink.js - Extracts commissie/function data
+  * Daily: processes only members with LastUpdate in last 2 days (performance optimization)
+  * Weekly: full sync of all tracked members with --all flag
 - submit-stadion-commissies.js - Creates/updates commissies in Stadion
 - submit-stadion-commissie-work-history.js - Links persons to commissies
+
+Note: Daily functions sync only processes members updated in Sportlink within the last 2 days. Full sync runs weekly to catch edge cases.
 
 **5. FreeScout Pipeline (daily via sync-freescout.js):**
 - submit-freescout-sync.js - Syncs Stadion members to FreeScout customers
@@ -228,13 +233,16 @@ The `stadion_id` mapping is critical: without it, sync creates new entries inste
 
 ## Cron Automation
 
-After `npm run install-cron`, six sync schedules are configured:
+After `npm run install-cron`, eight sync schedules are configured:
 
 - **People sync:** 4x daily at 8am, 11am, 2pm, 5pm (members, parents, birthdays, photos)
 - **Nikki sync:** Daily at 7:00 AM Amsterdam time
 - **FreeScout sync:** Daily at 8:00 AM Amsterdam time
 - **Team sync:** Weekly on Sunday at 6:00 AM
-- **Functions sync:** Daily at 7:15 AM (after Nikki sync)
+- **Functions sync (recent):** Daily at 7:15 AM (after Nikki sync, recent updates only)
+- **Functions sync (full):** Weekly on Sunday at 1:00 AM (all members with --all flag)
+- **Discipline sync:** Weekly on Monday at 11:30 PM
+- **Reverse sync:** Every 15 minutes (Stadion -> Sportlink)
 
 Each sync:
 - Runs via scripts/sync.sh wrapper
