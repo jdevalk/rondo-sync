@@ -1,17 +1,14 @@
 require('varlock/auto-load');
 
-const crypto = require('crypto');
-const { stadionRequest } = require('./lib/stadion-client');
+const { stadionRequestWithRetry } = require('./lib/stadion-client');
 const { openDb: openNikkiDb, getContributionsGroupedByMember } = require('./lib/nikki-db');
 const { openDb: openStadionDb, getAllTrackedMembers } = require('./lib/stadion-db');
 const { createSyncLogger } = require('./lib/logger');
+const { parseCliArgs, stableStringify, computeHash } = require('./lib/utils');
 
 /**
  * Build per-year ACF fields from contributions.
  * Creates fields like _nikki_2025_total, _nikki_2025_saldo, _nikki_2025_status
- *
- * @param {Array<{year: number, nikki_id: string, saldo: number, hoofdsom: number, status: string}>} contributions
- * @returns {Object} - Object with per-year field keys and values
  */
 function buildPerYearAcfFields(contributions) {
   const fields = {};
@@ -24,45 +21,10 @@ function buildPerYearAcfFields(contributions) {
 }
 
 /**
- * Compute hash for change detection (serializes object to JSON)
+ * Compute hash for change detection using stable JSON serialization.
  */
 function computeFieldsHash(fields) {
-  return crypto.createHash('sha256').update(JSON.stringify(fields) || '').digest('hex');
-}
-
-/**
- * Make a Stadion API request with retry logic for transient errors (5xx).
- * Uses exponential backoff: 1s, 2s, 4s between retries.
- * @param {string} endpoint - API endpoint
- * @param {string} method - HTTP method
- * @param {Object|null} body - Request body
- * @param {Object} options - Options for stadionRequest
- * @param {number} maxRetries - Maximum retry attempts (default 3)
- * @returns {Promise<Object>} - API response
- */
-async function stadionRequestWithRetry(endpoint, method, body, options, maxRetries = 3) {
-  let lastError;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await stadionRequest(endpoint, method, body, options);
-    } catch (error) {
-      lastError = error;
-
-      // Only retry on 5xx errors (server errors)
-      const status = error.message?.match(/\((\d+)\)/)?.[1];
-      if (!status || parseInt(status, 10) < 500) {
-        throw error; // Don't retry client errors (4xx)
-      }
-
-      if (attempt < maxRetries) {
-        const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
-        await new Promise(r => setTimeout(r, delay));
-      }
-    }
-  }
-
-  throw lastError;
+  return computeHash(stableStringify(fields));
 }
 
 /**
@@ -227,10 +189,8 @@ async function runNikkiStadionSync(options = {}) {
 
 module.exports = { runNikkiStadionSync, buildPerYearAcfFields };
 
-// CLI entry point
 if (require.main === module) {
-  const verbose = process.argv.includes('--verbose');
-  const force = process.argv.includes('--force');
+  const { verbose, force } = parseCliArgs();
   const dryRun = process.argv.includes('--dry-run');
 
   runNikkiStadionSync({ verbose, force, dryRun })

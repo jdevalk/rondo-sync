@@ -1,7 +1,7 @@
 require('varlock/auto-load');
 
 const { createSyncLogger } = require('./lib/logger');
-const { formatDuration, formatTimestamp } = require('./lib/utils');
+const { formatDuration, formatTimestamp, parseCliArgs } = require('./lib/utils');
 const { runNikkiDownload } = require('./download-nikki-contributions');
 const { runNikkiStadionSync } = require('./sync-nikki-to-stadion');
 
@@ -126,10 +126,8 @@ async function runNikkiSync(options = {}) {
 
 module.exports = { runNikkiSync };
 
-// CLI entry point
 if (require.main === module) {
-  const verbose = process.argv.includes('--verbose');
-  const force = process.argv.includes('--force');
+  const { verbose, force } = parseCliArgs();
 
   runNikkiSync({ verbose, force })
     .then(result => {

@@ -1,94 +1,14 @@
 require('varlock/auto-load');
 
-const crypto = require('crypto');
 const fs = require('fs/promises');
 const path = require('path');
 const { chromium } = require('playwright');
 const { parse } = require('csv-parse');
-const {
-  openDb,
-  upsertContributions,
-  getContributionCount,
-  pruneOldContributions
-} = require('./lib/nikki-db');
+const { openDb, upsertContributions, pruneOldContributions } = require('./lib/nikki-db');
 const { createSyncLogger } = require('./lib/logger');
-const { readEnv } = require('./lib/utils');
-const { createDebugLogger } = require('./lib/log-adapters');
-
-function generateAsciiTotp(secret, digits = 6, step = 30) {
-  const counter = Math.floor(Date.now() / 1000 / step);
-  const buffer = Buffer.alloc(8);
-  buffer.writeUInt32BE(Math.floor(counter / 0x100000000), 0);
-  buffer.writeUInt32BE(counter % 0x100000000, 4);
-  const hmac = crypto.createHmac('sha1', Buffer.from(secret, 'ascii')).update(buffer).digest();
-  const offset = hmac[hmac.length - 1] & 0x0f;
-  const code = ((hmac[offset] & 0x7f) << 24)
-    | ((hmac[offset + 1] & 0xff) << 16)
-    | ((hmac[offset + 2] & 0xff) << 8)
-    | (hmac[offset + 3] & 0xff);
-  const otp = (code % (10 ** digits)).toString().padStart(digits, '0');
-  return otp;
-}
-
-function decodeBase32(input) {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  const clean = String(input).toUpperCase().replace(/=+$/g, '').replace(/[^A-Z2-7]/g, '');
-  let bits = 0;
-  let value = 0;
-  const bytes = [];
-  for (const char of clean) {
-    const idx = alphabet.indexOf(char);
-    if (idx === -1) continue;
-    value = (value << 5) | idx;
-    bits += 5;
-    if (bits >= 8) {
-      bytes.push((value >>> (bits - 8)) & 0xff);
-      bits -= 8;
-    }
-  }
-  return Buffer.from(bytes);
-}
-
-function parseOtpAuthUrl(value) {
-  if (!value || !value.startsWith('otpauth://')) return null;
-  let url = null;
-  try {
-    url = new URL(value);
-  } catch {
-    return null;
-  }
-  const secret = url.searchParams.get('secret') || '';
-  const issuer = url.searchParams.get('issuer') || '';
-  const algorithm = (url.searchParams.get('algorithm') || 'SHA1').toUpperCase();
-  const digits = Number.parseInt(url.searchParams.get('digits') || '6', 10);
-  const period = Number.parseInt(url.searchParams.get('period') || '30', 10);
-  return { secret, issuer, algorithm, digits, period };
-}
-
-function generateTotpFromSecret(secretValue) {
-  const parsed = parseOtpAuthUrl(secretValue);
-  if (parsed) {
-    const key = decodeBase32(parsed.secret);
-    return generateTotpWithKey(key, parsed.digits, parsed.period, parsed.algorithm);
-  }
-  return generateAsciiTotp(secretValue);
-}
-
-function generateTotpWithKey(key, digits = 6, step = 30, algorithm = 'SHA1') {
-  const counter = Math.floor(Date.now() / 1000 / step);
-  const buffer = Buffer.alloc(8);
-  buffer.writeUInt32BE(Math.floor(counter / 0x100000000), 0);
-  buffer.writeUInt32BE(counter % 0x100000000, 4);
-  const algo = String(algorithm || 'SHA1').toLowerCase();
-  const hmac = crypto.createHmac(algo, key).update(buffer).digest();
-  const offset = hmac[hmac.length - 1] & 0x0f;
-  const code = ((hmac[offset] & 0x7f) << 24)
-    | ((hmac[offset + 1] & 0xff) << 16)
-    | ((hmac[offset + 2] & 0xff) << 8)
-    | (hmac[offset + 3] & 0xff);
-  const otp = (code % (10 ** digits)).toString().padStart(digits, '0');
-  return otp;
-}
+const { readEnv, parseCliArgs } = require('./lib/utils');
+const { createDebugLogger, isDebugEnabled } = require('./lib/log-adapters');
+const { generateTotp } = require('./lib/totp');
 
 /**
  * Parse European currency format to number.
@@ -148,10 +68,7 @@ async function loginToNikki(page, logger) {
       throw new Error('Missing NIKKI_OTP_SECRET - 2FA required but no secret configured');
     }
     logger.verbose('Generating OTP code...');
-    const otpCode = generateTotpFromSecret(otpSecret);
-    if (!otpCode) {
-      throw new Error('OTP generation failed');
-    }
+    const otpCode = generateTotp(otpSecret);
     await otpField.fill(otpCode);
   }
 
@@ -203,56 +120,27 @@ async function loginToNikki(page, logger) {
 }
 
 /**
- * Scrape contribution data from the /leden datatable
+ * Scrape contribution data from the /leden datatable.
+ * Waits for DataTables AJAX to complete before scraping.
  */
 async function scrapeContributions(page, logger) {
   logger.verbose('Navigating to /leden page...');
   await page.waitForTimeout(1000);
-  const response = await page.goto('https://mijn.nikki-online.nl/leden', { waitUntil: 'domcontentloaded' });
-  if (response) {
-    logger.verbose(`  /leden response: ${response.status()} ${response.url()}`);
-  }
-  logger.verbose(`  /leden URL: ${page.url()}`);
-  try {
-    const title = await page.title();
-    logger.verbose(`  /leden title: ${title}`);
-  } catch (error) {
-    logger.verbose(`  /leden title unavailable: ${error.message}`);
-  }
+  await page.goto('https://mijn.nikki-online.nl/leden', { waitUntil: 'domcontentloaded' });
+
+  // Check if we got redirected back to login
   const onLoginPage = await page.$('input[name="username"], input[name="password"]');
   if (onLoginPage) {
-    logger.verbose('  /leden appears to show login form.');
-  }
-  try {
-    const htmlLength = await page.evaluate(() => document.documentElement?.outerHTML?.length || 0);
-    logger.verbose(`  /leden HTML size: ${htmlLength} chars`);
-  } catch (error) {
-    logger.verbose(`  /leden HTML size unavailable: ${error.message}`);
+    throw new Error('Session expired: redirected to login page');
   }
 
-  // CRITICAL: Wait for DataTables to populate via AJAX before scraping
-  logger.verbose('Waiting for DataTables to load data...');
-  try {
-    // Wait for table to exist
-    await page.waitForSelector('#datatable, table', { timeout: 10000 });
+  // Wait for DataTables to populate via AJAX before scraping
+  logger.verbose('Waiting for DataTables to load...');
+  await page.waitForSelector('#datatable, table', { timeout: 10000 });
+  await page.waitForSelector('#datatable tbody tr, table tbody tr', { timeout: 15000 });
+  await page.waitForTimeout(2000);
 
-    // Wait for table rows to be present (DataTables loads via AJAX)
-    await page.waitForSelector('#datatable tbody tr, table tbody tr', { timeout: 15000 });
-
-    // Give DataTables additional time to finish rendering all rows
-    await page.waitForTimeout(2000);
-
-    const rowCount = await page.evaluate(() => {
-      const table = document.querySelector('#datatable') || document.querySelector('table');
-      return table ? table.querySelectorAll('tbody tr').length : 0;
-    });
-    logger.verbose(`Table loaded with ${rowCount} rows`);
-  } catch (error) {
-    logger.verbose(`Warning: Could not wait for table rows: ${error.message}`);
-  }
-
-  logger.verbose('Scraping table data from live DOM...');
-  // IMPORTANT: Scrape from live DOM (after AJAX), not from initial response HTML
+  // Scrape from live DOM (after AJAX completes)
   const html = await page.content();
   const rows = await page.evaluate((rawHtml) => {
     const parser = new DOMParser();
@@ -264,22 +152,13 @@ async function scrapeContributions(page, logger) {
       Array.from(row.querySelectorAll('td')).map(cell => cell.textContent?.trim() || '')
     ));
   }, html);
+
   const contributions = rows
     .map((cells) => {
       if (!cells || cells.length < 8) return null;
-      const jaar = cells[0];
-      const lidnr = cells[3];
-      const nikkiId = cells[5];
-      const saldo = cells[6];
-      const status = cells[7];
+      const [jaar, , , lidnr, , nikkiId, saldo, status] = cells;
       if (!jaar || !lidnr || !nikkiId) return null;
-      return {
-        year: jaar,
-        knvb_id: lidnr,
-        nikki_id: nikkiId,
-        saldo_raw: saldo,
-        status: status
-      };
+      return { year: jaar, knvb_id: lidnr, nikki_id: nikkiId, saldo_raw: saldo, status };
     })
     .filter(Boolean);
 
@@ -472,60 +351,55 @@ async function runNikkiDownload(options = {}) {
     const logDebug = createDebugLogger();
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({
-      acceptDownloads: true,  // REQUIRED for download operations
+      acceptDownloads: true,
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
     });
-    await context.route('**/*', (route) => {
-      const url = route.request().url();
-      if (
-        url === 'https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js' ||
-        url === 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' ||
-        url === 'https://mijn.nikki-online.nl/js/main.js'
-      ) {
-        route.abort();
-        return;
-      }
-      route.continue();
-    });
-    const page = await context.newPage();
-    const runtimeUserAgent = await page.evaluate(() => navigator.userAgent);
-    logger.verbose(`Using user agent: ${runtimeUserAgent}`);
 
-    page.on('request', r => logDebug('>>', r.method(), r.url()));
-    page.on('response', r => logDebug('<<', r.status(), r.url()));
+    // Block problematic JS files that interfere with scraping
+    const blockedUrls = [
+      'https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js',
+      'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+      'https://mijn.nikki-online.nl/js/main.js'
+    ];
+    await context.route('**/*', (route) => {
+      if (blockedUrls.includes(route.request().url())) {
+        route.abort();
+      } else {
+        route.continue();
+      }
+    });
+
+    const page = await context.newPage();
+
+    if (isDebugEnabled()) {
+      page.on('request', r => logDebug('>>', r.method(), r.url()));
+      page.on('response', r => logDebug('<<', r.status(), r.url()));
+    }
 
     try {
       await loginToNikki(page, logger);
 
       const rawContributions = await scrapeContributions(page, logger);
-
-      // Download and parse CSV for additional data (hoofdsom)
       const csvRecords = await downloadAndParseCsv(page, logger);
 
       // Parse and validate contributions from HTML
-      const htmlContributions = rawContributions.map((raw) => {
-        const year = parseInt(raw.year, 10);
-        const saldo = parseEuroAmount(raw.saldo_raw);
-
-        return {
+      const htmlContributions = rawContributions
+        .map((raw) => ({
           knvb_id: raw.knvb_id,
-          year: isNaN(year) ? 0 : year,
+          year: parseInt(raw.year, 10),
           nikki_id: raw.nikki_id,
-          saldo: saldo,
+          saldo: parseEuroAmount(raw.saldo_raw),
           status: raw.status || null
-        };
-      }).filter((c) => c.knvb_id && c.year > 0 && c.nikki_id);
+        }))
+        .filter((c) => c.knvb_id && c.year > 0 && c.nikki_id);
 
       // Merge with CSV data (adds hoofdsom field)
       const contributions = mergeHtmlAndCsvData(htmlContributions, csvRecords, logger);
-
       logger.verbose(`Parsed ${contributions.length} valid contributions`);
 
       if (contributions.length > 0) {
-        // Store to database (upsert handles current year updates)
         upsertContributions(db, contributions);
 
-        // Prune data older than retention window (keeps 4 years)
         const pruned = pruneOldContributions(db);
         if (pruned > 0) {
           logger.verbose(`Pruned ${pruned} old contribution records`);
@@ -535,13 +409,11 @@ async function runNikkiDownload(options = {}) {
       }
 
       logger.log(`Downloaded ${result.count} contributions from Nikki`);
-
     } finally {
       await browser.close();
     }
 
     return result;
-
   } catch (error) {
     result.success = false;
     result.error = error.message;
@@ -554,9 +426,8 @@ async function runNikkiDownload(options = {}) {
 
 module.exports = { runNikkiDownload, parseEuroAmount };
 
-// CLI entry point
 if (require.main === module) {
-  const verbose = process.argv.includes('--verbose');
+  const { verbose } = parseCliArgs();
   runNikkiDownload({ verbose })
     .then(result => {
       if (!result.success) process.exitCode = 1;
