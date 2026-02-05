@@ -6,7 +6,7 @@ This document describes what data flows from where to where, which fields are sy
 
 - [System Overview](#system-overview)
 - [Schedules](#schedules)
-- [Change Detection](#change-detection)
+- [API Load Management](#api-load-management)
 - [Pipeline 1: People](#pipeline-1-people)
 - [Pipeline 2: Nikki](#pipeline-2-nikki)
 - [Pipeline 3: Teams](#pipeline-3-teams)
@@ -72,13 +72,34 @@ All times are **Europe/Amsterdam** timezone.
  Monday  23:30  Discipline sync
 ```
 
-## Change Detection
+## API Load Management
+
+Every pipeline is designed to minimize API calls and avoid overloading external services.
+
+### Selective Sync via Hash-Based Change Detection
 
 All pipelines use **hash-based change detection**. Each record gets a SHA-256 hash of its data (`source_hash`). On sync, the hash is compared to `last_synced_hash`. API calls only happen when hashes differ. This means:
 
-- Local work (reading SQLite, computing hashes) runs every time
+- Local work (reading SQLite, computing hashes) runs every time -- this is cheap
 - Expensive work (API calls to Laposta/Stadion/FreeScout) only runs for actual changes
 - On a typical run with no changes, zero API calls are made
+
+The Functions pipeline takes this further: the daily run only downloads data for members updated in Sportlink within the last 2 days (plus VOG-filtered volunteers), avoiding the need to scrape all ~1000+ members every day.
+
+### Rate Limiting and Delays
+
+When API calls are needed, all pipelines insert delays between requests to avoid overwhelming external services:
+
+| Target | Delay | Notes |
+|--------|-------|-------|
+| Laposta API | 2s between requests | Fixed delay via `waitForRateLimit()` |
+| Stadion WordPress API | Exponential backoff on errors | 1s, 2s, 4s on retries |
+| Stadion photo uploads | 2s between uploads | Both upload and delete operations |
+| Nikki to Stadion | 500ms between updates | |
+| Photo downloads | 200ms between downloads | 1s exponential backoff on errors |
+| FreeScout API | Exponential backoff on errors | 1s, 2s, 4s on 5xx errors |
+| Sportlink browser scraping | 500ms-1.5s between members | Random jitter to avoid patterns |
+| Reverse sync (Sportlink) | 1-2s between members | Random jitter, exponential backoff on errors |
 
 ---
 
