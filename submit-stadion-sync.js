@@ -16,7 +16,8 @@ const {
   updateParentSyncState,
   deleteParent,
   resetParentStadionIds,
-  getParentsNotInList
+  getParentsNotInList,
+  updateVolunteerStatus
 } = require('./lib/stadion-db');
 const { resolveFieldConflicts, generateConflictSummary } = require('./lib/conflict-resolver');
 const { TRACKED_FIELDS } = require('./lib/sync-origin');
@@ -208,6 +209,10 @@ async function syncPerson(member, db, options) {
         const response = await stadionRequest(endpoint, 'PUT', updateData, options);
         updateSyncState(db, knvb_id, source_hash, stadion_id);
 
+        // Capture volunteer status from Stadion
+        const volunteerStatus = existingData.acf?.['huidig-vrijwilliger'] === '1' ? 1 : 0;
+        updateVolunteerStatus(db, knvb_id, volunteerStatus);
+
         // Compare financial block status and log activity if changed
         const newBlockStatus = updateData.acf?.['financiele-blokkade'] || false;
         if (previousBlockStatus !== newBlockStatus) {
@@ -246,6 +251,10 @@ async function syncPerson(member, db, options) {
     const response = await stadionRequest(endpoint, 'POST', data, options);
     const newId = response.body.id;
     updateSyncState(db, knvb_id, source_hash, newId);
+
+    // Capture volunteer status from Stadion (newly created person defaults)
+    const createVolunteerStatus = response.body.acf?.['huidig-vrijwilliger'] === '1' ? 1 : 0;
+    updateVolunteerStatus(db, knvb_id, createVolunteerStatus);
 
     // Log initial block status for newly created persons
     const newBlockStatus = data.acf?.['financiele-blokkade'] || false;
