@@ -98,13 +98,10 @@ async function runTeamDownload(options = {}) {
       const clubTeamsData = await clubTeamsResponse.json();
       const clubTeams = Array.isArray(clubTeamsData.Team) ? clubTeamsData.Team : [];
 
-      // Filter out teams with TeamCode starting with "AWC " (external teams)
-      const filteredClubTeams = clubTeams.filter(team => {
-        const teamCode = team.TeamCode || '';
-        return !teamCode.startsWith('AWC ');
-      });
+      // Filter out club teams that already exist as union teams
+      const filteredClubTeams = clubTeams.filter(team => !team.HasUnionTeamConnection);
 
-      logVerbose(`Found ${filteredClubTeams.length} club teams (filtered ${clubTeams.length - filteredClubTeams.length} AWC teams)`);
+      logVerbose(`Found ${filteredClubTeams.length} club-only teams (filtered ${clubTeams.length - filteredClubTeams.length} teams with union team connection)`);
 
       // Add club team records to the team records array
       const clubTeamRecords = filteredClubTeams.map(team => ({
