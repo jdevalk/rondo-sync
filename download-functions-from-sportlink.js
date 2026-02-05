@@ -17,6 +17,7 @@ const {
 const { createSyncLogger } = require('./lib/logger');
 const { loginToSportlink } = require('./lib/sportlink-login');
 const { createLoggerAdapter, createDebugLogger } = require('./lib/log-adapters');
+const { stadionRequest } = require('./lib/stadion-client');
 
 /**
  * Parse functions API response
@@ -379,6 +380,44 @@ async function fetchMemberFunctions(page, knvbId, logger) {
 }
 
 /**
+ * Fetch KNVB IDs of volunteers needing VOG from Stadion API.
+ * These are people we're actively waiting on a change for, so we want to
+ * check their Sportlink data daily regardless of LastUpdate.
+ * @param {Object} logger - Logger instance
+ * @returns {Promise<Set<string>>} Set of KNVB IDs
+ */
+async function fetchVogFilteredKnvbIds(logger) {
+  const knvbIds = new Set();
+  let page = 1;
+
+  try {
+    while (true) {
+      const response = await stadionRequest(
+        `stadion/v1/people/filtered?huidig_vrijwilliger=1&vog_missing=1&vog_older_than_years=3&per_page=100&page=${page}`,
+        'GET',
+        null,
+        { logger }
+      );
+
+      const data = response.body;
+      if (!data.people || data.people.length === 0) break;
+
+      for (const person of data.people) {
+        const knvbId = person.acf?.['knvb-id'];
+        if (knvbId) knvbIds.add(String(knvbId));
+      }
+
+      if (page >= (data.total_pages || 1)) break;
+      page++;
+    }
+  } catch (err) {
+    logger.verbose(`Could not fetch VOG-filtered people from Stadion: ${err.message}`);
+  }
+
+  return knvbIds;
+}
+
+/**
  * Filter members to only those updated recently
  * @param {Array} members - Array of tracked members [{knvb_id, stadion_id}]
  * @param {Map} memberDataMap - Map of knvb_id -> member data (includes LastUpdate)
@@ -462,10 +501,26 @@ async function runFunctionsDownload(options = {}) {
             }
           });
 
-          members = filterRecentlyUpdated(members, memberDataMap, days);
-          logger.log(`Processing ${members.length} of ${allMembersCount} members (updated in last ${days} days)`);
+          const recentMembers = filterRecentlyUpdated(members, memberDataMap, days);
+          const recentKnvbIds = new Set(recentMembers.map(m => m.knvb_id));
+
+          // Also fetch VOG-filtered people from Stadion (volunteers we're waiting on)
+          const vogKnvbIds = await fetchVogFilteredKnvbIds(logger);
+          let vogAddedCount = 0;
+          if (vogKnvbIds.size > 0) {
+            // Add VOG members not already in the recent set
+            for (const member of members) {
+              if (!recentKnvbIds.has(member.knvb_id) && vogKnvbIds.has(member.knvb_id)) {
+                recentMembers.push(member);
+                vogAddedCount++;
+              }
+            }
+          }
+
+          members = recentMembers;
+          logger.log(`Processing ${members.length} of ${allMembersCount} members (${members.length - vogAddedCount} recent + ${vogAddedCount} VOG-filtered)`);
         } catch (err) {
-          logger.verbose(`Error parsing Sportlink results, processing all members: ${err.message}`);
+          logger.verbose(`Error filtering members, processing all: ${err.message}`);
           logger.log(`Processing ${members.length} members (full sync)`);
         }
       } else {
