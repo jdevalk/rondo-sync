@@ -384,9 +384,9 @@ async function fetchMemberFunctions(page, knvbId, logger) {
  * @param {Map} memberDataMap - Map of knvb_id -> member data (includes LastUpdate)
  * @returns {Array} Filtered members
  */
-function filterRecentlyUpdated(members, memberDataMap) {
+function filterRecentlyUpdated(members, memberDataMap, days = 2) {
   const now = new Date();
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+  const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   return members.filter(member => {
     const memberData = memberDataMap.get(member.knvb_id);
@@ -397,7 +397,7 @@ function filterRecentlyUpdated(members, memberDataMap) {
 
     // Parse LastUpdate field (format: "YYYY-MM-DD" or similar)
     const lastUpdate = new Date(memberData.LastUpdate);
-    return lastUpdate >= twoDaysAgo;
+    return lastUpdate >= cutoff;
   });
 }
 
@@ -408,10 +408,11 @@ function filterRecentlyUpdated(members, memberDataMap) {
  * @param {boolean} [options.verbose=false] - Verbose mode
  * @param {boolean} [options.withInvoice=false] - Also fetch invoice data from /financial tab (slow, run monthly)
  * @param {boolean} [options.recentOnly=true] - Only process members with recent updates
+ * @param {number} [options.days=2] - Number of days back to consider for recent updates
  * @returns {Promise<{success: boolean, total: number, downloaded: number, functionsCount: number, committeesCount: number, errors: Array}>}
  */
 async function runFunctionsDownload(options = {}) {
-  const { logger: providedLogger, verbose = false, withInvoice = false, recentOnly = true } = options;
+  const { logger: providedLogger, verbose = false, withInvoice = false, recentOnly = true, days = 2 } = options;
   const logger = providedLogger || createSyncLogger({ verbose });
 
   const result = {
@@ -461,8 +462,8 @@ async function runFunctionsDownload(options = {}) {
             }
           });
 
-          members = filterRecentlyUpdated(members, memberDataMap);
-          logger.log(`Processing ${members.length} of ${allMembersCount} members (recent updates only)`);
+          members = filterRecentlyUpdated(members, memberDataMap, days);
+          logger.log(`Processing ${members.length} of ${allMembersCount} members (updated in last ${days} days)`);
         } catch (err) {
           logger.verbose(`Error parsing Sportlink results, processing all members: ${err.message}`);
           logger.log(`Processing ${members.length} members (full sync)`);
@@ -653,7 +654,9 @@ if (require.main === module) {
   const verbose = process.argv.includes('--verbose');
   const withInvoice = process.argv.includes('--with-invoice');
   const all = process.argv.includes('--all');
-  runFunctionsDownload({ verbose, withInvoice, recentOnly: !all })
+  const daysIdx = process.argv.indexOf('--days');
+  const days = daysIdx !== -1 ? parseInt(process.argv[daysIdx + 1], 10) || 2 : 2;
+  runFunctionsDownload({ verbose, withInvoice, recentOnly: !all, days })
     .then(result => {
       if (!result.success) process.exitCode = 1;
     })
