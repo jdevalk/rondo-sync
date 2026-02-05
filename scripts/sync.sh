@@ -34,26 +34,59 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# Parse sync type argument — show usage if none given
+# Interactive menu when no argument given
 if [ -z "$1" ]; then
+    # Only show menu if running in a terminal
+    if [ ! -t 0 ]; then
+        echo "Error: no pipeline specified (non-interactive mode)" >&2
+        echo "Usage: sync.sh <pipeline>" >&2
+        exit 1
+    fi
+
     echo ""
-    echo "Sportlink Sync — available pipelines:"
+    echo "Sportlink Sync — pick a pipeline:"
     echo ""
-    echo "  scripts/sync.sh people           Members, parents, birthdays, photos (4x daily)"
-    echo "  scripts/sync.sh functions        Commissies + free fields, recent updates (4x daily)"
-    echo "  scripts/sync.sh functions --all  Full commissie sync, all members (weekly)"
-    echo "  scripts/sync.sh nikki            Nikki contributions (daily)"
-    echo "  scripts/sync.sh freescout        FreeScout customers (daily)"
-    echo "  scripts/sync.sh teams            Team rosters + work history (weekly)"
-    echo "  scripts/sync.sh discipline       Discipline cases (weekly)"
-    echo "  scripts/sync.sh invoice          Functions + invoice data (monthly)"
-    echo "  scripts/sync.sh reverse          Reverse sync, Stadion → Sportlink (disabled)"
-    echo "  scripts/sync.sh all              Run all pipelines sequentially"
+    echo "  1) people           Members, parents, birthdays, photos"
+    echo "  2) functions        Commissies + free fields (recent updates)"
+    echo "  3) functions --all  Full commissie sync (all members)"
+    echo "  4) nikki            Nikki contributions"
+    echo "  5) freescout        FreeScout customers"
+    echo "  6) teams            Team rosters + work history"
+    echo "  7) discipline       Discipline cases"
+    echo "  8) invoice          Functions + invoice data"
+    echo "  9) all              Run all pipelines sequentially"
     echo ""
-    exit 0
+    printf "Choice [1-9]: "
+    read -r CHOICE
+
+    case "$CHOICE" in
+        1) set -- "people" ;;
+        2) set -- "functions" ;;
+        3) set -- "functions" "--all" ;;
+        4) set -- "nikki" ;;
+        5) set -- "freescout" ;;
+        6) set -- "teams" ;;
+        7) set -- "discipline" ;;
+        8) set -- "invoice" ;;
+        9) set -- "all" ;;
+        *)
+            echo "Invalid choice." >&2
+            exit 1
+            ;;
+    esac
+
+    printf "Verbose output? [y/N]: "
+    read -r VERBOSE_CHOICE
+    case "$VERBOSE_CHOICE" in
+        [yY]*) set -- "$@" "--verbose" ;;
+    esac
+
+    echo ""
 fi
 
 SYNC_TYPE="$1"
+shift
+EXTRA_FLAGS="$*"
 
 # Validate sync type
 case "$SYNC_TYPE" in
@@ -61,7 +94,7 @@ case "$SYNC_TYPE" in
         ;;
     *)
         echo "Unknown sync type: $SYNC_TYPE" >&2
-        echo "Run without arguments to see available pipelines." >&2
+        echo "Run without arguments for interactive menu." >&2
         exit 1
         ;;
 esac
@@ -133,6 +166,9 @@ case "$SYNC_TYPE" in
         SYNC_SCRIPT="sync-all.js"
         ;;
 esac
+
+# Merge flags from interactive menu and script mapping
+SYNC_FLAGS="${SYNC_FLAGS:+$SYNC_FLAGS }$EXTRA_FLAGS"
 
 # Run sync with logging
 echo "Starting $SYNC_TYPE sync at $(date)" | tee -a "$LOG_FILE"
