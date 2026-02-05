@@ -161,6 +161,7 @@ See `field-mapping.json` for the complete mapping. Key fields:
 |---|---|
 | *(email)* | `Email` |
 | `voornaam` | `FirstName` |
+| `tussenvoegsel` | `Infix` |
 | `achternaam` | `LastName` |
 | `geboortedatum` | `DateOfBirth` |
 | `team` | `UnionTeams` |
@@ -172,7 +173,8 @@ See `field-mapping.json` for the complete mapping. Key fields:
 | Stadion ACF Field | Source |
 |---|---|
 | `first_name` | `FirstName` |
-| `last_name` | `Infix` + `LastName` |
+| `infix` | `Infix` (lowercased tussenvoegsel) |
+| `last_name` | `LastName` |
 | `knvb-id` | `PublicPersonId` |
 | `gender` | `GenderCode` (Male→male, Female→female) |
 | `birth_year` | Year from `DateOfBirth` |

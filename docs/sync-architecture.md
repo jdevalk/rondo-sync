@@ -173,7 +173,8 @@ Source: Sportlink `SearchMembers` API + free fields from SQLite. Destination: St
 | Stadion ACF Field | Source | Notes |
 |---|---|---|
 | `first_name` | `FirstName` | Required on every PUT |
-| `last_name` | `Infix` + `LastName` | Combined with space |
+| `infix` | `Infix` | Lowercased tussenvoegsel (optional, omitted when empty) |
+| `last_name` | `LastName` | Required on every PUT |
 | `knvb-id` | `PublicPersonId` | |
 | `gender` | `GenderCode` | Normalized: Male->male, Female->female |
 | `birth_year` | `DateOfBirth` | Year extracted |
