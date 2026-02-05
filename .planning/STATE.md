@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 Phase: 32 of 32 complete
 Plan: All plans complete
 Status: v2.2 Discipline Cases milestone shipped
-Last activity: 2026-02-05 — Completed quick task 015: Add infix field for Stadion API
+Last activity: 2026-02-05 — Completed quick task 016: Sync huidig-vrijwilliger to Laposta
 
 Progress: [####################] 32/32 phases (100%)
 
@@ -68,10 +68,11 @@ None. Stadion UI work (DISC-07, DISC-08) deferred to Stadion codebase.
 | 013 | Add discipline fees to Financieel card (doorbelast/non-doorbelast split) | 2026-02-04 | 2a27fbd | [013-add-discipline-fees-to-financieel](./quick/013-add-discipline-fees-to-financieel/) |
 | 014 | Optimize member fetching with LastUpdate filter (daily recent, weekly full) | 2026-02-04 | 21d9d7a | [014-optimize-member-fetching-lastupdate-filter](./quick/014-optimize-member-fetching-lastupdate-filter/) |
 | 015 | Add infix (tussenvoegsel) as separate ACF field for Stadion API | 2026-02-05 | 8fd1a03 | [015-add-infix-field-for-stadion-api](./quick/015-add-infix-field-for-stadion-api/) |
+| 016 | Sync huidig-vrijwilliger from Stadion to Laposta as custom field | 2026-02-05 | 12aeb47 | [016-sync-huidig-vrijwilliger-to-laposta](./quick/016-sync-huidig-vrijwilliger-to-laposta/) |
 
 ## Session Continuity
 
-Last session: 2026-02-04
-Stopped at: Quick task 014 completed
+Last session: 2026-02-05
+Stopped at: Quick task 016 completed
 Resume file: None
 Next steps: Run `/gsd:new-milestone` to start next milestone
