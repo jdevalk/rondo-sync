@@ -2,6 +2,21 @@
 
 This document describes what data flows from where to where, which fields are synced, on what schedule, and how change detection works.
 
+## Table of Contents
+
+- [System Overview](#system-overview)
+- [Schedules](#schedules)
+- [Change Detection](#change-detection)
+- [Pipeline 1: People](#pipeline-1-people)
+- [Pipeline 2: Nikki](#pipeline-2-nikki)
+- [Pipeline 3: Teams](#pipeline-3-teams)
+- [Pipeline 4: Functions (Commissies)](#pipeline-4-functions-commissies)
+- [Pipeline 5: FreeScout](#pipeline-5-freescout)
+- [Pipeline 6: Discipline](#pipeline-6-discipline)
+- [Reverse Sync (Stadion to Sportlink)](#reverse-sync-stadion-to-sportlink)
+- [Databases](#databases)
+- [Locking](#locking)
+
 ## System Overview
 
 ```mermaid
