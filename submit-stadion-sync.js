@@ -405,29 +405,8 @@ async function syncParent(parent, db, knvbIdToStadionId, options) {
   if (!stadion_id) {
     const existingId = await findPersonByEmail(email, options);
     if (existingId) {
-      // Fetch full person record to verify name match (not just email)
-      // Only treat as duplicate if BOTH name AND email match
-      try {
-        const existingPerson = await stadionRequest(`wp/v2/people/${existingId}`, 'GET', null, options);
-        const existingFirstName = (existingPerson.body.acf?.first_name || '').toLowerCase().trim();
-        const existingLastName = (existingPerson.body.acf?.last_name || '').toLowerCase().trim();
-        const parentFirstName = (data.acf.first_name || '').toLowerCase().trim();
-        const parentLastName = (data.acf.last_name || '').toLowerCase().trim();
-
-        // Compare full names (first + last concatenated) to handle different name formats
-        // Parent names from Sportlink may be "John Doe" + "" while member names are "John" + "Doe"
-        const existingFullName = [existingFirstName, existingLastName].filter(Boolean).join(' ');
-        const parentFullName = [parentFirstName, parentLastName].filter(Boolean).join(' ');
-
-        if (existingFullName === parentFullName) {
-          logVerbose(`Parent ${email} already exists as person ${existingId} with matching name "${existingFullName}", will merge`);
-          stadion_id = existingId;
-        } else {
-          logVerbose(`Person ${existingId} has email ${email} but different name ("${existingFullName}" vs "${parentFullName}"), will create separate parent record`);
-        }
-      } catch (error) {
-        logVerbose(`Could not fetch person ${existingId} for name verification: ${error.message}`);
-      }
+      logVerbose(`Parent ${email} already exists as person ${existingId}, will merge`);
+      stadion_id = existingId;
     }
   }
 
