@@ -439,8 +439,14 @@ async function runFunctionsDownload(options = {}) {
 
     // Filter members by LastUpdate if recentOnly is true
     if (recentOnly) {
-      const { getLatestSportlinkResults } = require('./laposta-db');
-      const resultsJson = getLatestSportlinkResults(db);
+      const { openDb: openLapostaDb, getLatestSportlinkResults } = require('./laposta-db');
+      const lapostaDb = openLapostaDb();
+      let resultsJson;
+      try {
+        resultsJson = getLatestSportlinkResults(lapostaDb);
+      } finally {
+        lapostaDb.close();
+      }
 
       if (resultsJson) {
         try {
