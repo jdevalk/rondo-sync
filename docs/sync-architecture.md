@@ -5,6 +5,7 @@ This document describes what data flows from where to where, which fields are sy
 ## Table of Contents
 
 - [System Overview](#system-overview)
+  - [Why Browser Automation?](#why-browser-automation)
 - [Schedules](#schedules)
 - [API Load Management](#api-load-management)
 - [Pipeline 1: People](#pipeline-1-people)
@@ -39,7 +40,7 @@ graph LR
 
 ### Why Browser Automation?
 
-Neither Sportlink Club nor Nikki provide APIs. All data is extracted by automating their web applications using **Playwright (headless Chromium)**. The sync tool logs in, navigates pages, and intercepts internal requests (like `SearchMembers`, `MemberHeader`, `UnionTeams`) that the web app makes to its own backend. For committee memberships, free fields, and discipline cases, it scrapes the rendered HTML directly. Nikki is similar — contribution data is scraped from HTML tables and CSV exports. The reverse sync also uses browser automation to fill in Sportlink's web forms.
+Neither Sportlink Club nor Nikki provide APIs. All data is extracted by automating their web applications using **Playwright (headless Chromium)**. The sync tool logs in, navigates pages, and intercepts the internal requests (like `SearchMembers`, `MemberHeader`, `MemberFreeFields`, `UnionTeams`) that the web app makes to its own backend. Nikki is different — it has no internal requests to intercept, so contribution data is scraped from HTML tables and CSV exports. The reverse sync also uses browser automation to fill in Sportlink's web forms.
 
 ## Schedules
 
