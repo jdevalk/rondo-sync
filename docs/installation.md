@@ -124,7 +124,7 @@ This should:
 2. Log into Sportlink Club
 3. Handle TOTP 2FA
 4. Download member data
-5. Save results to `laposta-sync.sqlite`
+5. Save results to `data/laposta-sync.sqlite`
 
 If it fails, check:
 - Credentials in `.env` are correct
@@ -181,10 +181,11 @@ crontab -l
 ```
 /home/sportlink/
 ├── .env                          # Credentials (not in git)
-├── laposta-sync.sqlite           # Laposta sync state (created on first run)
-├── stadion-sync.sqlite           # Stadion sync state (created on first run)
-├── nikki-sync.sqlite             # Nikki sync state (created on first run)
-├── freescout-sync.sqlite         # FreeScout sync state (created on first run)
+├── data/                         # SQLite databases (created on first run)
+│   ├── laposta-sync.sqlite       # Laposta sync state
+│   ├── stadion-sync.sqlite       # Stadion sync state
+│   ├── nikki-sync.sqlite         # Nikki sync state
+│   └── freescout-sync.sqlite     # FreeScout sync state
 ├── photos/                       # Downloaded member photos
 ├── logs/                         # Sync logs
 │   └── cron/                     # Cron-specific logs

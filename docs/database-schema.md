@@ -23,7 +23,7 @@ The sportlink-sync system uses four SQLite databases to track sync state between
 
 ### Database Locations
 
-All databases are stored in the project root directory on the server at `/home/sportlink/`.
+All databases are stored in the `data/` directory on the server at `/home/sportlink/data/`.
 
 | Database | Purpose | Module |
 |---|---|---|

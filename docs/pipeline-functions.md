@@ -24,7 +24,7 @@ node pipelines/sync-functions.js --all --verbose  # Full (direct)
 
 ```
 pipelines/sync-functions.js
-├── Step 1: steps/download-functions-from-sportlink.js   → stadion-sync.sqlite
+├── Step 1: steps/download-functions-from-sportlink.js   → data/stadion-sync.sqlite
 │   ├── Scrape /functions tab (committees, club functions)
 │   └── Scrape /other tab (free fields: FreeScout ID, VOG, financial block, photo URL)
 ├── Step 2: steps/submit-stadion-commissies.js           → Stadion WordPress API (commissies)
@@ -50,7 +50,7 @@ pipelines/sync-functions.js
    - **`/other` tab**: Extracts free fields via two Sportlink APIs:
      - `MemberFreeFields` API: `Remarks3` (FreeScout ID), `Remarks8` (VOG date)
      - `MemberHeader` API: `HasFinancialTransferBlockOwnClub`, `Photo.Url`, `Photo.PhotoDate`
-5. Stores data in `stadion-sync.sqlite`:
+5. Stores data in `data/stadion-sync.sqlite`:
    - `sportlink_member_functions`: Club-level functions per member
    - `sportlink_member_committees`: Committee memberships per member
    - `sportlink_member_free_fields`: Free fields per member

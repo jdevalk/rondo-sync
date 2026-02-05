@@ -15,7 +15,7 @@ node pipelines/sync-discipline.js --verbose    # Direct execution (verbose)
 
 ```
 pipelines/sync-discipline.js
-├── Step 1: steps/download-discipline-cases.js       → stadion-sync.sqlite
+├── Step 1: steps/download-discipline-cases.js       → data/stadion-sync.sqlite
 └── Step 2: steps/submit-stadion-discipline.js       → Stadion WordPress API
 ```
 
@@ -38,7 +38,7 @@ pipelines/sync-discipline.js
    - `sanction_description`, `processing_date`
    - `administrative_fee`, `is_charged`
 6. Computes `source_hash` per case
-7. Upserts into `stadion-sync.sqlite` → `discipline_cases` table
+7. Upserts into `data/stadion-sync.sqlite` → `discipline_cases` table
 
 **Output:** `{ success, caseCount }`
 
@@ -47,7 +47,7 @@ pipelines/sync-discipline.js
 **Script:** `steps/submit-stadion-discipline.js`
 **Function:** `runSync({ logger, verbose, force })`
 
-1. Reads cases from `stadion-sync.sqlite` → `discipline_cases`
+1. Reads cases from `data/stadion-sync.sqlite` → `discipline_cases`
 2. Looks up `stadion_id` for each case's `public_person_id` from `stadion_members`
 3. Gets or creates the season taxonomy term (e.g., "2025-2026"):
    - `GET /wp/v2/seizoen?slug=2025-2026`

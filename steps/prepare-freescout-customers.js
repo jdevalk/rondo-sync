@@ -24,7 +24,7 @@ try {
  * @returns {boolean}
  */
 function nikkiDbExists() {
-  const dbPath = path.join(process.cwd(), 'nikki-sync.sqlite');
+  const dbPath = path.join(process.cwd(), 'data', 'nikki-sync.sqlite');
   return fs.existsSync(dbPath);
 }
 

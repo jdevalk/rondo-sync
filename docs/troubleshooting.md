@@ -105,7 +105,7 @@ rm /home/sportlink/.sync-people.lock   # Or whichever sync type
 node tools/show-sportlink-member.js member@example.com
 
 # Check Stadion mapping
-sqlite3 stadion-sync.sqlite "SELECT knvb_id, stadion_id, last_synced_at FROM stadion_members WHERE email = 'member@example.com'"
+sqlite3 data/stadion-sync.sqlite "SELECT knvb_id, stadion_id, last_synced_at FROM stadion_members WHERE email = 'member@example.com'"
 ```
 
 **Possible causes:**
@@ -147,7 +147,7 @@ node tools/validate-stadion-ids.js --apply      # Fix invalid IDs
 **Diagnosis:**
 ```bash
 # Check photo state distribution
-sqlite3 stadion-sync.sqlite "SELECT photo_state, COUNT(*) FROM stadion_members GROUP BY photo_state"
+sqlite3 data/stadion-sync.sqlite "SELECT photo_state, COUNT(*) FROM stadion_members GROUP BY photo_state"
 
 # Check consistency between files and database
 node tools/check-photo-consistency.js --verbose
@@ -240,15 +240,15 @@ npm run show-laposta-changes
 2. **Database corrupted:** The simplest recovery is to delete the database and re-run a full sync. The databases are derived from source systems and can be rebuilt:
    ```bash
    # Back up first
-   cp stadion-sync.sqlite stadion-sync.sqlite.bak
+   cp data/stadion-sync.sqlite data/stadion-sync.sqlite.bak
 
    # Delete and rebuild (this will create all members as new in Stadion!)
    # Only do this if you're certain - it may cause duplicate entries
-   rm stadion-sync.sqlite
+   rm data/stadion-sync.sqlite
    scripts/sync.sh all
    ```
 
-   **Warning:** Deleting `stadion-sync.sqlite` loses all `stadion_id` mappings. This means the next sync will create new WordPress posts instead of updating existing ones. Use `tools/repopulate-stadion-ids.js` afterward to restore mappings:
+   **Warning:** Deleting `data/stadion-sync.sqlite` loses all `stadion_id` mappings. This means the next sync will create new WordPress posts instead of updating existing ones. Use `tools/repopulate-stadion-ids.js` afterward to restore mappings:
    ```bash
    node tools/repopulate-stadion-ids.js --verbose  # Dry run
    node tools/repopulate-stadion-ids.js             # Apply

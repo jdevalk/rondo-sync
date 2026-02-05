@@ -15,7 +15,7 @@ node pipelines/sync-teams.js --verbose    # Direct execution (verbose)
 
 ```
 pipelines/sync-teams.js
-├── Step 1: steps/download-teams-from-sportlink.js   → stadion-sync.sqlite
+├── Step 1: steps/download-teams-from-sportlink.js   → data/stadion-sync.sqlite
 ├── Step 2: steps/submit-stadion-teams.js            → Stadion WordPress API (teams)
 └── Step 3: steps/submit-stadion-work-history.js     → Stadion WordPress API (person work_history)
 ```
@@ -35,9 +35,9 @@ pipelines/sync-teams.js
 4. For each team, fetches the team roster:
    - Players with their roles (Speler, Keeper, etc.)
    - Staff members with their roles (Trainer, Leider, etc.)
-5. Stores team metadata in `stadion-sync.sqlite` → `stadion_teams`:
+5. Stores team metadata in `data/stadion-sync.sqlite` → `stadion_teams`:
    - `team_name`, `sportlink_id`, `game_activity`, `gender`, `player_count`, `staff_count`
-6. Stores team membership in `stadion-sync.sqlite` → `sportlink_team_members`:
+6. Stores team membership in `data/stadion-sync.sqlite` → `sportlink_team_members`:
    - `sportlink_team_id`, `sportlink_person_id`, `member_type` (player/staff), `role_description`
 
 **Output:** `{ success, teamCount, memberCount }`
@@ -49,7 +49,7 @@ pipelines/sync-teams.js
 **Script:** `steps/submit-stadion-teams.js`
 **Function:** `runSync({ logger, verbose, force, currentSportlinkIds })`
 
-1. Reads all teams from `stadion-sync.sqlite` → `stadion_teams`
+1. Reads all teams from `data/stadion-sync.sqlite` → `stadion_teams`
 2. For each team where `source_hash != last_synced_hash`:
    - **No `stadion_id`**: `POST /wp/v2/teams` (create new team)
    - **Has `stadion_id`**: `PUT /wp/v2/teams/{stadion_id}` (update existing)

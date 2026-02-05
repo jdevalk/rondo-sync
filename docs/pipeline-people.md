@@ -15,8 +15,8 @@ node pipelines/sync-people.js --verbose   # Direct execution (verbose)
 
 ```
 pipelines/sync-people.js
-├── Step 1: steps/download-data-from-sportlink.js    → laposta-sync.sqlite, stadion-sync.sqlite
-├── Step 2: steps/prepare-laposta-members.js         → laposta-sync.sqlite (members table)
+├── Step 1: steps/download-data-from-sportlink.js    → data/laposta-sync.sqlite, data/stadion-sync.sqlite
+├── Step 2: steps/prepare-laposta-members.js         → data/laposta-sync.sqlite (members table)
 ├── Step 3: steps/submit-laposta-list.js             → Laposta API
 ├── Step 4: steps/submit-stadion-sync.js             → Stadion WordPress API (members + parents)
 ├── Step 5: steps/sync-important-dates.js            → Stadion WordPress API (birthdays)
@@ -37,26 +37,26 @@ pipelines/sync-people.js
 3. Handles TOTP 2FA with `lib/totp.js`
 4. Calls Sportlink `SearchMembers` API to get all members
 5. Calls `MemberHeader` API for each member (photo URLs, financial block status)
-6. Stores raw JSON results in `laposta-sync.sqlite` → `sportlink_runs` table
-7. Upserts member data into `stadion-sync.sqlite` → `stadion_members` table
+6. Stores raw JSON results in `data/laposta-sync.sqlite` → `sportlink_runs` table
+7. Upserts member data into `data/stadion-sync.sqlite` → `stadion_members` table
 
 **Output:** `{ success, memberCount }`
 
 **Databases written:**
-- `laposta-sync.sqlite`: `sportlink_runs` (full JSON dump)
-- `stadion-sync.sqlite`: `stadion_members` (per-member data with `source_hash`)
+- `data/laposta-sync.sqlite`: `sportlink_runs` (full JSON dump)
+- `data/stadion-sync.sqlite`: `stadion_members` (per-member data with `source_hash`)
 
 ### Step 2: Prepare Laposta Members
 
 **Script:** `steps/prepare-laposta-members.js`
 **Function:** `runPrepare({ logger, verbose })`
 
-1. Reads latest Sportlink results from `laposta-sync.sqlite` → `sportlink_runs`
+1. Reads latest Sportlink results from `data/laposta-sync.sqlite` → `sportlink_runs`
 2. Applies field mappings from `config/field-mapping.json` to transform Sportlink fields to Laposta custom fields
 3. Handles parent extraction: creates separate list entries for `EmailAddressParent1` / `EmailAddressParent2`
 4. Deduplicates parent entries across lists
 5. Computes `source_hash` for each member (SHA-256 of email + custom fields)
-6. Upserts into `laposta-sync.sqlite` → `members` table
+6. Upserts into `data/laposta-sync.sqlite` → `members` table
 
 **Output:** `{ success, lists: [{ total }], excluded }`
 
@@ -70,7 +70,7 @@ pipelines/sync-people.js
 **Script:** `steps/submit-laposta-list.js`
 **Function:** `runSubmit({ logger, verbose, force })`
 
-1. Reads members from `laposta-sync.sqlite` where `source_hash != last_synced_hash`
+1. Reads members from `data/laposta-sync.sqlite` where `source_hash != last_synced_hash`
 2. For each changed member, calls Laposta API:
    - **New member** (no existing Laposta record): `POST /api/v2/member`
    - **Updated member**: `POST /api/v2/member` with update
@@ -87,7 +87,7 @@ pipelines/sync-people.js
 **Script:** `steps/submit-stadion-sync.js`
 **Function:** `runSync({ logger, verbose, force })`
 
-1. Reads members from `stadion-sync.sqlite` where `source_hash != last_synced_hash`
+1. Reads members from `data/stadion-sync.sqlite` where `source_hash != last_synced_hash`
 2. Reads free fields from `sportlink_member_free_fields` table (FreeScout ID, VOG date, financial block)
 3. Builds WordPress API payload with ACF fields (see field mappings below)
 4. For each changed member:
@@ -109,7 +109,7 @@ pipelines/sync-people.js
 **Script:** `steps/sync-important-dates.js`
 **Function:** `runSync({ logger, verbose, force })`
 
-1. Reads all members with `DateOfBirth` from `stadion-sync.sqlite`
+1. Reads all members with `DateOfBirth` from `data/stadion-sync.sqlite`
 2. For each member with a birth date and a `stadion_id`:
    - Creates/updates an `important_date` post in Stadion
    - Links to the person via `acf.related_people`

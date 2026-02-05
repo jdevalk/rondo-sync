@@ -15,7 +15,7 @@ node pipelines/sync-nikki.js --verbose    # Direct execution (verbose)
 
 ```
 pipelines/sync-nikki.js
-├── Step 1: steps/download-nikki-contributions.js    → nikki-sync.sqlite
+├── Step 1: steps/download-nikki-contributions.js    → data/nikki-sync.sqlite
 └── Step 2: steps/sync-nikki-to-stadion.js           → Stadion WordPress API
 ```
 
@@ -35,11 +35,11 @@ pipelines/sync-nikki.js
 5. A single member can have **multiple contribution lines per year** (e.g., separate amounts for different family members)
 6. Each line is stored as a separate row in SQLite, keyed by `(knvb_id, year, nikki_id)`
 7. Computes `source_hash` per contribution record
-8. Upserts into `nikki-sync.sqlite` → `nikki_contributions` table
+8. Upserts into `data/nikki-sync.sqlite` → `nikki_contributions` table
 
 **Output:** `{ success, count }`
 
-**Database written:** `nikki-sync.sqlite` → `nikki_contributions`
+**Database written:** `data/nikki-sync.sqlite` → `nikki_contributions`
 
 ### Step 2: Sync to Stadion
 
@@ -48,7 +48,7 @@ pipelines/sync-nikki.js
 
 1. Groups contributions by `knvb_id` and `year`
 2. For members with multiple lines per year: **sums** `saldo` and `hoofdsom` across all lines
-3. Looks up `stadion_id` from `stadion-sync.sqlite` → `stadion_members` (cross-database lookup)
+3. Looks up `stadion_id` from `data/stadion-sync.sqlite` → `stadion_members` (cross-database lookup)
 4. Skips members without a `stadion_id` (not yet synced to Stadion)
 5. For each member with changes, sends `PUT /wp/v2/people/{stadion_id}` with:
    - `first_name` and `last_name` (always required by Stadion API)

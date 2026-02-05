@@ -101,28 +101,28 @@ node tools/show-laposta-changes.js --all  # All members with diffs
 
 ```bash
 # Member count
-sqlite3 stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_members"
+sqlite3 data/stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_members"
 
 # Members needing sync (hash mismatch)
-sqlite3 stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_members WHERE last_synced_hash IS NULL OR last_synced_hash != source_hash"
+sqlite3 data/stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_members WHERE last_synced_hash IS NULL OR last_synced_hash != source_hash"
 
 # Photo state distribution
-sqlite3 stadion-sync.sqlite "SELECT photo_state, COUNT(*) FROM stadion_members GROUP BY photo_state"
+sqlite3 data/stadion-sync.sqlite "SELECT photo_state, COUNT(*) FROM stadion_members GROUP BY photo_state"
 
 # Team count
-sqlite3 stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_teams WHERE stadion_id IS NOT NULL"
+sqlite3 data/stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_teams WHERE stadion_id IS NOT NULL"
 
 # Commissie count
-sqlite3 stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_commissies WHERE stadion_id IS NOT NULL"
+sqlite3 data/stadion-sync.sqlite "SELECT COUNT(*) FROM stadion_commissies WHERE stadion_id IS NOT NULL"
 
 # Recent Sportlink downloads
-sqlite3 laposta-sync.sqlite "SELECT id, created_at FROM sportlink_runs ORDER BY id DESC LIMIT 5"
+sqlite3 data/laposta-sync.sqlite "SELECT id, created_at FROM sportlink_runs ORDER BY id DESC LIMIT 5"
 
 # Nikki contributions with outstanding balance
 node tools/show-nikki-contributions.js --outstanding
 
 # FreeScout customer count
-sqlite3 freescout-sync.sqlite "SELECT COUNT(*) FROM freescout_customers WHERE freescout_id IS NOT NULL"
+sqlite3 data/freescout-sync.sqlite "SELECT COUNT(*) FROM freescout_customers WHERE freescout_id IS NOT NULL"
 ```
 
 ## Deploying Updates
@@ -233,4 +233,4 @@ Weekly checks:
 Monthly checks:
 - [ ] Log files cleaned up (`find logs/cron/ -name "*.log" -mtime +30 | wc -l`)
 - [ ] Photo directory size reasonable (`du -sh photos/`)
-- [ ] Database sizes stable (`ls -lh *.sqlite`)
+- [ ] Database sizes stable (`ls -lh data/*.sqlite`)

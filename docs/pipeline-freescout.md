@@ -17,7 +17,7 @@ node pipelines/sync-freescout.js --verbose    # Direct execution (verbose)
 pipelines/sync-freescout.js
 ├── Check credentials (FREESCOUT_API_KEY + FREESCOUT_URL)
 └── steps/submit-freescout-sync.js
-    ├── steps/prepare-freescout-customers.js   → freescout-sync.sqlite
+    ├── steps/prepare-freescout-customers.js   → data/freescout-sync.sqlite
     └── Submit to FreeScout API          → FreeScout customers
 ```
 
@@ -31,23 +31,23 @@ Before running, `pipelines/sync-freescout.js` verifies that `FREESCOUT_API_KEY` 
 
 **Script:** `steps/prepare-freescout-customers.js` (called internally by `steps/submit-freescout-sync.js`)
 
-1. Reads member data from `stadion-sync.sqlite` → `stadion_members`
-2. Reads team assignments from `stadion-sync.sqlite` → `stadion_work_history`
-3. Reads contribution data from `nikki-sync.sqlite` → `nikki_contributions`
+1. Reads member data from `data/stadion-sync.sqlite` → `stadion_members`
+2. Reads team assignments from `data/stadion-sync.sqlite` → `stadion_work_history`
+3. Reads contribution data from `data/nikki-sync.sqlite` → `nikki_contributions`
 4. Builds customer records with:
    - Name, email, phone from Stadion member data
    - Team memberships (comma-separated)
    - KNVB ID, member since date
    - Latest Nikki contribution balance and status
 5. Computes `source_hash` per customer
-6. Upserts into `freescout-sync.sqlite` → `freescout_customers`
+6. Upserts into `data/freescout-sync.sqlite` → `freescout_customers`
 
 ### Customer Sync
 
 **Script:** `steps/submit-freescout-sync.js`
 **Function:** `runSubmit({ logger, verbose, force })`
 
-1. Reads customers from `freescout-sync.sqlite` where `source_hash != last_synced_hash`
+1. Reads customers from `data/freescout-sync.sqlite` where `source_hash != last_synced_hash`
 2. For each changed customer:
    - **No `freescout_id`**: `POST /api/customers` (create new customer)
    - **Has `freescout_id`**: `PUT /api/customers/{freescout_id}` (update existing)
