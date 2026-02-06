@@ -18,13 +18,14 @@
   2. The people pipeline no longer creates, updates, or deletes `important_date` posts for birthdays
   3. The `stadion_important_dates` table no longer exists (or is fully unused) in `stadion-sync.sqlite`
   4. Email report after a people sync shows birthdate sync results without a separate "Important Dates" section
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 33-01: TBD
+- [ ] 33-01-PLAN.md — Add birthdate to person ACF payload and remove birthday sync step
+- [ ] 33-02-PLAN.md — Deprecate DB table and update docs/tools
 
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 33. Birthday Field Migration | v2.3 | 0/TBD | Not started | - |
+| 33. Birthday Field Migration | v2.3 | 0/2 | Not started | - |
