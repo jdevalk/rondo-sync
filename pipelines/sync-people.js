@@ -7,7 +7,6 @@ const { runDownload } = require('../steps/download-data-from-sportlink');
 const { runPrepare } = require('../steps/prepare-laposta-members');
 const { runSubmit } = require('../steps/submit-laposta-list');
 const { runSync: runStadionSync } = require('../steps/submit-stadion-sync');
-const { runSync: runBirthdaySync } = require('../steps/sync-important-dates');
 const { runPhotoDownload } = require('../steps/download-photos-from-api');
 const { runPhotoSync } = require('../steps/upload-photos-to-stadion');
 const { runReverseSync } = require('../lib/reverse-sync-sportlink');
@@ -47,14 +46,6 @@ function printSummary(logger, stats) {
   }
   logger.log('');
 
-  logger.log('BIRTHDAY SYNC');
-  logger.log(minorDivider);
-  const birthdaySyncText = stats.birthdays.total > 0
-    ? `${stats.birthdays.synced}/${stats.birthdays.total}`
-    : '0 changes';
-  logger.log(`Birthdays synced: ${birthdaySyncText}`);
-  logger.log('');
-
   logger.log('PHOTO SYNC');
   logger.log(minorDivider);
   if (stats.photos.downloaded > 0 || stats.photos.uploaded > 0 || stats.photos.deleted > 0) {
@@ -91,7 +82,6 @@ function printSummary(logger, stats) {
   const allErrors = [
     ...stats.errors,
     ...stats.stadion.errors,
-    ...stats.birthdays.errors,
     ...stats.photos.errors,
     ...stats.reverseSync.errors
   ];
@@ -134,14 +124,6 @@ async function runPeopleSync(options = {}) {
     errors: [],
     lists: [],
     stadion: {
-      total: 0,
-      synced: 0,
-      created: 0,
-      updated: 0,
-      skipped: 0,
-      errors: []
-    },
-    birthdays: {
       total: 0,
       synced: 0,
       created: 0,
@@ -267,32 +249,7 @@ async function runPeopleSync(options = {}) {
       });
     }
 
-    // Step 5: Birthday Sync
-    logger.verbose('Syncing birthdays to Stadion...');
-    try {
-      const birthdayResult = await runBirthdaySync({ logger, verbose, force });
-
-      stats.birthdays = {
-        total: birthdayResult.total,
-        synced: birthdayResult.synced,
-        created: birthdayResult.created,
-        updated: birthdayResult.updated,
-        skipped: birthdayResult.skipped,
-        errors: (birthdayResult.errors || []).map(e => ({
-          knvb_id: e.knvb_id,
-          message: e.message,
-          system: 'birthday-sync'
-        }))
-      };
-    } catch (err) {
-      logger.error(`Birthday sync failed: ${err.message}`);
-      stats.birthdays.errors.push({
-        message: `Birthday sync failed: ${err.message}`,
-        system: 'birthday-sync'
-      });
-    }
-
-    // Step 6: Photo Download (API-based)
+    // Step 5: Photo Download (API-based)
     logger.verbose('Downloading photos from Sportlink API...');
     try {
       const photoDownloadResult = await runPhotoDownload({ logger, verbose, force });
@@ -313,7 +270,7 @@ async function runPeopleSync(options = {}) {
       });
     }
 
-    // Step 7: Photo Upload/Delete
+    // Step 6: Photo Upload/Delete
     logger.verbose('Syncing photos to Stadion...');
     try {
       const photoSyncResult = await runPhotoSync({ logger, verbose });
@@ -344,7 +301,7 @@ async function runPeopleSync(options = {}) {
       });
     }
 
-    // Step 8: Reverse Sync (Stadion -> Sportlink)
+    // Step 7: Reverse Sync (Stadion -> Sportlink)
     logger.verbose('Running reverse sync (Stadion -> Sportlink)...');
     try {
       const reverseSyncResult = await runReverseSync({ logger, verbose });
@@ -384,7 +341,6 @@ async function runPeopleSync(options = {}) {
     return {
       success: stats.errors.length === 0 &&
                stats.stadion.errors.length === 0 &&
-               stats.birthdays.errors.length === 0 &&
                stats.photos.errors.length === 0 &&
                stats.reverseSync.errors.length === 0,
       stats
