@@ -11,7 +11,7 @@ const {
   computeSourceHash
 } = require('../lib/laposta-db');
 const { normalizeEmail, isValidEmail, buildChildFullName, hasValue } = require('../lib/parent-dedupe');
-const { openDb: openStadionDb, getVolunteerStatusMap } = require('../lib/stadion-db');
+const { openDb: openStadionDb, getVolunteerStatusMap } = require('../lib/rondo-club-db');
 const { readEnv, parseCliArgs } = require('../lib/utils');
 const { createLoggerAdapter } = require('../lib/log-adapters');
 

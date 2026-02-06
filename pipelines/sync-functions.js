@@ -3,8 +3,8 @@ require('varlock/auto-load');
 const { createSyncLogger } = require('../lib/logger');
 const { formatDuration, formatTimestamp } = require('../lib/utils');
 const { runFunctionsDownload } = require('../steps/download-functions-from-sportlink');
-const { runSync: runCommissiesSync } = require('../steps/submit-stadion-commissies');
-const { runSync: runCommissieWorkHistorySync } = require('../steps/submit-stadion-commissie-work-history');
+const { runSync: runCommissiesSync } = require('../steps/submit-rondo-club-commissies');
+const { runSync: runCommissieWorkHistorySync } = require('../steps/submit-rondo-club-commissie-work-history');
 
 /**
  * Print summary report for functions sync
@@ -164,7 +164,7 @@ async function runFunctionsSync(options = {}) {
     logger.verbose('Syncing commissies to Stadion...');
     try {
       // Get current commissie names for orphan detection
-      const { openDb, getAllCommissies } = require('../lib/stadion-db');
+      const { openDb, getAllCommissies } = require('../lib/rondo-club-db');
       const db = openDb();
       const allCommissies = getAllCommissies(db);
       const currentCommissieNames = allCommissies.map(c => c.commissie_name);

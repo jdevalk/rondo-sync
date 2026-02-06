@@ -2,7 +2,7 @@ require('varlock/auto-load');
 
 const fs = require('fs/promises');
 const path = require('path');
-const { openDb, getMembersNeedingPhotoDownload, updatePhotoState } = require('../lib/stadion-db');
+const { openDb, getMembersNeedingPhotoDownload, updatePhotoState } = require('../lib/rondo-club-db');
 const { createSyncLogger } = require('../lib/logger');
 
 /**

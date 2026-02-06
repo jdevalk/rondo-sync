@@ -17,7 +17,7 @@
 
 require('varlock/auto-load');
 
-const { openDb } = require('../lib/stadion-db');
+const { openDb } = require('../lib/rondo-club-db');
 
 const dryRun = process.argv.includes('--dry-run');
 

@@ -6,7 +6,7 @@ const {
   upsertTeamsWithMetadata,
   upsertTeamMembers,
   clearTeamMembers
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 const { loginToSportlink } = require('../lib/sportlink-login');
 const { createLoggerAdapter, createDebugLogger, isDebugEnabled } = require('../lib/log-adapters');
 

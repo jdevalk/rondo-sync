@@ -1,8 +1,8 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
-const { runPrepare } = require('./prepare-stadion-members');
-const { runPrepare: runPrepareParents } = require('./prepare-stadion-parents');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
+const { runPrepare } = require('./prepare-rondo-club-members');
+const { runPrepare: runPrepareParents } = require('./prepare-rondo-club-parents');
 const {
   openDb,
   upsertMembers,
@@ -18,10 +18,10 @@ const {
   resetParentStadionIds,
   getParentsNotInList,
   updateVolunteerStatus
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 const { resolveFieldConflicts, generateConflictSummary } = require('../lib/conflict-resolver');
 const { TRACKED_FIELDS } = require('../lib/sync-origin');
-const { extractFieldValue } = require('../lib/detect-stadion-changes');
+const { extractFieldValue } = require('../lib/detect-rondo-club-changes');
 
 /**
  * Extract tracked field values from member data.

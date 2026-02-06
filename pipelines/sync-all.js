@@ -7,18 +7,18 @@ const { runDownload } = require('../steps/download-data-from-sportlink');
 const { runTeamDownload } = require('../steps/download-teams-from-sportlink');
 const { runPrepare } = require('../steps/prepare-laposta-members');
 const { runSubmit } = require('../steps/submit-laposta-list');
-const { runSync: runRondoClubSync } = require('../steps/submit-stadion-sync');
-const { runSync: runTeamSync } = require('../steps/submit-stadion-teams');
-const { runSync: runWorkHistorySync } = require('../steps/submit-stadion-work-history');
+const { runSync: runRondoClubSync } = require('../steps/submit-rondo-club-sync');
+const { runSync: runTeamSync } = require('../steps/submit-rondo-club-teams');
+const { runSync: runWorkHistorySync } = require('../steps/submit-rondo-club-work-history');
 const { runPhotoDownload } = require('../steps/download-photos-from-api');
-const { runPhotoSync } = require('../steps/upload-photos-to-stadion');
+const { runPhotoSync } = require('../steps/upload-photos-to-rondo-club');
 const { runFunctionsDownload } = require('../steps/download-functions-from-sportlink');
-const { runSync: runCommissieSync } = require('../steps/submit-stadion-commissies');
-const { runSync: runCommissieWorkHistorySync } = require('../steps/submit-stadion-commissie-work-history');
+const { runSync: runCommissieSync } = require('../steps/submit-rondo-club-commissies');
+const { runSync: runCommissieWorkHistorySync } = require('../steps/submit-rondo-club-commissie-work-history');
 const { runSubmit: runFreescoutSubmit } = require('../steps/submit-freescout-sync');
 const { checkCredentials: checkFreescoutCredentials } = require('../lib/freescout-client');
 const { runDisciplineSync: runDisciplinePipelineSync } = require('./sync-discipline');
-const { openDb } = require('../lib/stadion-db');
+const { openDb } = require('../lib/rondo-club-db');
 
 /**
  * Parse CLI arguments
@@ -499,7 +499,7 @@ async function runSyncAll(options = {}) {
       if (teamDownloadResult.success) {
         logger.verbose(`Downloaded ${teamDownloadResult.teamCount} teams with ${teamDownloadResult.memberCount} members`);
         // Store the sportlink IDs for orphan detection
-        const { getAllTeamsForSync } = require('../lib/stadion-db');
+        const { getAllTeamsForSync } = require('../lib/rondo-club-db');
         const db = openDb();
         const allTeams = getAllTeamsForSync(db);
         teamDownloadSportlinkIds = allTeams.filter(t => t.sportlink_id).map(t => t.sportlink_id);

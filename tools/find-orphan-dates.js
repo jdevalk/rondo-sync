@@ -11,7 +11,7 @@
  */
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 
 async function fetchAllPages(endpoint, options = {}) {
   const allItems = [];

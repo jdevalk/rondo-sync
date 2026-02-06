@@ -2,7 +2,7 @@ require('varlock/auto-load');
 
 const path = require('path');
 const fs = require('fs');
-const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId, getMemberWorkHistory, getAllTrackedMembers } = require('../lib/stadion-db');
+const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId, getMemberWorkHistory, getAllTrackedMembers } = require('../lib/rondo-club-db');
 const { openDb: openFreescoutDb, getCustomerByKnvbId } = require('../lib/freescout-db');
 const { createLoggerAdapter } = require('../lib/log-adapters');
 

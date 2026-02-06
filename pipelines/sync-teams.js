@@ -3,8 +3,8 @@ require('varlock/auto-load');
 const { createSyncLogger } = require('../lib/logger');
 const { formatDuration, formatTimestamp } = require('../lib/utils');
 const { runTeamDownload } = require('../steps/download-teams-from-sportlink');
-const { runSync: runTeamSync } = require('../steps/submit-stadion-teams');
-const { runSync: runWorkHistorySync } = require('../steps/submit-stadion-work-history');
+const { runSync: runTeamSync } = require('../steps/submit-rondo-club-teams');
+const { runSync: runWorkHistorySync } = require('../steps/submit-rondo-club-work-history');
 
 /**
  * Print summary report for team sync
@@ -148,7 +148,7 @@ async function runTeamsSync(options = {}) {
     logger.verbose('Syncing teams to Stadion...');
     try {
       // Get sportlink IDs for orphan detection (teams we just downloaded)
-      const { openDb, getAllTeamsForSync } = require('../lib/stadion-db');
+      const { openDb, getAllTeamsForSync } = require('../lib/rondo-club-db');
       const db = openDb();
       const allTeams = getAllTeamsForSync(db);
       const currentSportlinkIds = allTeams.filter(t => t.sportlink_id).map(t => t.sportlink_id);

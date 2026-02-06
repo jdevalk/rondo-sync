@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 const {
   openDb,
   upsertImportantDate,
@@ -9,7 +9,7 @@ const {
   getOrphanImportantDates,
   deleteImportantDate,
   getAllTrackedMembers
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 const { openDb: openLapostaDb, getLatestSportlinkResults } = require('../lib/laposta-db');
 
 /**

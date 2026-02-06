@@ -1,7 +1,7 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
-const { openDb, getAllTrackedMembers, getAllActiveMemberFunctions, getAllActiveMemberCommittees } = require('../lib/stadion-db');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
+const { openDb, getAllTrackedMembers, getAllActiveMemberFunctions, getAllActiveMemberCommittees } = require('../lib/rondo-club-db');
 
 async function clearWorkHistory() {
   const db = openDb();

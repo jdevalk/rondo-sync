@@ -1,7 +1,7 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
-const { openDb, updateSyncState, getAllTrackedMembers } = require('../lib/stadion-db');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
+const { openDb, updateSyncState, getAllTrackedMembers } = require('../lib/rondo-club-db');
 
 /**
  * Fetch all people from Rondo Club with their KNVB IDs.

@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 const {
   openDb: openDisciplineDb,
   getCasesNeedingSync,
@@ -8,7 +8,7 @@ const {
   getSeasonFromDate,
   getAllCases
 } = require('../lib/discipline-db');
-const { openDb: openStadionDb } = require('../lib/stadion-db');
+const { openDb: openStadionDb } = require('../lib/rondo-club-db');
 
 /**
  * Convert date string to ACF Ymd format (e.g., "2026-01-15" -> "20260115")

@@ -1,7 +1,7 @@
 require('varlock/auto-load');
 
 const { openDb, getLatestSportlinkResults } = require('../lib/laposta-db');
-const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId, getMemberInvoiceDataByKnvbId } = require('../lib/stadion-db');
+const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId, getMemberInvoiceDataByKnvbId } = require('../lib/rondo-club-db');
 const { createLoggerAdapter } = require('../lib/log-adapters');
 
 /**

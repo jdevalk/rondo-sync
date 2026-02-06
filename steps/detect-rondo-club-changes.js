@@ -4,7 +4,7 @@
  * Detects changes in Rondo Club that need reverse sync to Sportlink.
  */
 
-const { detectChanges } = require('../lib/detect-stadion-changes');
+const { detectChanges } = require('../lib/detect-rondo-club-changes');
 const { createSyncLogger } = require('../lib/logger');
 
 async function main() {

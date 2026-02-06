@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { openDb } = require('../lib/stadion-db');
+const { openDb } = require('../lib/rondo-club-db');
 
 const RONDO_URL = process.env.RONDO_URL;
 const RONDO_USERNAME = process.env.RONDO_USERNAME;

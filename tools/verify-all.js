@@ -1,5 +1,5 @@
-const db = require('../lib/stadion-db');
-const detectModule = require('../lib/detect-stadion-changes');
+const db = require('../lib/rondo-club-db');
+const detectModule = require('../lib/detect-rondo-club-changes');
 const fs = require('fs');
 
 console.log('=== Overall Verification ===\n');
@@ -21,7 +21,7 @@ console.log(`   Has required exports: ${hasRequiredExports ? 'PASS' : 'FAIL'}`);
 
 // 3. CLI entry point verification
 console.log('\n3. CLI entry point verification');
-const cliExists = fs.existsSync('../steps/detect-stadion-changes.js');
+const cliExists = fs.existsSync('../steps/detect-rondo-club-changes.js');
 console.log(`   CLI exists: ${cliExists ? 'PASS' : 'FAIL'}`);
 
 // Overall result

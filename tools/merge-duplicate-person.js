@@ -7,8 +7,8 @@
  */
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
-const { openDb } = require('../lib/stadion-db');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
+const { openDb } = require('../lib/rondo-club-db');
 
 async function mergePerson(parentId, memberId) {
   console.log(`Merging parent ${parentId} into member ${memberId}...`);

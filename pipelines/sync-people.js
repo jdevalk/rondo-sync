@@ -6,9 +6,9 @@ const { formatDuration, formatTimestamp } = require('../lib/utils');
 const { runDownload } = require('../steps/download-data-from-sportlink');
 const { runPrepare } = require('../steps/prepare-laposta-members');
 const { runSubmit } = require('../steps/submit-laposta-list');
-const { runSync: runRondoClubSync } = require('../steps/submit-stadion-sync');
+const { runSync: runRondoClubSync } = require('../steps/submit-rondo-club-sync');
 const { runPhotoDownload } = require('../steps/download-photos-from-api');
-const { runPhotoSync } = require('../steps/upload-photos-to-stadion');
+const { runPhotoSync } = require('../steps/upload-photos-to-rondo-club');
 const { runReverseSync } = require('../lib/reverse-sync-sportlink');
 
 /**

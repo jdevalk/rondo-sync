@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 
 /**
  * Delete teams that have commas in their names (bad sync data)

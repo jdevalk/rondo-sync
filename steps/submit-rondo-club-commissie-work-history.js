@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 const {
   openDb,
   getAllCommissies,
@@ -14,7 +14,7 @@ const {
   updateCommissieWorkHistorySyncState,
   deleteCommissieWorkHistory,
   computeCommissieWorkHistoryHash
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 
 /**
  * Convert JS Date to ACF date format (YYYYMMDD).

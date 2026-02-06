@@ -13,11 +13,11 @@ const {
   clearMemberFreeFields,
   upsertMemberInvoiceData,
   clearMemberInvoiceData
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 const { createSyncLogger } = require('../lib/logger');
 const { loginToSportlink } = require('../lib/sportlink-login');
 const { createLoggerAdapter, createDebugLogger } = require('../lib/log-adapters');
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 
 /**
  * Parse functions API response

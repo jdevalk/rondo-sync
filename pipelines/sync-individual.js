@@ -15,13 +15,13 @@ const {
   upsertMemberFunctions,
   upsertMemberCommittees,
   upsertMemberFreeFields
-} = require('../lib/stadion-db');
-const { preparePerson } = require('../steps/prepare-stadion-members');
-const { rondoClubRequest } = require('../lib/stadion-client');
+} = require('../lib/rondo-club-db');
+const { preparePerson } = require('../steps/prepare-rondo-club-members');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 const { resolveFieldConflicts } = require('../lib/conflict-resolver');
 const { TRACKED_FIELDS } = require('../lib/sync-origin');
-const { extractFieldValue } = require('../lib/detect-stadion-changes');
-const { syncCommissieWorkHistoryForMember } = require('../steps/submit-stadion-commissie-work-history');
+const { extractFieldValue } = require('../lib/detect-rondo-club-changes');
+const { syncCommissieWorkHistoryForMember } = require('../steps/submit-rondo-club-commissie-work-history');
 const {
   loginToSportlink,
   fetchMemberFunctions,

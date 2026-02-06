@@ -3,7 +3,7 @@ require('varlock/auto-load');
 const { createSyncLogger } = require('../lib/logger');
 const { formatDuration, formatTimestamp } = require('../lib/utils');
 const { runDownload } = require('../steps/download-discipline-cases');
-const { runSync: runDisciplineSync } = require('../steps/submit-stadion-discipline');
+const { runSync: runDisciplineSync } = require('../steps/submit-rondo-club-discipline');
 
 /**
  * Print summary report for discipline sync

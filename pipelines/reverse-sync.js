@@ -3,7 +3,7 @@ require('varlock/auto-load');
 const { requireProductionServer } = require('../lib/server-check');
 const { createSyncLogger } = require('../lib/logger');
 const { runReverseSyncMultiPage } = require('../lib/reverse-sync-sportlink');
-const { detectChanges } = require('../lib/detect-stadion-changes');
+const { detectChanges } = require('../lib/detect-rondo-club-changes');
 
 /**
  * Run full reverse sync for all fields (Stadion -> Sportlink)

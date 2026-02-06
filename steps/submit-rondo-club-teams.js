@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 const {
   openDb,
   getTeamsNeedingSync,
@@ -8,7 +8,7 @@ const {
   getOrphanTeamsBySportlinkId,
   deleteTeam,
   getAllTeamsForSync
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 
 /**
  * Fetch all teams from WordPress API (paginated)

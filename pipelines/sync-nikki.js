@@ -3,7 +3,7 @@ require('varlock/auto-load');
 const { createSyncLogger } = require('../lib/logger');
 const { formatDuration, formatTimestamp, parseCliArgs } = require('../lib/utils');
 const { runNikkiDownload } = require('../steps/download-nikki-contributions');
-const { runNikkiRondoClubSync } = require('../steps/sync-nikki-to-stadion');
+const { runNikkiRondoClubSync } = require('../steps/sync-nikki-to-rondo-club');
 
 /**
  * Print summary report for Nikki sync

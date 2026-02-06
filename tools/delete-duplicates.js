@@ -12,7 +12,7 @@
 
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 
 const RONDO_URL = process.env.RONDO_URL;
 const RONDO_USERNAME = process.env.RONDO_USERNAME;

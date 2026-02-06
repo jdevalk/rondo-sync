@@ -8,7 +8,7 @@
  */
 
 require('varlock/auto-load');
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 
 async function cleanupAllRelationships() {
   console.log('Scanning all people for relationship issues...');

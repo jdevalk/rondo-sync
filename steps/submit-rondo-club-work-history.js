@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 const { openDb: openLapostaDb, getLatestSportlinkResults } = require('../lib/laposta-db');
 const {
   openDb,
@@ -11,7 +11,7 @@ const {
   updateWorkHistorySyncState,
   deleteWorkHistory,
   getTeamMemberRole
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 
 /**
  * Check if a team name is valid
@@ -251,7 +251,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
     newWorkHistory.push(entry);
 
     // Update tracking with stadion_work_history_id
-    const sourceHash = require('../lib/stadion-db').computeWorkHistoryHash(knvb_id, teamName);
+    const sourceHash = require('../lib/rondo-club-db').computeWorkHistoryHash(knvb_id, teamName);
     updateWorkHistorySyncState(db, knvb_id, teamName, sourceHash, newIndex);
 
     addedCount++;
@@ -295,7 +295,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
             job_title: jobTitle
           };
           // Update tracking with the found index
-          const sourceHash = require('../lib/stadion-db').computeWorkHistoryHash(knvb_id, teamName);
+          const sourceHash = require('../lib/rondo-club-db').computeWorkHistoryHash(knvb_id, teamName);
           updateWorkHistorySyncState(db, knvb_id, teamName, sourceHash, existingIndex);
           updatedCount++;
           modified = true;
@@ -307,7 +307,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
           const newIndex = newWorkHistory.length;
           newWorkHistory.push(entry);
           // Update tracking
-          const sourceHash = require('../lib/stadion-db').computeWorkHistoryHash(knvb_id, teamName);
+          const sourceHash = require('../lib/rondo-club-db').computeWorkHistoryHash(knvb_id, teamName);
           updateWorkHistorySyncState(db, knvb_id, teamName, sourceHash, newIndex);
           addedCount++;
           modified = true;

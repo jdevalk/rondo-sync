@@ -1,6 +1,6 @@
 require('varlock/auto-load');
 
-const { rondoClubRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/rondo-club-client');
 const {
   openDb,
   getCommissiesNeedingSync,
@@ -9,7 +9,7 @@ const {
   deleteCommissie,
   getAllCommissies,
   upsertCommissies
-} = require('../lib/stadion-db');
+} = require('../lib/rondo-club-db');
 
 /**
  * Fetch all commissies from WordPress API (paginated)

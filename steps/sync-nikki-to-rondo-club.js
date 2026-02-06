@@ -1,8 +1,8 @@
 require('varlock/auto-load');
 
-const { stadionRequestWithRetry } = require('../lib/stadion-client');
+const { stadionRequestWithRetry } = require('../lib/rondo-club-client');
 const { openDb: openNikkiDb, getContributionsGroupedByMember } = require('../lib/nikki-db');
-const { openDb: openStadionDb, getAllTrackedMembers } = require('../lib/stadion-db');
+const { openDb: openStadionDb, getAllTrackedMembers } = require('../lib/rondo-club-db');
 const { createSyncLogger } = require('../lib/logger');
 const { parseCliArgs, stableStringify, computeHash } = require('../lib/utils');
 
