@@ -76,7 +76,7 @@ async function getBirthdayTermId(options = {}) {
 }
 
 /**
- * Create a new important date in Stadion
+ * Create a new important date in Rondo Club
  * @param {number} stadionPersonId - Rondo Club person post ID
  * @param {string} dateValue - Date in YYYY-MM-DD format
  * @param {number} birthdayTermId - Term ID for birthday date type
@@ -106,7 +106,7 @@ async function createImportantDate(stadionPersonId, dateValue, birthdayTermId, o
 }
 
 /**
- * Update an existing important date in Stadion
+ * Update an existing important date in Rondo Club
  * @param {number} stadionDateId - Rondo Club important date post ID
  * @param {number} stadionPersonId - Rondo Club person post ID
  * @param {string} dateValue - Date in YYYY-MM-DD format

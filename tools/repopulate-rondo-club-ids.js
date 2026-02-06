@@ -110,7 +110,7 @@ async function runRepopulate(options = {}) {
         }
         updated++;
       } else {
-        logVerbose(`${member.knvb_id} not found in Stadion`);
+        logVerbose(`${member.knvb_id} not found in Rondo Club`);
         notInStadion++;
       }
     }
@@ -118,7 +118,7 @@ async function runRepopulate(options = {}) {
     console.log(`\nResults:`);
     console.log(`  Updated: ${updated}${dryRun ? ' (dry run)' : ''}`);
     console.log(`  Already set: ${alreadySet}`);
-    console.log(`  Not in Stadion: ${notInStadion}`);
+    console.log(`  Not in Rondo Club: ${notInStadion}`);
 
     return { updated, alreadySet, notInStadion };
   } finally {

@@ -128,7 +128,7 @@ async function verifyEntity(db, entityKey, options) {
   // Fetch valid IDs from Rondo Club
   if (verbose) console.log(`  Fetching from Rondo Club...`);
   const validIds = await fetchAllIds(config.endpoint, options);
-  console.log(`  Stadion: ${validIds.size} records`);
+  console.log(`  Rondo Club: ${validIds.size} records`);
 
   // Get local tracking data
   const localRecords = db.prepare(`
@@ -142,7 +142,7 @@ async function verifyEntity(db, entityKey, options) {
 
   console.log(`  Local DB: ${tracked} tracked (${withId} with ID, ${withoutId} without)`);
 
-  // Find invalid stadion_ids (exist locally but not in Stadion)
+  // Find invalid stadion_ids (exist locally but not in Rondo Club)
   const invalidRecords = localRecords.filter(r => {
     return r[config.idColumn] != null && !validIds.has(r[config.idColumn]);
   });
@@ -210,7 +210,7 @@ function printSummary(results, options) {
   console.log('VERIFICATION SUMMARY');
   console.log('═'.repeat(50));
 
-  const headers = ['Entity', 'Stadion', 'Local', 'Invalid', 'Fixed'];
+  const headers = ['Entity', 'Rondo Club', 'Local', 'Invalid', 'Fixed'];
   const widths = [18, 10, 10, 10, 8];
 
   // Print header

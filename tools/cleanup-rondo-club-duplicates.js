@@ -105,7 +105,7 @@ async function runCleanup(options = {}) {
   // Get all Rondo Club people
   console.log('Fetching all people from Rondo Club...');
   const stadionPeople = await getAllStadionPeople();
-  console.log(`Found ${stadionPeople.length} people in Stadion`);
+  console.log(`Found ${stadionPeople.length} people in Rondo Club`);
   console.log('');
 
   // Build expected sets

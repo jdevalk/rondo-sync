@@ -190,7 +190,7 @@ function prepareCustomer(member, freescoutDb, rondoClubDb, nikkiDb) {
 }
 
 /**
- * Prepare FreeScout customers from Sportlink/Stadion data
+ * Prepare FreeScout customers from Sportlink/Rondo Club data
  * @param {Object} options
  * @param {Object} [options.logger] - Logger instance with log(), verbose(), error() methods
  * @param {boolean} [options.verbose=false] - Verbose mode

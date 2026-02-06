@@ -33,7 +33,7 @@ function computeFieldsHash(fields) {
  * @param {Object} [options.logger] - Logger instance
  * @param {boolean} [options.verbose=false] - Verbose mode
  * @param {boolean} [options.force=false] - Force update all members
- * @param {boolean} [options.dryRun=false] - Don't actually update Stadion
+ * @param {boolean} [options.dryRun=false] - Don't actually update Rondo Club
  * @returns {Promise<{success: boolean, updated: number, skipped: number, errors: number}>}
  */
 async function runNikkiStadionSync(options = {}) {
@@ -134,7 +134,7 @@ async function runNikkiStadionSync(options = {}) {
         continue;
       }
 
-      // Update Stadion
+      // Update Rondo Club
       try {
         logger.verbose(`[${processed}/${contributionsByMember.size}] ${knvbId}: Updating Rondo Club ID ${rondoClubId}`);
 

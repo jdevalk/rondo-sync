@@ -106,7 +106,7 @@ async function run() {
 
   // Fetch all people
   const people = await getAllPeople();
-  console.log(`\nTotal people in Stadion: ${people.length}`);
+  console.log(`\nTotal people in Rondo Club: ${people.length}`);
 
   // Find duplicates
   const duplicateGroups = findDuplicates(people);

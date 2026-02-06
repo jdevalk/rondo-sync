@@ -281,7 +281,7 @@ if (require.main === module) {
 
   runSync(options)
     .then(result => {
-      console.log(`Stadion commissies sync: ${result.synced}/${result.total} synced`);
+      console.log(`Rondo Club commissies sync: ${result.synced}/${result.total} synced`);
       console.log(`  Created: ${result.created}`);
       console.log(`  Updated: ${result.updated}`);
       console.log(`  Skipped: ${result.skipped}`);

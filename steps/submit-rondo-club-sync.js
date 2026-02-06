@@ -111,7 +111,7 @@ function applyResolutions(originalData, resolutions) {
 
 /**
  * Log financial block status change as activity on person
- * Uses Stadion's activity endpoint: POST /rondo/v1/people/{id}/activities
+ * Uses Rondo Club's activity endpoint: POST /rondo/v1/people/{id}/activities
  * @param {number} rondoClubId - WordPress person post ID
  * @param {boolean} isBlocked - New financial block status
  * @param {Object} options - Logger and verbose options
@@ -823,7 +823,7 @@ if (require.main === module) {
   runSync(options)
     .then(result => {
       if (options.includeMembers) {
-        console.log(`Stadion sync: ${result.synced}/${result.total} synced`);
+        console.log(`Rondo Club sync: ${result.synced}/${result.total} synced`);
         console.log(`  Created: ${result.created}`);
         console.log(`  Updated: ${result.updated}`);
         console.log(`  Skipped: ${result.skipped}`);

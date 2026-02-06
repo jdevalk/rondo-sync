@@ -238,7 +238,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
   for (const teamName of changes.added) {
     const teamStadionId = lookupTeamStadionId(teamName, teamMap);
     if (!teamStadionId) {
-      logVerbose(`Warning: Team "${teamName}" not found in Stadion, skipping`);
+      logVerbose(`Warning: Team "${teamName}" not found in Rondo Club, skipping`);
       continue;
     }
 
@@ -265,7 +265,7 @@ async function syncWorkHistoryForMember(member, currentTeams, db, teamMap, optio
     for (const teamName of changes.unchanged) {
       const teamStadionId = lookupTeamStadionId(teamName, teamMap);
       if (!teamStadionId) {
-        logVerbose(`Warning: Team "${teamName}" not found in Stadion, skipping`);
+        logVerbose(`Warning: Team "${teamName}" not found in Rondo Club, skipping`);
         continue;
       }
 

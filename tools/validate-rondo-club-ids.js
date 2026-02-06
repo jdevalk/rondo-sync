@@ -36,7 +36,7 @@ async function getAllStadionPeopleIds() {
 async function run() {
   const dryRun = process.argv.includes('--dry-run');
 
-  console.log(dryRun ? '=== DRY RUN ===' : '=== VALIDATING STADION IDS ===');
+  console.log(dryRun ? '=== DRY RUN ===' : '=== VALIDATING RONDO CLUB IDS ===');
   console.log('');
 
   // Get all valid person IDs from Rondo Club

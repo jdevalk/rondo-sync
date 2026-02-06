@@ -5,7 +5,7 @@ const { createSyncLogger } = require('../lib/logger');
 const { runReverseSync } = require('../lib/reverse-sync-sportlink');
 
 /**
- * Run contact fields reverse sync (Stadion -> Sportlink)
+ * Run contact fields reverse sync (Rondo Club -> Sportlink)
  * @param {Object} options
  * @param {boolean} [options.verbose=false] - Verbose mode
  * @returns {Promise<{success: boolean, synced: number, failed: number, results: Array}>}
@@ -14,7 +14,7 @@ async function runContactFieldsReverseSync(options = {}) {
   const { verbose = false, logger: providedLogger } = options;
   const logger = providedLogger || createSyncLogger({ verbose, prefix: 'reverse' });
 
-  logger.log('Starting contact fields reverse sync (Stadion -> Sportlink)...');
+  logger.log('Starting contact fields reverse sync (Rondo Club -> Sportlink)...');
 
   try {
     const result = await runReverseSync({ verbose, logger });

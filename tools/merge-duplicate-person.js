@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Merge duplicate person records in Stadion
+ * Merge duplicate person records in Rondo Club
  * Merges parent record into member record and cleans up relationships
  *
  * Usage: node scripts/merge-duplicate-person.js --parent=10987 --member=3893

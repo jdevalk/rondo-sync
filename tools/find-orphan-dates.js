@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Find and optionally delete orphaned important dates in Stadion
+ * Find and optionally delete orphaned important dates in Rondo Club
  *
  * Orphaned dates are those where related_people references a person ID
- * that no longer exists in Stadion.
+ * that no longer exists in Rondo Club.
  *
  * Usage:
  *   node scripts/find-orphan-dates.js          # List orphaned dates

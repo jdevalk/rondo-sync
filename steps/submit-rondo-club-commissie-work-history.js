@@ -56,7 +56,7 @@ function buildWorkHistoryEntry(commissieStadionId, jobTitle, isActive, startDate
     is_current: isActive,
     start_date: convertDateForACF(startDate),
     end_date: isActive ? '' : convertDateForACF(endDate),
-    team: commissieStadionId  // Note: This will work once Stadion's work_history.team field accepts commissie post type
+    team: commissieStadionId  // Note: This will work once Rondo Club's work_history.team field accepts commissie post type
   };
 }
 
@@ -160,7 +160,7 @@ async function syncCommissieWorkHistoryForMember(member, currentCommissies, db, 
   for (const commissie of changes.added) {
     const commissieStadionId = commissieMap.get(commissie.commissie_name);
     if (!commissieStadionId) {
-      logVerbose(`Warning: Commissie "${commissie.commissie_name}" not found in Stadion, skipping`);
+      logVerbose(`Warning: Commissie "${commissie.commissie_name}" not found in Rondo Club, skipping`);
       continue;
     }
 
