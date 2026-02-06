@@ -125,7 +125,7 @@ async function logFinancialBlockActivity(rondoClubId, isBlocked, options) {
 
   try {
     await rondoClubRequest(
-      `stadion/v1/people/${rondoClubId}/activities`,
+      `rondo/v1/people/${rondoClubId}/activities`,
       'POST',
       {
         content: activityText,
@@ -355,7 +355,7 @@ async function findPersonByEmail(email, options) {
   try {
     // Use dedicated email lookup endpoint
     const response = await rondoClubRequest(
-      `stadion/v1/people/find-by-email?email=${encodeURIComponent(email)}`,
+      `rondo/v1/people/find-by-email?email=${encodeURIComponent(email)}`,
       'GET',
       null,
       options

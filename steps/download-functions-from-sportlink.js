@@ -393,7 +393,7 @@ async function fetchVogFilteredKnvbIds(logger) {
   try {
     while (true) {
       const response = await rondoClubRequest(
-        `stadion/v1/people/filtered?huidig_vrijwilliger=1&vog_missing=1&vog_older_than_years=3&per_page=100&page=${page}`,
+        `rondo/v1/people/filtered?huidig_vrijwilliger=1&vog_missing=1&vog_older_than_years=3&per_page=100&page=${page}`,
         'GET',
         null,
         { logger }
