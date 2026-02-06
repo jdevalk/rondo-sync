@@ -134,7 +134,16 @@ Full bidirectional sync pipeline operational:
 
 ### Active
 
-(None — planning next milestone)
+## Current Milestone: v2.3 Birthday Field Migration
+
+**Goal:** Replace the separate important_date post type birthday sync with a simple `acf.birthdate` field on the person CPT, matching Stadion's updated data model.
+
+**Target features:**
+- Sync birthdate as ACF field on person during existing person sync step
+- Remove the important_date post creation/update/delete lifecycle for birthdays
+- Clean up orphaned important_date birthday posts in Stadion
+- Remove the `stadion_important_dates` tracking table (or repurpose)
+- Update email reports to reflect simplified birthday sync
 
 ### Out of Scope
 
@@ -240,4 +249,4 @@ Full bidirectional sync pipeline operational:
 | Monday 11:30 PM schedule | Weekly sync avoids overlap with other syncs, catches weekend matches | ✓ Good |
 
 ---
-*Last updated: 2026-02-03 after v2.2 milestone*
+*Last updated: 2026-02-06 after v2.3 milestone start*

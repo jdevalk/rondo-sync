@@ -2,34 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-03)
+See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
-**Current focus:** Planning next milestone
+**Current focus:** v2.3 Birthday Field Migration
 
 ## Current Position
 
-Phase: 32 of 32 complete
-Plan: All plans complete
-Status: v2.2 Discipline Cases milestone shipped
-Last activity: 2026-02-05 — Completed quick task 016: Sync huidig-vrijwilliger to Laposta
-
-Progress: [####################] 32/32 phases (100%)
-
-## Performance Metrics
-
-**Velocity:**
-- Total plans completed: 3 (v2.2 discipline cases)
-- Average duration: ~3 minutes
-- Total execution time: ~10 minutes
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 30 | 1 | 4m | 4m |
-| 31 | 1 | 2m | 2m |
-| 32 | 1 | 3m | 3m |
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v2.3
+Last activity: 2026-02-06 — Milestone v2.3 started
 
 ## Accumulated Context
 
@@ -49,7 +32,7 @@ Recent decisions affecting future work:
 6 pending:
 - [fetch-invoice-addresses-from-sportlink](./todos/pending/2026-02-04-fetch-invoice-addresses-from-sportlink.md) - Fetch invoice addresses and email from Sportlink financial tab
 - [review-deleted-member-handling](./todos/pending/2026-02-06-review-deleted-member-handling.md) - Review how deleted members are handled across all downstream systems
-- [adapt-birthday-sync-to-acf-field](./todos/pending/2026-02-06-adapt-birthday-sync-to-acf-field.md) - Adapt birthday sync to new Stadion ACF field model (awaiting docs)
+- [adapt-birthday-sync-to-acf-field](./todos/pending/2026-02-06-adapt-birthday-sync-to-acf-field.md) - Adapt birthday sync to new Stadion ACF field model (**in milestone v2.3**)
 - [rename-project-to-rondo](./todos/pending/2026-02-06-rename-project-to-rondo.md) - Rename project from Sportlink Sync to Rondo Sync (Stadion → Rondo Club)
 - [document-and-simplify-adding-sync-targets](./todos/pending/2026-02-06-document-and-simplify-adding-sync-targets.md) - Document and simplify adding custom sync targets
 - [detect-stale-parent-email-addresses](./todos/pending/2026-02-06-detect-stale-parent-email-addresses.md) - Detect and flag stale parent email addresses
@@ -57,12 +40,12 @@ Recent decisions affecting future work:
 ### Active Debug Sessions
 
 2 active:
-- birthday-sync-404-errors.md
+- birthday-sync-404-errors.md (likely resolved by v2.3 migration)
 - download-functions-no-api-response.md
 
 ### Blockers/Concerns
 
-None. Stadion UI work (DISC-07, DISC-08) deferred to Stadion codebase.
+None.
 
 ### Quick Tasks Completed
 
@@ -77,7 +60,7 @@ None. Stadion UI work (DISC-07, DISC-08) deferred to Stadion codebase.
 
 ## Session Continuity
 
-Last session: 2026-02-05
-Stopped at: Quick task 016 completed
+Last session: 2026-02-06
+Stopped at: Milestone v2.3 started, defining requirements
 Resume file: None
-Next steps: Run `/gsd:new-milestone` to start next milestone
+Next steps: Define requirements and create roadmap
