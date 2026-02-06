@@ -23,16 +23,16 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BDAY-01 | TBD | Pending |
-| BDAY-02 | TBD | Pending |
-| BDAY-03 | TBD | Pending |
-| BDAY-04 | TBD | Pending |
+| BDAY-01 | Phase 33 | Pending |
+| BDAY-02 | Phase 33 | Pending |
+| BDAY-03 | Phase 33 | Pending |
+| BDAY-04 | Phase 33 | Pending |
 
 **Coverage:**
 - v2.3 requirements: 4 total
-- Mapped to phases: 0
-- Unmapped: 4
+- Mapped to phases: 4
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-06*
-*Last updated: 2026-02-06 after initial definition*
+*Last updated: 2026-02-06 after roadmap creation*
