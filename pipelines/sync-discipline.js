@@ -26,7 +26,7 @@ function printSummary(logger, stats) {
   logger.log(`Cases downloaded: ${stats.download.caseCount}`);
   logger.log('');
 
-  logger.log('STADION SYNC');
+  logger.log('RONDO CLUB SYNC');
   logger.log(minorDivider);
   if (stats.sync.total > 0) {
     logger.log(`Cases synced: ${stats.sync.synced}/${stats.sync.total}`);
@@ -71,7 +71,7 @@ function printSummary(logger, stats) {
 /**
  * Run discipline sync pipeline (weekly)
  * - Download discipline cases from Sportlink
- * - Sync cases to Stadion
+ * - Sync cases to Rondo Club
  *
  * Uses member data from last people sync to link cases to persons
  */
@@ -120,8 +120,8 @@ async function runDisciplineSyncPipeline(options = {}) {
       });
     }
 
-    // Step 2: Sync cases to Stadion
-    logger.verbose('Syncing discipline cases to Stadion...');
+    // Step 2: Sync cases to Rondo Club
+    logger.verbose('Syncing discipline cases to Rondo Club...');
     try {
       const syncResult = await runDisciplineSync({ logger, verbose, force });
       stats.sync.total = syncResult.total;

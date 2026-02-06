@@ -6,7 +6,7 @@ const { formatDuration, formatTimestamp } = require('../lib/utils');
 const { runDownload } = require('../steps/download-data-from-sportlink');
 const { runPrepare } = require('../steps/prepare-laposta-members');
 const { runSubmit } = require('../steps/submit-laposta-list');
-const { runSync: runStadionSync } = require('../steps/submit-stadion-sync');
+const { runSync: runRondoClubSync } = require('../steps/submit-stadion-sync');
 const { runPhotoDownload } = require('../steps/download-photos-from-api');
 const { runPhotoSync } = require('../steps/upload-photos-to-stadion');
 const { runReverseSync } = require('../lib/reverse-sync-sportlink');
@@ -38,11 +38,11 @@ function printSummary(logger, stats) {
   logger.log(`Members synced: ${stats.synced} (${stats.added} added, ${stats.updated} updated)`);
   logger.log('');
 
-  logger.log('STADION SYNC');
+  logger.log('RONDO CLUB SYNC');
   logger.log(minorDivider);
-  logger.log(`Persons synced: ${stats.stadion.synced}/${stats.stadion.total} (${stats.stadion.created} created, ${stats.stadion.updated} updated)`);
-  if (stats.stadion.skipped > 0) {
-    logger.log(`Skipped: ${stats.stadion.skipped} (unchanged)`);
+  logger.log(`Persons synced: ${stats.rondoClub.synced}/${stats.rondoClub.total} (${stats.rondoClub.created} created, ${stats.rondoClub.updated} updated)`);
+  if (stats.rondoClub.skipped > 0) {
+    logger.log(`Skipped: ${stats.rondoClub.skipped} (unchanged)`);
   }
   logger.log('');
 
@@ -60,7 +60,7 @@ function printSummary(logger, stats) {
 
   // Only show reverse sync section if there were changes or failures
   if (stats.reverseSync.synced > 0 || stats.reverseSync.failed > 0) {
-    logger.log('REVERSE SYNC (STADION -> SPORTLINK)');
+    logger.log('REVERSE SYNC (RONDO CLUB -> SPORTLINK)');
     logger.log(minorDivider);
     logger.log(`Contact fields synced: ${stats.reverseSync.synced} members`);
     if (stats.reverseSync.failed > 0) {
@@ -81,7 +81,7 @@ function printSummary(logger, stats) {
 
   const allErrors = [
     ...stats.errors,
-    ...stats.stadion.errors,
+    ...stats.rondoClub.errors,
     ...stats.photos.errors,
     ...stats.reverseSync.errors
   ];
@@ -103,7 +103,7 @@ function printSummary(logger, stats) {
  * Run people sync pipeline (hourly)
  * - Download from Sportlink
  * - Prepare + Submit to Laposta
- * - Sync to Stadion (members + parents)
+ * - Sync to Rondo Club (members + parents)
  * - Sync birthdays
  */
 async function runPeopleSync(options = {}) {
@@ -123,7 +123,7 @@ async function runPeopleSync(options = {}) {
     updated: 0,
     errors: [],
     lists: [],
-    stadion: {
+    rondoClub: {
       total: 0,
       synced: 0,
       created: 0,
@@ -206,46 +206,46 @@ async function runPeopleSync(options = {}) {
       }
     });
 
-    // Step 4: Sync to Stadion
-    logger.verbose('Syncing to Stadion...');
+    // Step 4: Sync to Rondo Club
+    logger.verbose('Syncing to Rondo Club...');
     try {
-      const stadionResult = await runStadionSync({ logger, verbose, force });
+      const rondoClubResult = await runRondoClubSync({ logger, verbose, force });
 
-      stats.stadion.total = stadionResult.total;
-      stats.stadion.synced = stadionResult.synced;
-      stats.stadion.created = stadionResult.created;
-      stats.stadion.updated = stadionResult.updated;
-      stats.stadion.skipped = stadionResult.skipped;
+      stats.rondoClub.total = rondoClubResult.total;
+      stats.rondoClub.synced = rondoClubResult.synced;
+      stats.rondoClub.created = rondoClubResult.created;
+      stats.rondoClub.updated = rondoClubResult.updated;
+      stats.rondoClub.skipped = rondoClubResult.skipped;
 
-      if (stadionResult.parents) {
-        stats.stadion.total += stadionResult.parents.total;
-        stats.stadion.synced += stadionResult.parents.synced;
-        stats.stadion.created += stadionResult.parents.created;
-        stats.stadion.updated += stadionResult.parents.updated;
-        stats.stadion.skipped += stadionResult.parents.skipped;
+      if (rondoClubResult.parents) {
+        stats.rondoClub.total += rondoClubResult.parents.total;
+        stats.rondoClub.synced += rondoClubResult.parents.synced;
+        stats.rondoClub.created += rondoClubResult.parents.created;
+        stats.rondoClub.updated += rondoClubResult.parents.updated;
+        stats.rondoClub.skipped += rondoClubResult.parents.skipped;
 
-        if (stadionResult.parents.errors?.length > 0) {
-          stats.stadion.errors.push(...stadionResult.parents.errors.map(e => ({
+        if (rondoClubResult.parents.errors?.length > 0) {
+          stats.rondoClub.errors.push(...rondoClubResult.parents.errors.map(e => ({
             email: e.email,
             message: e.message,
-            system: 'stadion'
+            system: 'rondoClub'
           })));
         }
       }
 
-      if (stadionResult.errors?.length > 0) {
-        stats.stadion.errors.push(...stadionResult.errors.map(e => ({
+      if (rondoClubResult.errors?.length > 0) {
+        stats.rondoClub.errors.push(...rondoClubResult.errors.map(e => ({
           knvb_id: e.knvb_id,
           email: e.email,
           message: e.message,
-          system: 'stadion'
+          system: 'rondoClub'
         })));
       }
     } catch (err) {
-      logger.error(`Stadion sync failed: ${err.message}`);
-      stats.stadion.errors.push({
-        message: `Stadion sync failed: ${err.message}`,
-        system: 'stadion'
+      logger.error(`Rondo Club sync failed: ${err.message}`);
+      stats.rondoClub.errors.push({
+        message: `Rondo Club sync failed: ${err.message}`,
+        system: 'rondoClub'
       });
     }
 
@@ -271,7 +271,7 @@ async function runPeopleSync(options = {}) {
     }
 
     // Step 6: Photo Upload/Delete
-    logger.verbose('Syncing photos to Stadion...');
+    logger.verbose('Syncing photos to Rondo Club...');
     try {
       const photoSyncResult = await runPhotoSync({ logger, verbose });
 
@@ -301,8 +301,8 @@ async function runPeopleSync(options = {}) {
       });
     }
 
-    // Step 7: Reverse Sync (Stadion -> Sportlink)
-    logger.verbose('Running reverse sync (Stadion -> Sportlink)...');
+    // Step 7: Reverse Sync (Rondo Club -> Sportlink)
+    logger.verbose('Running reverse sync (Rondo Club -> Sportlink)...');
     try {
       const reverseSyncResult = await runReverseSync({ logger, verbose });
 
@@ -340,7 +340,7 @@ async function runPeopleSync(options = {}) {
 
     return {
       success: stats.errors.length === 0 &&
-               stats.stadion.errors.length === 0 &&
+               stats.rondoClub.errors.length === 0 &&
                stats.photos.errors.length === 0 &&
                stats.reverseSync.errors.length === 0,
       stats

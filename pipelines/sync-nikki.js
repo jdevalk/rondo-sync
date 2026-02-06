@@ -3,7 +3,7 @@ require('varlock/auto-load');
 const { createSyncLogger } = require('../lib/logger');
 const { formatDuration, formatTimestamp, parseCliArgs } = require('../lib/utils');
 const { runNikkiDownload } = require('../steps/download-nikki-contributions');
-const { runNikkiStadionSync } = require('../steps/sync-nikki-to-stadion');
+const { runNikkiRondoClubSync } = require('../steps/sync-nikki-to-stadion');
 
 /**
  * Print summary report for Nikki sync
@@ -28,11 +28,11 @@ function printSummary(logger, stats) {
 
   logger.log('STADION SYNC');
   logger.log(minorDivider);
-  logger.log(`Members updated: ${stats.stadion.updated}`);
-  logger.log(`Skipped (no changes): ${stats.stadion.skipped}`);
-  logger.log(`Skipped (no Stadion ID): ${stats.stadion.noStadionId}`);
-  if (stats.stadion.errors > 0) {
-    logger.log(`Errors: ${stats.stadion.errors}`);
+  logger.log(`Members updated: ${stats.rondoClub.updated}`);
+  logger.log(`Skipped (no changes): ${stats.rondoClub.skipped}`);
+  logger.log(`Skipped (no Rondo Club ID): ${stats.rondoClub.noRondoClubId}`);
+  if (stats.rondoClub.errors > 0) {
+    logger.log(`Errors: ${stats.rondoClub.errors}`);
   }
   logger.log('');
 
@@ -42,7 +42,7 @@ function printSummary(logger, stats) {
 /**
  * Run Nikki sync pipeline (daily)
  * - Download Nikki contribution data from nikki-online.nl
- * - Sync contribution status to Stadion member WYSIWYG field
+ * - Sync contribution status to Rondo Club member WYSIWYG field
  */
 async function runNikkiSync(options = {}) {
   const { verbose = false, force = false } = options;
@@ -60,7 +60,7 @@ async function runNikkiSync(options = {}) {
     stadion: {
       updated: 0,
       skipped: 0,
-      noStadionId: 0,
+      noRondoClubId: 0,
       errors: 0
     }
   };
@@ -85,17 +85,17 @@ async function runNikkiSync(options = {}) {
       });
     }
 
-    // Step 2: Sync to Stadion
-    logger.verbose('Syncing Nikki contributions to Stadion...');
+    // Step 2: Sync to Rondo Club
+    logger.verbose('Syncing Nikki contributions to Rondo Club...');
     try {
-      const stadionResult = await runNikkiStadionSync({ logger, verbose, force });
-      stats.stadion.updated = stadionResult.updated;
-      stats.stadion.skipped = stadionResult.skipped;
-      stats.stadion.noStadionId = stadionResult.noStadionId;
-      stats.stadion.errors = stadionResult.errors;
+      const rondoClubResult = await runNikkiRondoClubSync({ logger, verbose, force });
+      stats.rondoClub.updated = rondoClubResult.updated;
+      stats.rondoClub.skipped = rondoClubResult.skipped;
+      stats.rondoClub.noRondoClubId = rondoClubResult.noRondoClubId;
+      stats.rondoClub.errors = rondoClubResult.errors;
     } catch (err) {
-      logger.error(`Stadion sync failed: ${err.message}`);
-      stats.stadion.errors++;
+      logger.error(`Rondo Club sync failed: ${err.message}`);
+      stats.rondoClub.errors++;
     }
 
     // Complete
@@ -107,7 +107,7 @@ async function runNikkiSync(options = {}) {
     logger.close();
 
     return {
-      success: stats.download.errors.length === 0 && stats.stadion.errors === 0,
+      success: stats.download.errors.length === 0 && stats.rondoClub.errors === 0,
       stats
     };
   } catch (err) {

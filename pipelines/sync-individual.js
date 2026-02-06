@@ -17,7 +17,7 @@ const {
   upsertMemberFreeFields
 } = require('../lib/stadion-db');
 const { preparePerson } = require('../steps/prepare-stadion-members');
-const { stadionRequest } = require('../lib/stadion-client');
+const { rondoClubRequest } = require('../lib/stadion-client');
 const { resolveFieldConflicts } = require('../lib/conflict-resolver');
 const { TRACKED_FIELDS } = require('../lib/sync-origin');
 const { extractFieldValue } = require('../lib/detect-stadion-changes');
@@ -331,11 +331,11 @@ async function syncIndividual(knvbId, options = {}) {
       // Get existing person for conflict resolution
       let existingData = null;
       try {
-        const existing = await stadionRequest(`wp/v2/people/${stadionId}`, 'GET', null, { verbose });
+        const existing = await rondoClubRequest(`wp/v2/people/${stadionId}`, 'GET', null, { verbose });
         existingData = existing.body;
       } catch (e) {
         if (e.message?.includes('404')) {
-          console.log(`Person ${stadionId} no longer exists in Stadion - will create new`);
+          console.log(`Person ${stadionId} no longer exists in Rondo Club - will create new`);
           // Fall through to create
         } else {
           throw e;
@@ -363,7 +363,7 @@ async function syncIndividual(knvbId, options = {}) {
           updateData = applyResolutions(prepared.data, resolution.resolutions);
         }
 
-        await stadionRequest(`wp/v2/people/${stadionId}`, 'PUT', updateData, { verbose });
+        await rondoClubRequest(`wp/v2/people/${stadionId}`, 'PUT', updateData, { verbose });
         updateSyncState(stadionDb, knvbId, prepared.source_hash, stadionId);
 
         console.log(`Updated person ${stadionId} (${prepared.data.acf.first_name} ${prepared.data.acf.last_name})`);
@@ -382,7 +382,7 @@ async function syncIndividual(knvbId, options = {}) {
 
     // CREATE new person
     log('Creating new person');
-    const response = await stadionRequest('wp/v2/people', 'POST', prepared.data, { verbose });
+    const response = await rondoClubRequest('wp/v2/people', 'POST', prepared.data, { verbose });
     const newId = response.body.id;
     updateSyncState(stadionDb, knvbId, prepared.source_hash, newId);
 
