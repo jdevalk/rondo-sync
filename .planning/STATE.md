@@ -5,29 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention.
-**Current focus:** v2.3 Birthday Field Migration - Phase 33 (complete)
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 33 of 33 (Birthday Field Migration)
-Plan: 2/2 complete
-Status: Phase complete, milestone complete
-Last activity: 2026-02-06 — Phase 33 executed and verified
+Phase: 33 of 33 (last completed)
+Plan: N/A
+Status: Between milestones
+Last activity: 2026-02-06 — v2.3 Birthday Field Migration shipped
 
-Progress: [██████████] 100%
+Progress: [██████████] v2.3 complete
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- [v2.3]: All 4 birthday migration requirements in single phase (tightly coupled, no natural split)
-- [v2.3]: Birthdate field uses Y-m-d format matching Stadion ACF date field convention
-- [33-01]: No separate birthdate counter in email report - birthdate is just another ACF field covered by existing person sync stats
-- [33-02]: Keep stadion_important_dates table schema for backward compatibility, only mark functions as deprecated
-- [33-02]: Documentation deprecation pattern uses "(DEPRECATED - vX.X)" prefix consistently
 
 ### Pending Todos
 
@@ -41,8 +34,7 @@ Recent decisions affecting current work:
 
 ### Active Debug Sessions
 
-2 active:
-- birthday-sync-404-errors.md (resolved by v2.3 migration)
+1 active:
 - download-functions-no-api-response.md
 
 ### Blockers/Concerns
@@ -52,6 +44,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Phase 33 complete, milestone v2.3 complete
+Stopped at: v2.3 milestone complete, archived
 Resume file: None
-Next steps: `/gsd:audit-milestone` or `/gsd:complete-milestone`
+Next steps: `/gsd:new-milestone`

@@ -8,6 +8,24 @@ A CLI tool that synchronizes member data bidirectionally between Sportlink Club 
 
 Keep downstream systems (Laposta, Stadion) automatically in sync with Sportlink member data without manual intervention — now bidirectionally.
 
+## Current State (v2.3 Shipped)
+
+**Shipped:** 2026-02-06
+
+Full bidirectional sync pipeline operational with simplified birthday handling:
+- Member data downloads from Sportlink via browser automation
+- Members sync to Laposta email lists with hash-based change detection
+- Members and parents sync to Stadion WordPress with relationship linking
+- **Birthdate syncs as `acf.birthdate` field on person records (simplified from separate important_date posts)**
+- Financial block status syncs bidirectionally with activity audit trail
+- Photos download via HTTP (from MemberHeader API URLs) and upload to Stadion hourly
+- Teams extract from Sportlink and sync to Stadion with work history
+- FreeScout customer sync from Stadion and Nikki databases
+- Reverse sync pushes contact field corrections from Stadion to Sportlink
+- Nikki contributions sync with CSV download, per-year ACF fields, and 4-year retention
+- Discipline cases download from Sportlink and sync to Stadion with season-based organization
+- Six automated pipelines (people 4x daily, nikki daily, teams/functions weekly, reverse sync every 15 minutes, discipline weekly Monday 11:30 PM)
+
 ## Current State (v2.2 Shipped)
 
 **Shipped:** 2026-02-03
@@ -131,19 +149,14 @@ Full bidirectional sync pipeline operational:
 - ✓ Link cases to persons via existing PublicPersonId → stadion_id mapping — v2.2
 - ✓ Organize by season category (auto-derived from date) — v2.2
 - ✓ Weekly sync schedule with email reporting — v2.2
+- ✓ Sync birthdate as `acf.birthdate` field on person during existing Stadion person sync step — v2.3
+- ✓ Remove the separate `sync-important-dates.js` step from the people pipeline — v2.3
+- ✓ Remove or deprecate the `stadion_important_dates` DB table — v2.3
+- ✓ Update email reports to remove the separate birthday sync section — v2.3
 
 ### Active
 
-## Current Milestone: v2.3 Birthday Field Migration
-
-**Goal:** Replace the separate important_date post type birthday sync with a simple `acf.birthdate` field on the person CPT, matching Stadion's updated data model.
-
-**Target features:**
-- Sync birthdate as ACF field on person during existing person sync step
-- Remove the important_date post creation/update/delete lifecycle for birthdays
-- Clean up orphaned important_date birthday posts in Stadion
-- Remove the `stadion_important_dates` tracking table (or repurpose)
-- Update email reports to reflect simplified birthday sync
+(None — next milestone not yet planned)
 
 ### Out of Scope
 
@@ -247,6 +260,10 @@ Full bidirectional sync pipeline operational:
 | Discipline-cases post type | Custom post type in Stadion for disciplinary data | ✓ Good |
 | Season taxonomy auto-create | Creates season terms (e.g., "2025-2026") if missing | ✓ Good |
 | Monday 11:30 PM schedule | Weekly sync avoids overlap with other syncs, catches weekend matches | ✓ Good |
+| Birthdate as ACF field on person | Eliminates complex important_date post lifecycle management | ✓ Good |
+| No separate birthdate counter in report | Covered by person sync stats via hash-based change detection | ✓ Good |
+| Keep important_dates table for backward compat | Avoid breaking existing production databases | ✓ Good |
+| @deprecated JSDoc for DB functions | Functions retained in exports but clearly marked for future removal | ✓ Good |
 
 ---
-*Last updated: 2026-02-06 after v2.3 milestone start*
+*Last updated: 2026-02-06 after v2.3 milestone*

@@ -1,5 +1,32 @@
 # Project Milestones: Sportlink Sync
 
+## v2.3 Birthday Field Migration (Shipped: 2026-02-06)
+
+**Delivered:** Migrated birthday handling from separate important_date posts to a simple `acf.birthdate` field on person records, simplifying the data model and removing an entire sync lifecycle.
+
+**Phases completed:** 33 (2 plans total)
+
+**Key accomplishments:**
+
+- Birthdate now syncs as `acf.birthdate` (Y-m-d) on person records via existing person pipeline
+- Removed birthday sync step from people pipeline (8 steps → 7 steps)
+- Deprecated `stadion_important_dates` DB table and 8 associated functions with backward compatibility
+- Updated 14 documentation files to reflect simplified architecture
+- Resolved birthday sync 404 errors by eliminating the important_date post lifecycle entirely
+
+**Stats:**
+
+- 28 files modified
+- 20,956 lines total JavaScript (project)
+- 1 phase, 2 plans, 4 tasks
+- Same day development (2026-02-06)
+
+**Git range:** `b8b7761` → `d1c02e1`
+
+**What's next:** To be determined in next milestone planning.
+
+---
+
 ## v2.2 Discipline Cases (Shipped: 2026-02-03)
 
 **Delivered:** Discipline case sync from Sportlink to Stadion with season-based organization, person linking, and weekly automated pipeline.
