@@ -2,7 +2,7 @@ require('varlock/auto-load');
 
 const { stadionRequestWithRetry } = require('../lib/rondo-club-client');
 const { openDb: openNikkiDb, getContributionsGroupedByMember } = require('../lib/nikki-db');
-const { openDb: openStadionDb, getAllTrackedMembers } = require('../lib/rondo-club-db');
+const { openDb: openRondoClubDb, getAllTrackedMembers } = require('../lib/rondo-club-db');
 const { createSyncLogger } = require('../lib/logger');
 const { parseCliArgs, stableStringify, computeHash } = require('../lib/utils');
 
@@ -49,7 +49,7 @@ async function runNikkiStadionSync(options = {}) {
   };
 
   const nikkiDb = openNikkiDb();
-  const stadionDb = openStadionDb();
+  const rondoClubDb = openRondoClubDb();
 
   try {
     logger.log('Starting Nikki → Rondo Club sync');
@@ -59,7 +59,7 @@ async function runNikkiStadionSync(options = {}) {
     logger.verbose(`Found contributions for ${contributionsByMember.size} members`);
 
     // Get all tracked members from Rondo Club DB (knvb_id → stadion_id mapping)
-    const trackedMembers = getAllTrackedMembers(stadionDb);
+    const trackedMembers = getAllTrackedMembers(rondoClubDb);
     const knvbIdToStadionId = new Map();
     for (const member of trackedMembers) {
       if (member.knvb_id && member.stadion_id) {
@@ -129,7 +129,7 @@ async function runNikkiStadionSync(options = {}) {
 
       if (dryRun) {
         const years = contributions.map(c => c.year).join(', ');
-        logger.log(`[DRY-RUN] Would update ${knvbId} (Stadion ID: ${rondoClubId}, years: ${years})`);
+        logger.log(`[DRY-RUN] Would update ${knvbId} (Rondo Club ID: ${rondoClubId}, years: ${years})`);
         result.updated++;
         continue;
       }
@@ -183,7 +183,7 @@ async function runNikkiStadionSync(options = {}) {
 
   } finally {
     nikkiDb.close();
-    stadionDb.close();
+    rondoClubDb.close();
   }
 }
 

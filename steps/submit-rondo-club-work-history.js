@@ -368,7 +368,7 @@ async function runSync(options = {}) {
   try {
     // Open databases
     const lapostaDb = openLapostaDb();
-    const stadionDb = openDb();
+    const rondoClubDb = openDb();
 
     try {
       // Load Sportlink data
@@ -387,7 +387,7 @@ async function runSync(options = {}) {
 
       // Load team mapping: team_code -> stadion_id
       // SearchMembers returns team codes (e.g. "JO17-1") which match TeamCode from the teams download
-      const teams = getAllTeams(stadionDb);
+      const teams = getAllTeams(rondoClubDb);
       const teamMap = new Map(teams.filter(t => t.team_code).map(t => [t.team_code, t.stadion_id]));
       logVerbose(`Loaded ${teams.length} teams from Rondo Club (${teamMap.size} with team codes)`);
 
@@ -418,13 +418,13 @@ async function runSync(options = {}) {
 
       // Upsert to tracking database
       if (workHistoryRecords.length > 0) {
-        upsertWorkHistory(stadionDb, workHistoryRecords);
+        upsertWorkHistory(rondoClubDb, workHistoryRecords);
       }
 
       // Get members needing sync
       const needsSync = backfillOnly
-        ? getWorkHistoryNeedingSync(stadionDb, true)
-        : getWorkHistoryNeedingSync(stadionDb, force);
+        ? getWorkHistoryNeedingSync(rondoClubDb, true)
+        : getWorkHistoryNeedingSync(rondoClubDb, force);
 
       // Group by knvb_id
       const memberMap = new Map();
@@ -455,7 +455,7 @@ async function runSync(options = {}) {
           const syncResult = await syncWorkHistoryForMember(
             member,
             currentTeams,
-            stadionDb,
+            rondoClubDb,
             teamMap,
             options,
             kernelGameActivities,
@@ -480,7 +480,7 @@ async function runSync(options = {}) {
       result.success = result.errors.length === 0;
     } finally {
       lapostaDb.close();
-      stadionDb.close();
+      rondoClubDb.close();
     }
 
     return result;

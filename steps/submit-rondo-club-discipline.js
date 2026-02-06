@@ -8,7 +8,7 @@ const {
   getSeasonFromDate,
   getAllCases
 } = require('../lib/discipline-db');
-const { openDb: openStadionDb } = require('../lib/rondo-club-db');
+const { openDb: openRondoClubDb } = require('../lib/rondo-club-db');
 
 /**
  * Convert date string to ACF Ymd format (e.g., "2026-01-15" -> "20260115")
@@ -34,7 +34,7 @@ function toAcfDateFormat(dateString) {
  * @returns {Map<string, number>} - Map of KNVB ID to Rondo Club person ID
  */
 function buildPersonLookup() {
-  const db = openStadionDb();
+  const db = openRondoClubDb();
   const stmt = db.prepare('SELECT knvb_id, stadion_id FROM stadion_members WHERE stadion_id IS NOT NULL');
   const rows = stmt.all();
   db.close();

@@ -4,7 +4,7 @@ require('varlock/auto-load');
 const { chromium } = require('playwright');
 const { openDb: openLapostaDb, getLatestSportlinkResults } = require('../lib/laposta-db');
 const {
-  openDb: openStadionDb,
+  openDb: openRondoClubDb,
   getMemberFreeFieldsByKnvbId,
   upsertMembers,
   getMembersNeedingSync,
@@ -151,7 +151,7 @@ async function fetchFreshDataFromSportlink(knvbId, db, options = {}) {
 /**
  * Sync functions/commissie work history for a single member
  */
-async function syncFunctionsForMember(knvbId, stadionId, db, memberFunctions, memberCommittees, options = {}) {
+async function syncFunctionsForMember(knvbId, rondoClubId, db, memberFunctions, memberCommittees, options = {}) {
   const { verbose = false, force = false } = options;
   const log = verbose ? console.log : () => {};
 
@@ -198,7 +198,7 @@ async function syncFunctionsForMember(knvbId, stadionId, db, memberFunctions, me
 
   try {
     const result = await syncCommissieWorkHistoryForMember(
-      { knvb_id: knvbId, stadion_id: stadionId },
+      { knvb_id: knvbId, stadion_id: rondoClubId },
       currentCommissies,
       db,
       commissieMap,
@@ -226,13 +226,13 @@ async function syncIndividual(knvbId, options = {}) {
 
   // Open databases
   const lapostaDb = openLapostaDb();
-  const stadionDb = openStadionDb();
+  const rondoClubDb = openRondoClubDb();
 
   try {
     // Fetch fresh data from Sportlink if requested
     if (fetch) {
       console.log('Fetching fresh data from Sportlink...');
-      const fetchResult = await fetchFreshDataFromSportlink(knvbId, stadionDb, { verbose });
+      const fetchResult = await fetchFreshDataFromSportlink(knvbId, rondoClubDb, { verbose });
       if (!fetchResult.success) {
         console.error('Failed to fetch data from Sportlink');
         return { success: false, error: 'Failed to fetch from Sportlink' };
@@ -261,7 +261,7 @@ async function syncIndividual(knvbId, options = {}) {
     log(`Found member: ${member.FirstName} ${member.Infix || ''} ${member.LastName}`);
 
     // Get free fields for this member (now includes freshly fetched data if --fetch was used)
-    const freeFields = getMemberFreeFieldsByKnvbId(stadionDb, knvbId);
+    const freeFields = getMemberFreeFieldsByKnvbId(rondoClubDb, knvbId);
     log(`Free fields: ${JSON.stringify(freeFields)}`);
 
     // Prepare the person data
@@ -269,10 +269,10 @@ async function syncIndividual(knvbId, options = {}) {
     log(`Prepared data for ${prepared.knvb_id}`);
 
     // Upsert to tracking database to get current state
-    upsertMembers(stadionDb, [prepared]);
+    upsertMembers(rondoClubDb, [prepared]);
 
     // Get member with stadion_id from database
-    const [trackedMember] = getMembersNeedingSync(stadionDb, force);
+    const [trackedMember] = getMembersNeedingSync(rondoClubDb, force);
     const memberToSync = trackedMember?.knvb_id === knvbId ? trackedMember : null;
 
     if (!memberToSync && !force) {
@@ -282,20 +282,20 @@ async function syncIndividual(knvbId, options = {}) {
     }
 
     // Get stadion_id from database directly if not forcing
-    const stmt = stadionDb.prepare('SELECT stadion_id FROM stadion_members WHERE knvb_id = ?');
+    const stmt = rondoClubDb.prepare('SELECT stadion_id FROM stadion_members WHERE knvb_id = ?');
     const row = stmt.get(knvbId);
-    const stadionId = row?.stadion_id;
+    const rondoClubId = row?.stadion_id;
 
-    log(`Stadion ID: ${stadionId || 'none (will create)'}`);
+    log(`Rondo Club ID: ${rondoClubId || 'none (will create)'}`);
 
     // Get functions data for dry run display
-    const memberFunctions = getMemberFunctions(stadionDb, knvbId);
-    const memberCommittees = getMemberCommittees(stadionDb, knvbId);
+    const memberFunctions = getMemberFunctions(rondoClubDb, knvbId);
+    const memberCommittees = getMemberCommittees(rondoClubDb, knvbId);
 
     if (dryRun) {
       console.log('\n=== DRY RUN - No changes will be made ===');
       console.log(`KNVB ID: ${knvbId}`);
-      console.log(`Stadion ID: ${stadionId || '(will create new)'}`);
+      console.log(`Rondo Club ID: ${rondoClubId || '(will create new)'}`);
       console.log(`Name: ${prepared.data.acf.first_name} ${prepared.data.acf.last_name}`);
       console.log(`Email: ${prepared.email || 'none'}`);
       console.log('\nData to sync:');
@@ -324,18 +324,18 @@ async function syncIndividual(knvbId, options = {}) {
     }
 
     // Perform the sync
-    if (stadionId) {
+    if (rondoClubId) {
       // UPDATE existing person
-      log(`Updating existing person: ${stadionId}`);
+      log(`Updating existing person: ${rondoClubId}`);
 
       // Get existing person for conflict resolution
       let existingData = null;
       try {
-        const existing = await rondoClubRequest(`wp/v2/people/${stadionId}`, 'GET', null, { verbose });
+        const existing = await rondoClubRequest(`wp/v2/people/${rondoClubId}`, 'GET', null, { verbose });
         existingData = existing.body;
       } catch (e) {
         if (e.message?.includes('404')) {
-          console.log(`Person ${stadionId} no longer exists in Rondo Club - will create new`);
+          console.log(`Person ${rondoClubId} no longer exists in Rondo Club - will create new`);
           // Fall through to create
         } else {
           throw e;
@@ -352,7 +352,7 @@ async function syncIndividual(knvbId, options = {}) {
           { knvb_id: knvbId, source_hash: prepared.source_hash },
           sportlinkData,
           stadionData,
-          stadionDb
+          rondoClubDb
         );
 
         if (resolution.conflicts.length > 0) {
@@ -363,20 +363,20 @@ async function syncIndividual(knvbId, options = {}) {
           updateData = applyResolutions(prepared.data, resolution.resolutions);
         }
 
-        await rondoClubRequest(`wp/v2/people/${stadionId}`, 'PUT', updateData, { verbose });
-        updateSyncState(stadionDb, knvbId, prepared.source_hash, stadionId);
+        await rondoClubRequest(`wp/v2/people/${rondoClubId}`, 'PUT', updateData, { verbose });
+        updateSyncState(rondoClubDb, knvbId, prepared.source_hash, rondoClubId);
 
-        console.log(`Updated person ${stadionId} (${prepared.data.acf.first_name} ${prepared.data.acf.last_name})`);
+        console.log(`Updated person ${rondoClubId} (${prepared.data.acf.first_name} ${prepared.data.acf.last_name})`);
 
         // Sync functions/commissie work history
         if (!skipFunctions) {
-          const functionsResult = await syncFunctionsForMember(knvbId, stadionId, stadionDb, memberFunctions, memberCommittees, { verbose, force });
+          const functionsResult = await syncFunctionsForMember(knvbId, rondoClubId, rondoClubDb, memberFunctions, memberCommittees, { verbose, force });
           if (functionsResult.synced) {
             console.log(`  Functions: ${functionsResult.added} added, ${functionsResult.ended} ended`);
           }
         }
 
-        return { success: true, action: 'updated', stadionId };
+        return { success: true, action: 'updated', rondoClubId };
       }
     }
 
@@ -384,23 +384,23 @@ async function syncIndividual(knvbId, options = {}) {
     log('Creating new person');
     const response = await rondoClubRequest('wp/v2/people', 'POST', prepared.data, { verbose });
     const newId = response.body.id;
-    updateSyncState(stadionDb, knvbId, prepared.source_hash, newId);
+    updateSyncState(rondoClubDb, knvbId, prepared.source_hash, newId);
 
     console.log(`Created person ${newId} (${prepared.data.acf.first_name} ${prepared.data.acf.last_name})`);
 
     // Sync functions/commissie work history for new person
     if (!skipFunctions) {
-      const functionsResult = await syncFunctionsForMember(knvbId, newId, stadionDb, memberFunctions, memberCommittees, { verbose, force });
+      const functionsResult = await syncFunctionsForMember(knvbId, newId, rondoClubDb, memberFunctions, memberCommittees, { verbose, force });
       if (functionsResult.synced) {
         console.log(`  Functions: ${functionsResult.added} added, ${functionsResult.ended} ended`);
       }
     }
 
-    return { success: true, action: 'created', stadionId: newId };
+    return { success: true, action: 'created', rondoClubId: newId };
 
   } finally {
     lapostaDb.close();
-    stadionDb.close();
+    rondoClubDb.close();
   }
 }
 

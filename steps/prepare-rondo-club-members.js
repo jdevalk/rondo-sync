@@ -1,7 +1,7 @@
 require('varlock/auto-load');
 
 const { openDb, getLatestSportlinkResults } = require('../lib/laposta-db');
-const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId, getMemberInvoiceDataByKnvbId } = require('../lib/rondo-club-db');
+const { openDb: openRondoClubDb, getMemberFreeFieldsByKnvbId, getMemberInvoiceDataByKnvbId } = require('../lib/rondo-club-db');
 const { createLoggerAdapter } = require('../lib/log-adapters');
 
 /**
@@ -272,7 +272,7 @@ async function runPrepare(options = {}) {
     logVerbose(`Found ${members.length} Sportlink members in database`);
 
     // Open Rondo Club DB to look up free fields
-    const stadionDb = openStadionDb();
+    const rondoClubDb = openRondoClubDb();
 
     // Filter out invalid members and transform valid ones
     const validMembers = [];
@@ -292,13 +292,13 @@ async function runPrepare(options = {}) {
         }
 
         // Look up free fields (FreeScout ID, VOG datum) for this member
-        const freeFields = getMemberFreeFieldsByKnvbId(stadionDb, member.PublicPersonId);
+        const freeFields = getMemberFreeFieldsByKnvbId(rondoClubDb, member.PublicPersonId);
         if (freeFields && (freeFields.freescout_id || freeFields.vog_datum)) {
           freeFieldsCount++;
         }
 
         // Look up invoice data for this member
-        const invoiceData = getMemberInvoiceDataByKnvbId(stadionDb, member.PublicPersonId);
+        const invoiceData = getMemberInvoiceDataByKnvbId(rondoClubDb, member.PublicPersonId);
         if (invoiceData && (invoiceData.invoice_email || invoiceData.invoice_address_is_default === 0)) {
           invoiceDataCount++;
         }
@@ -307,7 +307,7 @@ async function runPrepare(options = {}) {
         validMembers.push(prepared);
       });
     } finally {
-      stadionDb.close();
+      rondoClubDb.close();
     }
 
     logVerbose(`Prepared ${validMembers.length} members for Rondo Club sync (${skippedCount} skipped)`);

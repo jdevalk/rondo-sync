@@ -11,7 +11,7 @@ const {
   computeSourceHash
 } = require('../lib/laposta-db');
 const { normalizeEmail, isValidEmail, buildChildFullName, hasValue } = require('../lib/parent-dedupe');
-const { openDb: openStadionDb, getVolunteerStatusMap } = require('../lib/rondo-club-db');
+const { openDb: openRondoClubDb, getVolunteerStatusMap } = require('../lib/rondo-club-db');
 const { readEnv, parseCliArgs } = require('../lib/utils');
 const { createLoggerAdapter } = require('../lib/log-adapters');
 
@@ -542,11 +542,11 @@ async function runPrepare(options = {}) {
     // Load volunteer status from Rondo Club DB
     let volunteerStatusMap = new Map();
     try {
-      const stadionDb = openStadionDb();
+      const rondoClubDb = openRondoClubDb();
       try {
-        volunteerStatusMap = getVolunteerStatusMap(stadionDb);
+        volunteerStatusMap = getVolunteerStatusMap(rondoClubDb);
       } finally {
-        stadionDb.close();
+        rondoClubDb.close();
       }
     } catch (e) {
       logVerbose('Could not load volunteer status from Rondo Club DB, defaulting all to 0');

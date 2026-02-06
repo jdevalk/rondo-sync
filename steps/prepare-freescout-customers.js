@@ -2,7 +2,7 @@ require('varlock/auto-load');
 
 const path = require('path');
 const fs = require('fs');
-const { openDb: openStadionDb, getMemberFreeFieldsByKnvbId, getMemberWorkHistory, getAllTrackedMembers } = require('../lib/rondo-club-db');
+const { openDb: openRondoClubDb, getMemberFreeFieldsByKnvbId, getMemberWorkHistory, getAllTrackedMembers } = require('../lib/rondo-club-db');
 const { openDb: openFreescoutDb, getCustomerByKnvbId } = require('../lib/freescout-db');
 const { createLoggerAdapter } = require('../lib/log-adapters');
 
@@ -32,11 +32,11 @@ function nikkiDbExists() {
  * Get existing FreeScout ID for a member
  * First checks freescout_customers table (authoritative), then sportlink_member_free_fields (secondary)
  * @param {Object} freescoutDb - FreeScout database connection
- * @param {Object} stadionDb - Rondo Club database connection
+ * @param {Object} rondoClubDb - Rondo Club database connection
  * @param {string} knvbId - Member KNVB ID
  * @returns {number|null} - FreeScout customer ID or null
  */
-function getExistingFreescoutId(freescoutDb, stadionDb, knvbId) {
+function getExistingFreescoutId(freescoutDb, rondoClubDb, knvbId) {
   // First check our authoritative tracking database
   const trackedCustomer = getCustomerByKnvbId(freescoutDb, knvbId);
   if (trackedCustomer && trackedCustomer.freescout_id) {
@@ -44,7 +44,7 @@ function getExistingFreescoutId(freescoutDb, stadionDb, knvbId) {
   }
 
   // Fall back to Sportlink free fields (for initial seeding)
-  const freeFields = getMemberFreeFieldsByKnvbId(stadionDb, knvbId);
+  const freeFields = getMemberFreeFieldsByKnvbId(rondoClubDb, knvbId);
   if (freeFields && freeFields.freescout_id) {
     return freeFields.freescout_id;
   }
@@ -73,12 +73,12 @@ function getPhotoUrl(member) {
 
 /**
  * Get union teams (comma-separated) from work history
- * @param {Object} stadionDb - Rondo Club database connection
+ * @param {Object} rondoClubDb - Rondo Club database connection
  * @param {string} knvbId - Member KNVB ID
  * @returns {string} - Comma-separated team names or empty string
  */
-function getUnionTeams(stadionDb, knvbId) {
-  const workHistory = getMemberWorkHistory(stadionDb, knvbId);
+function getUnionTeams(rondoClubDb, knvbId) {
+  const workHistory = getMemberWorkHistory(rondoClubDb, knvbId);
   if (!workHistory || workHistory.length === 0) {
     return '';
   }
@@ -123,11 +123,11 @@ function getMostRecentNikkiData(nikkiDb, knvbId) {
  * Transform a stadion member to FreeScout customer format
  * @param {Object} member - Member record from stadion_members
  * @param {Object} freescoutDb - FreeScout database connection
- * @param {Object} stadionDb - Rondo Club database connection
+ * @param {Object} rondoClubDb - Rondo Club database connection
  * @param {Object|null} nikkiDb - Nikki database connection (may be null)
  * @returns {Object|null} - FreeScout customer object or null if no email
  */
-function prepareCustomer(member, freescoutDb, stadionDb, nikkiDb) {
+function prepareCustomer(member, freescoutDb, rondoClubDb, nikkiDb) {
   const data = member.data || {};
   const acf = data.acf || {};
 
@@ -146,7 +146,7 @@ function prepareCustomer(member, freescoutDb, stadionDb, nikkiDb) {
   }
 
   // Get FreeScout ID from tracking databases
-  const freescoutId = getExistingFreescoutId(freescoutDb, stadionDb, member.knvb_id);
+  const freescoutId = getExistingFreescoutId(freescoutDb, rondoClubDb, member.knvb_id);
 
   // Get mobile phone from contact_info
   let mobilePhone = null;
@@ -158,7 +158,7 @@ function prepareCustomer(member, freescoutDb, stadionDb, nikkiDb) {
   }
 
   // Get union teams
-  const unionTeams = getUnionTeams(stadionDb, member.knvb_id);
+  const unionTeams = getUnionTeams(rondoClubDb, member.knvb_id);
 
   // Get Nikki data
   const nikkiData = getMostRecentNikkiData(nikkiDb, member.knvb_id);
@@ -201,14 +201,14 @@ async function runPrepare(options = {}) {
 
   const { log, verbose: logVerbose, error: logError } = createLoggerAdapter({ logger, verbose });
 
-  let stadionDb = null;
+  let rondoClubDb = null;
   let freescoutDb = null;
   let nikkiDb = null;
   let nikkiWarningLogged = false;
 
   try {
     // Open Rondo Club database
-    stadionDb = openStadionDb();
+    rondoClubDb = openRondoClubDb();
 
     // Open FreeScout database
     freescoutDb = openFreescoutDb();
@@ -228,7 +228,7 @@ async function runPrepare(options = {}) {
     }
 
     // Get all tracked members from stadion_members
-    const stmt = stadionDb.prepare(`
+    const stmt = rondoClubDb.prepare(`
       SELECT knvb_id, email, data_json, stadion_id, photo_state
       FROM stadion_members
       ORDER BY knvb_id ASC
@@ -250,7 +250,7 @@ async function runPrepare(options = {}) {
         data: JSON.parse(row.data_json)
       };
 
-      const customer = prepareCustomer(member, freescoutDb, stadionDb, nikkiDb);
+      const customer = prepareCustomer(member, freescoutDb, rondoClubDb, nikkiDb);
       if (customer) {
         customers.push(customer);
       } else {
@@ -276,7 +276,7 @@ async function runPrepare(options = {}) {
     return { success: false, customers: [], error: errorMsg };
   } finally {
     // Close all database connections
-    if (stadionDb) stadionDb.close();
+    if (rondoClubDb) rondoClubDb.close();
     if (freescoutDb) freescoutDb.close();
     if (nikkiDb) nikkiDb.close();
   }
