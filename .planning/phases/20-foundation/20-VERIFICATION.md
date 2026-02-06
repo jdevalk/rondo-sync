@@ -39,7 +39,7 @@ must_haves:
 | 1 | SQLite schema includes forward and reverse modification timestamps per field | VERIFIED | 14 timestamp columns added (7 fields x 2 systems) in lib/stadion-db.js lines 261-313 |
 | 2 | All sync operations record origin (user-edit vs sync-initiated) | VERIFIED | sync_origin column exists (line 317-318); SYNC_ORIGIN constants defined in lib/sync-origin.js; actual usage deferred to Phase 21 as designed |
 | 3 | Timestamp comparison operations normalize all times to UTC before comparison | VERIFIED | createTimestamp() uses toISOString() which is UTC; compareTimestamps() handles ISO 8601 strings correctly |
-| 4 | Migration script successfully adds columns to existing stadion-sync.sqlite without data loss | VERIFIED | Uses idempotent PRAGMA table_info + ALTER TABLE ADD COLUMN pattern; SUMMARY reports successful test on production DB copy (1068 rows preserved) |
+| 4 | Migration script successfully adds columns to existing rondo-sync.sqlite without data loss | VERIFIED | Uses idempotent PRAGMA table_info + ALTER TABLE ADD COLUMN pattern; SUMMARY reports successful test on production DB copy (1068 rows preserved) |
 
 **Score:** 4/4 truths verified
 

@@ -8,7 +8,7 @@
 
 Phase 13 implements team extraction from Sportlink CSV data and creates corresponding team entities in Stadion WordPress via REST API. The system must extract team names from `UnionTeams` (priority) or `ClubTeams` (fallback) fields, create teams in Stadion if they don't exist, and maintain a SQLite mapping table to track team name → Stadion team ID relationships.
 
-This phase builds on existing infrastructure: the codebase already uses better-sqlite3 for state tracking (stadion-sync.sqlite) with hash-based change detection, and has established patterns for WordPress REST API communication via stadion-client.js. The team extraction requires parsing Sportlink fields, deduplicating team names across members, and implementing idempotent create-or-retrieve operations.
+This phase builds on existing infrastructure: the codebase already uses better-sqlite3 for state tracking (rondo-sync.sqlite) with hash-based change detection, and has established patterns for WordPress REST API communication via stadion-client.js. The team extraction requires parsing Sportlink fields, deduplicating team names across members, and implementing idempotent create-or-retrieve operations.
 
 **Primary recommendation:** Use the existing stadion-db.js pattern (hash-based tracking with stadion_id storage) to create a `stadion_teams` table, implement team extraction during prepare-stadion-members.js phase, and sync teams before member sync to ensure team IDs exist for Phase 14's work_history linkage.
 

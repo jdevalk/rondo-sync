@@ -40,7 +40,7 @@ re_verification: false
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
 | prepare-stadion-members.js | submit-stadion-sync.js | prepared member data with financiele-blokkade field | ✓ WIRED | Line 4 import, line 578 call to runPrepare, field passed through in data.acf |
-| submit-stadion-sync.js | Stadion REST API /stadion/v1/people/{id}/activities | activity creation POST request | ✓ WIRED | Line 38: `stadionRequest('stadion/v1/people/${stadionId}/activities', 'POST', ...)` with content, activity_type, activity_date |
+| submit-stadion-sync.js | Stadion REST API /rondo/v1/people/{id}/activities | activity creation POST request | ✓ WIRED | Line 38: `stadionRequest('stadion/v1/people/${stadionId}/activities', 'POST', ...)` with content, activity_type, activity_date |
 | prepare-stadion-members.js | Phase 17 database | freeFields.has_financial_block | ✓ WIRED | Line 218: getMemberFreeFieldsByKnvbId call, Phase 17 schema verified with has_financial_block column |
 | Boolean conversion | SQLite INTEGER to JS boolean | Strict equality check | ✓ WIRED | Line 136: `(freeFields.has_financial_block === 1)` ensures only 1→true, null/undefined/0→false |
 
@@ -156,7 +156,7 @@ re_verification: false
 
 4. **Stadion API:**
    - ACF field: `financiele-blokkade` (boolean)
-   - Activity endpoint: `POST /stadion/v1/people/{id}/activities`
+   - Activity endpoint: `POST /rondo/v1/people/{id}/activities`
    - Activity payload: {content, activity_type, activity_date}
 
 ---

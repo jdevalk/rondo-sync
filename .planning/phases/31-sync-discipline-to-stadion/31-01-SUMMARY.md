@@ -44,7 +44,7 @@ Created complete sync pipeline from discipline-sync.sqlite to Stadion WordPress:
    - Implemented `getCaseByDossierId()` for single case lookup
 
 2. **Sync Script (submit-stadion-discipline.js):**
-   - Person lookup via stadion-sync.sqlite (knvb_id -> stadion_id mapping)
+   - Person lookup via rondo-sync.sqlite (knvb_id -> stadion_id mapping)
    - Person name fetching with caching for title construction
    - Season term auto-creation via `/wp/v2/seizoen` API with caching
    - Create/update discipline-cases posts with full ACF field mapping
@@ -62,7 +62,7 @@ Created complete sync pipeline from discipline-sync.sqlite to Stadion WordPress:
 - Month-based boundary using JavaScript Date.getMonth() (0-indexed)
 
 **Person Linking:**
-- Build lookup map from stadion-sync.sqlite at sync start
+- Build lookup map from rondo-sync.sqlite at sync start
 - Map public_person_id (KNVB ID) to stadion_id (WordPress post ID)
 - Skip cases where person not yet synced (counted in skipped_no_person)
 - Never create orphaned cases (data integrity)

@@ -79,7 +79,7 @@ const logContent = fs.readFileSync(logFilePath, 'utf8');
 client.sendEmail({
   From: FROM_EMAIL,
   To: TO_EMAIL,
-  Subject: `Sportlink Sync Report - ${new Date().toISOString().split('T')[0]}`,
+  Subject: `Rondo Sync Report - ${new Date().toISOString().split('T')[0]}`,
   TextBody: logContent
 })
 .then(() => {

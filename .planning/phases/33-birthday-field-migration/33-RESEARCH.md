@@ -10,7 +10,7 @@ This phase migrates birthday syncing from a separate `important_date` post type 
 
 **Current architecture:**
 - Step 5 in people pipeline: `steps/sync-important-dates.js` creates/updates/deletes `important_date` posts
-- Tracking table: `stadion_important_dates` in `stadion-sync.sqlite` (9 columns)
+- Tracking table: `stadion_important_dates` in `rondo-sync.sqlite` (9 columns)
 - WordPress: Separate post type with taxonomy `date_type=birthday`, linked via `acf.related_people`
 - Email report: Dedicated "BIRTHDAY SYNC" section with stats
 

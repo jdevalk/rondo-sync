@@ -21,7 +21,7 @@ must_haves:
 ---
 
 <objective>
-Document all three SQLite databases (laposta-sync.sqlite, stadion-sync.sqlite, nikki-sync.sqlite) with complete schema documentation including all tables, fields, and their purposes.
+Document all three SQLite databases (laposta-sync.sqlite, rondo-sync.sqlite, nikki-sync.sqlite) with complete schema documentation including all tables, fields, and their purposes.
 
 Purpose: User cannot find certain database fields - comprehensive documentation will serve as reference
 Output: docs/DATABASES.md with complete schema for all three databases
@@ -78,7 +78,7 @@ Create docs/DATABASES.md documenting all three databases:
 - created_at: TEXT NOT NULL - First seen timestamp
 - UNIQUE (list_index, email)
 
-## 2. stadion-sync.sqlite (WordPress Stadion sync)
+## 2. rondo-sync.sqlite (WordPress Stadion sync)
 
 ### Tables:
 **stadion_members** - Member/person records

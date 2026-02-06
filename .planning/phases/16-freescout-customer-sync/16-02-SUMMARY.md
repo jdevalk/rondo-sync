@@ -33,7 +33,7 @@ key-files:
 
 decisions:
   - id: multi-source-aggregation
-    choice: "Aggregate data from stadion-sync.sqlite and nikki-sync.sqlite"
+    choice: "Aggregate data from rondo-sync.sqlite and nikki-sync.sqlite"
     reason: "FreeScout needs unified customer view from multiple data sources"
   - id: nikki-optional
     choice: "Nikki data is optional - null values if database unavailable"

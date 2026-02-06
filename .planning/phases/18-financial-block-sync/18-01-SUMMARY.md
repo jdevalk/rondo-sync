@@ -112,7 +112,7 @@ if (freeFields.has_financial_block !== undefined) {
 - **404 during PUT:** Clear stadion_id, fall through to CREATE path
 
 ### Stadion API Integration
-- **Activity endpoint:** `POST /stadion/v1/people/{person_id}/activities`
+- **Activity endpoint:** `POST /rondo/v1/people/{person_id}/activities`
 - **Activity payload:**
   - `content`: Dutch text describing status change
   - `activity_type`: "financial_block_change"

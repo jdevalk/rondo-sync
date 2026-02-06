@@ -46,7 +46,7 @@ Phase 19 eliminates browser automation for photo downloads by using `Photo.Url` 
 **Process:**
 1. Query members with `photo_state = 'downloaded'`
 2. Find photo file in `photos/` directory (try extensions: jpg, jpeg, png, webp, gif)
-3. Upload via multipart/form-data POST to `/wp-json/stadion/v1/people/{stadion_id}/photo`
+3. Upload via multipart/form-data POST to `/wp-json/rondo/v1/people/{stadion_id}/photo`
 4. Update `photo_state` to `'synced'`
 
 **Also handles deletion:**

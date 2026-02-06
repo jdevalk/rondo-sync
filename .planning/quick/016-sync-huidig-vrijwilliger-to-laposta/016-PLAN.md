@@ -40,7 +40,7 @@ must_haves:
 Sync the computed `huidig-vrijwilliger` field from Stadion back into the sync tool's database, then include it as `huidigvrijwilliger` ("0"/"1") in Laposta member preparation.
 
 Purpose: Laposta email lists need to know who is a current volunteer so segments/campaigns can target them.
-Output: Three modified files implementing the full data flow: Stadion API -> stadion-sync.sqlite -> Laposta preparation.
+Output: Three modified files implementing the full data flow: Stadion API -> rondo-sync.sqlite -> Laposta preparation.
 </objective>
 
 <execution_context>

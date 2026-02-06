@@ -161,7 +161,7 @@ Verified patterns from official sources:
 client.sendEmail({
     From: "Sportlink SYNC <sender@example.com>",
     To: process.env.OPERATOR_EMAIL,
-    Subject: `Sportlink Sync Report - ${today}`,
+    Subject: `Rondo Sync Report - ${today}`,
     HtmlBody: "<html><body><pre>Report content here</pre></body></html>",
     TextBody: "Report content here"
 });

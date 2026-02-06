@@ -194,7 +194,7 @@ node -c submit-stadion-sync.js
 ssh root@46.202.155.16
 cd /home/sportlink
 node submit-stadion-sync.js --verbose  # No import errors
-sqlite3 stadion-sync.sqlite "SELECT COUNT(*) FROM conflict_resolutions"
+sqlite3 rondo-sync.sqlite "SELECT COUNT(*) FROM conflict_resolutions"
 ```
 
 ## Deviations from Plan

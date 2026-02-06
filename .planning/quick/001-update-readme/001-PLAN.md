@@ -11,7 +11,7 @@ autonomous: true
 must_haves:
   truths:
     - "README describes dual-system sync (Laposta + Stadion)"
-    - "README documents all environment variables including STADION_* and POSTMARK_*"
+    - "README documents all environment variables including RONDO_* and POSTMARK_*"
     - "README explains email delivery via Postmark (not local mail)"
     - "README covers all npm scripts including Stadion-specific ones"
   artifacts:
@@ -22,7 +22,7 @@ must_haves:
 ---
 
 <objective>
-Update README.md to comprehensively document the full Sportlink Sync application.
+Update README.md to comprehensively document the full Rondo Sync application.
 
 Purpose: The current README only covers Laposta sync (v1.0). It's missing Stadion WordPress sync (v1.3), Postmark email delivery (v1.1), and several environment variables. Users need accurate documentation.
 
@@ -53,7 +53,7 @@ Key additions needed:
 2. **Features section**: Add Stadion sync, Postmark email delivery, HTML reports
 3. **Architecture section**: Add from CLAUDE.md (Sync Pipeline, Data Flow diagram)
 4. **Environment Variables**: Complete list including:
-   - STADION_URL, STADION_USERNAME, STADION_APP_PASSWORD, STADION_PERSON_TYPE
+   - RONDO_URL, RONDO_USERNAME, RONDO_APP_PASSWORD, RONDO_PERSON_TYPE
    - OPERATOR_EMAIL, POSTMARK_API_KEY, POSTMARK_FROM_EMAIL
 5. **Stadion sync commands**: Add section covering:
    - npm run sync-stadion
@@ -74,7 +74,7 @@ Style: Keep it user-friendly with practical examples. Match the existing README 
   <verify>
 Manual review: README.md contains:
 - "Stadion WordPress" in description
-- STADION_* environment variables
+- RONDO_* environment variables
 - POSTMARK_* environment variables
 - sync-stadion npm scripts
 - Architecture/data flow section
@@ -86,7 +86,7 @@ Manual review: README.md contains:
 
 <verification>
 - README.md mentions "Stadion WordPress" sync
-- README.md documents all STADION_* environment variables
+- README.md documents all RONDO_* environment variables
 - README.md documents all POSTMARK_* environment variables
 - README.md includes sync-stadion commands
 - README.md no longer mentions "mail command" requirement

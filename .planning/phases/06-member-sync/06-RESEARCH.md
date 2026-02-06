@@ -479,7 +479,7 @@ Things that couldn't be fully resolved:
 1. **Exact Custom Post Type Name**
    - What we know: Stadion uses custom post type for person records, exposed via REST API
    - What's unclear: The exact CPT slug (e.g., "person", "stadion_person", "member")
-   - Recommendation: Add STADION_PERSON_TYPE env variable, default to "person", document in README
+   - Recommendation: Add RONDO_PERSON_TYPE env variable, default to "person", document in README
    - Confidence: LOW - needs Phase 8 verification
 
 2. **ACF Field Names**

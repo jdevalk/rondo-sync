@@ -33,7 +33,7 @@ key-decisions:
   - "Graceful fallback to '0' if stadion DB is unavailable during Laposta preparation"
 
 patterns-established:
-  - "Cross-DB enrichment: open stadion-sync.sqlite in Laposta prepare to add Stadion-sourced fields"
+  - "Cross-DB enrichment: open rondo-sync.sqlite in Laposta prepare to add Stadion-sourced fields"
 
 duration: 3min
 completed: 2026-02-05

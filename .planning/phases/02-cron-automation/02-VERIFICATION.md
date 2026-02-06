@@ -19,7 +19,7 @@ score: 4/4 must-haves verified
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
 | 1 | Crontab entry exists that runs sync daily at 6:00 AM Amsterdam time | ✓ VERIFIED | install-cron.sh line 36: `0 6 * * * flock -w 0 $PROJECT_DIR/.cron.lock $PROJECT_DIR/scripts/cron-wrapper.sh` with CRON_TZ=Europe/Amsterdam |
-| 2 | Email with custom subject sent after each sync run | ✓ VERIFIED | cron-wrapper.sh lines 47-50: Sends email with subject "Sportlink Sync Report - YYYY-MM-DD" if MAILTO is set |
+| 2 | Email with custom subject sent after each sync run | ✓ VERIFIED | cron-wrapper.sh lines 47-50: Sends email with subject "Rondo Sync Report - YYYY-MM-DD" if MAILTO is set |
 | 3 | Overlapping executions are prevented by lockfile | ✓ VERIFIED | cron-wrapper.sh lines 13-18: flock-based locking with .cron.lock, exits if already locked |
 | 4 | Failed sync triggers retry 2 hours later | ✓ VERIFIED | cron-wrapper.sh line 43: touches /tmp/sportlink-sync-retry on failure; install-cron.sh line 39: retry job at 8:00 AM checks for flag |
 
@@ -145,7 +145,7 @@ All implementations are complete and substantive.
 **Test:** 
 1. Set MAILTO in .env file to a valid email address
 2. Run `./scripts/cron-wrapper.sh` manually
-3. Check email inbox for "Sportlink Sync Report - YYYY-MM-DD"
+3. Check email inbox for "Rondo Sync Report - YYYY-MM-DD"
 
 **Expected:** Email received with sync output as body and custom subject line
 

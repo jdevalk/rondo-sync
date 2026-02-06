@@ -54,8 +54,8 @@ completed: 2026-02-06
 - **Files modified:** 4 (bug fixes discovered during deploy)
 
 ## Accomplishments
-- Production server .env updated from STADION_* to RONDO_* variables (backup at .env.pre-rondo)
-- Database copied to data/rondo-sync.sqlite (old stadion-sync.sqlite preserved as backup)
+- Production server .env updated from RONDO_* to RONDO_* variables (backup at .env.pre-rondo)
+- Database copied to data/rondo-sync.sqlite (old rondo-sync.sqlite preserved as backup)
 - Phase 2 renamed code deployed via git pull
 - Full sync completed: 1068 members, 61 teams, 1062 FreeScout customers, 106 discipline cases
 - Cron jobs re-enabled after successful verification
@@ -102,7 +102,7 @@ Each task was committed atomically:
 
 **3. [Rule 3 - Blocking] Phase 1 not deployed to production**
 - **Found during:** Task 1 (pre-flight API check returned 404 for /rondo/v1/)
-- **Issue:** Production WordPress still served /stadion/v1/ — Phase 1 code rename had not been deployed
+- **Issue:** Production WordPress still served /rondo/v1/ — Phase 1 code rename had not been deployed
 - **Fix:** Built frontend assets and ran bin/deploy.sh to deploy Phase 1 to production
 - **No commit:** Deployment operation only
 

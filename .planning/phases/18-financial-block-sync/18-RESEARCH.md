@@ -225,7 +225,7 @@ const isBlocked = (freeFields?.has_financial_block === 1);
 **Warning signs:** Manual force sync works but automatic sync doesn't detect changes
 
 ### Pitfall 5: Activity Endpoint Doesn't Exist
-**What goes wrong:** POST to `/stadion/v1/people/{id}/activity` returns 404
+**What goes wrong:** POST to `/rondo/v1/people/{id}/activity` returns 404
 **Why it happens:** Assuming activity endpoint exists without verification
 **How to avoid:** Check Stadion REST API implementation first, may need to use note endpoint or create custom endpoint
 **Warning signs:** 404 errors when trying to log activities
@@ -433,7 +433,7 @@ Things that couldn't be fully resolved:
 1. **Activity Logging Endpoint**
    - What we know: Stadion uses WordPress comments with `comment_type = 'activity'` for activity logging
    - What's unclear: Exact REST API endpoint for creating activities (may need custom endpoint or use notes endpoint)
-   - Recommendation: Check Stadion source code for `/stadion/v1/people/{id}/activity` endpoint, implement if missing
+   - Recommendation: Check Stadion source code for `/rondo/v1/people/{id}/activity` endpoint, implement if missing
 
 2. **Initial State Activity Logging**
    - What we know: Context doc says "Log initial state on first sync"

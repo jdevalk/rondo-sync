@@ -649,7 +649,7 @@ WHERE knvb_id = ?;
    ```
 
 3. **Database Schema Migration Plan**
-   - Existing `stadion-sync.sqlite` schema designed for forward sync only
+   - Existing `rondo-sync.sqlite` schema designed for forward sync only
    - Must add reverse sync columns without breaking forward sync
    - Migration script with rollback capability
 

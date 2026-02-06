@@ -363,7 +363,7 @@ try {
 | Simple request/response | Search before create + error recovery | Existing Stadion pattern | Prevents duplicates, handles edge cases |
 
 **Deprecated/outdated:**
-- JSON file-based state: SQLite databases (laposta-sync.sqlite, stadion-sync.sqlite) replaced JSON for state tracking
+- JSON file-based state: SQLite databases (laposta-sync.sqlite, rondo-sync.sqlite) replaced JSON for state tracking
 - Synchronous fs operations: Modern codebase uses synchronous better-sqlite3 but async for file I/O
 
 ## Open Questions

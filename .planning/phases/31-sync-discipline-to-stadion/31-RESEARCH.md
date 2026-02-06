@@ -10,7 +10,7 @@ This phase syncs discipline case data from the local SQLite database (populated 
 
 The sync requires:
 1. Reading cases from `discipline-sync.sqlite`
-2. Looking up person `stadion_id` from `stadion-sync.sqlite` via `knvb_id` (PublicPersonId)
+2. Looking up person `stadion_id` from `rondo-sync.sqlite` via `knvb_id` (PublicPersonId)
 3. Managing season taxonomy terms via WordPress REST API
 4. Creating/updating discipline-cases posts with ACF fields
 5. Tracking sync state with hash-based change detection
@@ -35,7 +35,7 @@ The established libraries/tools for this domain:
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| Separate discipline-sync.sqlite | Add to stadion-sync.sqlite | Separate is cleaner for modular syncs, follows existing nikki-sync pattern |
+| Separate discipline-sync.sqlite | Add to rondo-sync.sqlite | Separate is cleaner for modular syncs, follows existing nikki-sync pattern |
 
 **Installation:**
 No new packages needed - all dependencies already in project.
@@ -86,7 +86,7 @@ updateSyncState(db, dossier_id, source_hash, stadion_id);
 ```
 
 ### Pattern 3: Cross-Database Person Lookup
-**What:** Read person mapping from `stadion-sync.sqlite` to link cases to persons
+**What:** Read person mapping from `rondo-sync.sqlite` to link cases to persons
 **When to use:** When linking discipline cases to persons via relationship field
 **Example:**
 ```javascript
@@ -150,7 +150,7 @@ if (require.main === module) {
 
 ### Anti-Patterns to Avoid
 - **Querying WordPress to find existing posts by field:** Use local stadion_id tracking instead - much faster and avoids rate limits
-- **Modifying stadion-sync.sqlite for discipline tracking:** Keep discipline-sync.sqlite separate for modularity
+- **Modifying rondo-sync.sqlite for discipline tracking:** Keep discipline-sync.sqlite separate for modularity
 - **Creating orphan cases (person doesn't exist):** Skip and report - case will sync on next run when person exists
 
 ## Don't Hand-Roll

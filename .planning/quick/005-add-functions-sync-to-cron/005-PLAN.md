@@ -141,7 +141,7 @@ Update `scripts/install-cron.sh` to include the weekly functions sync:
 2. Update CRON_ENTRIES (line ~101-113) to add functions:
    ```bash
    CRON_ENTRIES="
-   # Sportlink Sync automation (installed $(date +%Y-%m-%d))
+   # Rondo Sync automation (installed $(date +%Y-%m-%d))
    CRON_TZ=Europe/Amsterdam
 
    # People sync: hourly (download, laposta, stadion members, birthdays)

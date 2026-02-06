@@ -33,7 +33,7 @@ User indicated all areas are Claude's discretion. The following will be determin
 - No rate limiting initially (Stadion is private instance)
 
 **Credential validation:**
-- Load from environment variables (STADION_* prefix)
+- Load from environment variables (RONDO_* prefix)
 - Fail early with clear message if credentials missing
 - Test connection on first use
 

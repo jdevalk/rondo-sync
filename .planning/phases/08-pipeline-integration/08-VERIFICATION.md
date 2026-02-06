@@ -153,7 +153,7 @@ score: 5/5 must-haves verified
 - **Substantive:** ✓ VERIFIED
   - Updated with Stadion integration details
   - Documents dual-system sync pipeline
-  - Environment variables include STADION_* vars
+  - Environment variables include RONDO_* vars
   - Data flow diagram updated
 - **Wired:** ✓ VERIFIED
   - Project documentation file
@@ -208,7 +208,7 @@ CLAUDE.md updates verified:
 - ✓ Quick Reference: mentions Laposta + Stadion
 - ✓ Sync Pipeline: lists submit-stadion-sync.js as Step 4
 - ✓ Data Flow: shows Stadion WordPress API in diagram
-- ✓ Environment Variables: includes STADION_* variables
+- ✓ Environment Variables: includes RONDO_* variables
 - ✓ Architecture: explains dual-system sync
 
 ---

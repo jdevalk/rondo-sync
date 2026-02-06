@@ -49,7 +49,7 @@ Created comprehensive database schema documentation covering:
   - laposta_fields: Cached Laposta field definitions
   - members: Member data for up to 4 Laposta lists
 
-- **stadion-sync.sqlite** (11 tables): WordPress Stadion synchronization
+- **rondo-sync.sqlite** (11 tables): WordPress Stadion synchronization
   - stadion_members: Person records with photo state tracking
   - stadion_parents: Parent/guardian records (no KNVB ID)
   - stadion_important_dates: Birth dates and important dates

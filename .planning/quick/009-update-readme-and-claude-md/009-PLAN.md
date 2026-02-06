@@ -98,7 +98,7 @@ Update README.md to document all current functionality:
 
 6. **Database section** - Update to list all 4 databases:
    - `laposta-sync.sqlite` - Laposta sync tracking
-   - `stadion-sync.sqlite` - Stadion WordPress sync tracking
+   - `rondo-sync.sqlite` - Stadion WordPress sync tracking
    - `freescout-sync.sqlite` - FreeScout customer sync tracking
    - `nikki-sync.sqlite` - Nikki contribution sync tracking
 

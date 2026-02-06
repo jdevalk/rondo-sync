@@ -39,7 +39,7 @@ score: 5/5 must-haves verified
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
 | submit-stadion-discipline.js | lib/discipline-db.js | require + function calls | ✓ WIRED | Import at line 10, getCasesNeedingSync() called at line 257, updateCaseSyncState() called at lines 178, 212 |
-| submit-stadion-discipline.js | lib/stadion-db.js | Person stadion_id lookup | ✓ WIRED | buildPersonLookup() opens stadion-sync.sqlite (line 18), queries stadion_members table (line 19), returns Map for O(1) lookup |
+| submit-stadion-discipline.js | lib/stadion-db.js | Person stadion_id lookup | ✓ WIRED | buildPersonLookup() opens rondo-sync.sqlite (line 18), queries stadion_members table (line 19), returns Map for O(1) lookup |
 | submit-stadion-discipline.js | /wp/v2/discipline-cases | stadionRequest POST/PUT | ✓ WIRED | POST endpoint at line 204 (create), PUT endpoint at line 171 (update), both with full ACF payload and error handling |
 | submit-stadion-discipline.js | /wp/v2/seizoen | Season term lookup/create | ✓ WIRED | GET wp/v2/seizoen?slug={season} at line 86, POST wp/v2/seizoen at line 97 if not found, caching to avoid duplicate calls |
 
@@ -119,7 +119,7 @@ Phase 31 goal achieved: Sync discipline cases from SQLite to Stadion WordPress w
 
 **Wiring:**
 - All key links verified as wired and functional
-- Person lookup uses stadion-sync.sqlite mapping
+- Person lookup uses rondo-sync.sqlite mapping
 - Cases without matching person are skipped (not orphaned)
 - Season terms auto-create via REST API with caching
 - Create/update logic with 404 recovery

@@ -34,8 +34,8 @@ Created `lib/stadion-client.js` - a WordPress REST API client that establishes t
 
 ### Key Features
 
-- **Credential validation** - Checks STADION_URL, STADION_USERNAME, STADION_APP_PASSWORD exist before making requests
-- **HTTPS enforcement** - Requires STADION_URL to start with 'https://'
+- **Credential validation** - Checks RONDO_URL, RONDO_USERNAME, RONDO_APP_PASSWORD exist before making requests
+- **HTTPS enforcement** - Requires RONDO_URL to start with 'https://'
 - **Error handling** - Network errors, timeouts, and API errors return structured objects
 - **WordPress error parsing** - Normalizes various WordPress error formats to consistent structure
 - **Pattern consistency** - Follows established patterns from submit-laposta-list.js (varlock, https module, Promise-based)
@@ -92,9 +92,9 @@ None - plan executed exactly as written.
 - `url` (Node.js core) - URL parsing
 
 **Environment variables:**
-- `STADION_URL` - WordPress site URL (must start with https://)
-- `STADION_USERNAME` - WordPress username
-- `STADION_APP_PASSWORD` - Application password from WordPress Admin
+- `RONDO_URL` - WordPress site URL (must start with https://)
+- `RONDO_USERNAME` - WordPress username
+- `RONDO_APP_PASSWORD` - Application password from WordPress Admin
 
 ---
 

@@ -542,7 +542,7 @@ if (require.main === module) {
 # Source: Adapted from install-cron.sh pattern
 
 CRON_ENTRIES="
-# Sportlink Sync automation (installed $(date +%Y-%m-%d))
+# Rondo Sync automation (installed $(date +%Y-%m-%d))
 CRON_TZ=Europe/Amsterdam
 
 # People sync: 4x daily during work hours

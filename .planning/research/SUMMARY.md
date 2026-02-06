@@ -1,6 +1,6 @@
 # Project Research Summary
 
-**Project:** Sportlink Sync v2.0 Bidirectional Sync
+**Project:** Rondo Sync v2.0 Bidirectional Sync
 **Domain:** Bidirectional data synchronization with browser automation and last-edit-wins conflict resolution
 **Researched:** 2026-01-29
 **Confidence:** MEDIUM-HIGH
@@ -99,7 +99,7 @@ Based on research, suggested phase structure:
 **Addresses:**
 - Schema additions for `forward_*` and `reverse_*` tracking
 - `modified_by` field for origin tracking
-- Migration script to add columns to existing `stadion-sync.sqlite`
+- Migration script to add columns to existing `rondo-sync.sqlite`
 - Backfill existing data with initial timestamps
 
 **Avoids:** Pitfall #1 (infinite loops), Pitfall #5 (state tracking complexity)
@@ -242,7 +242,7 @@ Research provides strong foundation for implementation. Medium confidence areas 
 - [WordPress REST API Posts Reference](https://developer.wordpress.org/rest-api/reference/posts/) — `modified` and `modified_gmt` fields verified as standard
 - [Playwright Actions Documentation](https://playwright.dev/docs/input) — Form automation API confirmed
 - [Stadion API Documentation](~/Code/stadion/docs/) — ACF field structure, person API endpoints
-- [Sportlink Sync CLAUDE.md](CLAUDE.md) — Current architecture, existing patterns, database schema
+- [Rondo Sync CLAUDE.md](CLAUDE.md) — Current architecture, existing patterns, database schema
 
 ### Secondary (MEDIUM confidence)
 - [The Engineering Challenges of Bi-Directional Sync](https://www.stacksync.com/blog/the-engineering-challenges-of-bi-directional-sync-why-two-one-way-pipelines-fail) — Two one-way pipelines anti-pattern

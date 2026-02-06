@@ -95,13 +95,13 @@ if (require.main === module) {
 // Source: submit-laposta-list.js lines 72-121
 function stadionRequest(endpoint, method, body) {
   return new Promise((resolve, reject) => {
-    const apiKey = process.env.STADION_APP_PASSWORD;
-    const username = process.env.STADION_USERNAME;
+    const apiKey = process.env.RONDO_APP_PASSWORD;
+    const username = process.env.RONDO_USERNAME;
 
     const auth = Buffer.from(`${username}:${apiKey}`).toString('base64');
 
     const options = {
-      hostname: new URL(process.env.STADION_URL).hostname,
+      hostname: new URL(process.env.RONDO_URL).hostname,
       path: `/wp-json/wp/v2/${endpoint}`,
       method: method,
       headers: {
@@ -181,9 +181,9 @@ logger?.error('Error occurred:', err.message);
 require('varlock/auto-load');
 
 // Later:
-const apiKey = process.env.STADION_APP_PASSWORD;
+const apiKey = process.env.RONDO_APP_PASSWORD;
 if (!apiKey) {
-  throw new Error('STADION_APP_PASSWORD not found in .env file');
+  throw new Error('RONDO_APP_PASSWORD not found in .env file');
 }
 ```
 
@@ -219,7 +219,7 @@ Problems that look simple but have existing solutions:
 ### Pitfall 2: Missing HTTPS Requirement
 **What goes wrong:** Authentication fails silently or isn't available
 **Why it happens:** WordPress disables application passwords on non-HTTPS sites by default for security
-**How to avoid:** Verify `STADION_URL` uses `https://` scheme, fail fast with clear error if not
+**How to avoid:** Verify `RONDO_URL` uses `https://` scheme, fail fast with clear error if not
 **Warning signs:** Application password UI not available in WordPress admin
 **Source:** [WordPress Application Passwords docs](https://developer.wordpress.org/rest-api/reference/application-passwords/) state HTTPS is required
 
@@ -277,12 +277,12 @@ function readEnv(name, fallback = '') {
   return process.env[name] ?? fallback;
 }
 
-const stadionUrl = readEnv('STADION_URL');
-const stadionUsername = readEnv('STADION_USERNAME');
-const stadionPassword = readEnv('STADION_APP_PASSWORD');
+const stadionUrl = readEnv('RONDO_URL');
+const stadionUsername = readEnv('RONDO_USERNAME');
+const stadionPassword = readEnv('RONDO_APP_PASSWORD');
 
 if (!stadionUrl || !stadionUsername || !stadionPassword) {
-  throw new Error('STADION_URL, STADION_USERNAME, and STADION_APP_PASSWORD required in .env');
+  throw new Error('RONDO_URL, RONDO_USERNAME, and RONDO_APP_PASSWORD required in .env');
 }
 ```
 

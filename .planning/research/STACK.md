@@ -1,6 +1,6 @@
 # Technology Stack: Bidirectional Sync
 
-**Project:** Sportlink Sync v2.0
+**Project:** Rondo Sync v2.0
 **Research Focus:** Stack additions for bidirectional sync with last-edit-wins conflict resolution
 **Researched:** 2026-01-29
 **Overall confidence:** HIGH

@@ -1,4 +1,4 @@
-# Project Milestones: Sportlink Sync
+# Project Milestones: Rondo Sync
 
 ## v2.3 Birthday Field Migration (Shipped: 2026-02-06)
 

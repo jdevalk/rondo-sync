@@ -20,7 +20,7 @@ must_haves:
       contains: "ClubTeams"
   key_links:
     - from: "download-teams-from-sportlink.js"
-      to: "stadion-sync.sqlite"
+      to: "rondo-sync.sqlite"
       via: "upsertTeamsWithMetadata and upsertTeamMembers"
       pattern: "ClubTeams.*filter"
 ---

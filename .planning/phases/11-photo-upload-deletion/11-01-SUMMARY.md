@@ -52,7 +52,7 @@ completed: 2026-01-26
 
 ## Accomplishments
 - Created photo sync script handling both upload and delete operations
-- Upload phase syncs downloaded photos to Stadion WordPress via `/stadion/v1/people/{id}/photo` endpoint
+- Upload phase syncs downloaded photos to Stadion WordPress via `/rondo/v1/people/{id}/photo` endpoint
 - Delete phase removes photos from local storage and Stadion when removed from Sportlink
 - Module/CLI hybrid with npm scripts for easy execution
 
@@ -99,7 +99,7 @@ None - script works correctly. Test run showed 768 photos pending upload skipped
 
 ## User Setup Required
 
-None - no external service configuration required. Photo sync uses existing STADION_* environment variables.
+None - no external service configuration required. Photo sync uses existing RONDO_* environment variables.
 
 ## Next Phase Readiness
 

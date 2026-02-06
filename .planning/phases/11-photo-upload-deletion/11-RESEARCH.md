@@ -6,7 +6,7 @@
 
 ## Summary
 
-This phase uploads photos downloaded in Phase 10 to Stadion WordPress and handles photo deletion from both local storage and Stadion when photos are removed in Sportlink. The standard approach uses multipart/form-data requests to a custom WordPress REST API endpoint (`POST /stadion/v1/people/{id}/photo`) for uploading, and DELETE requests to remove photos. File operations use Node.js native fs/promises for local photo deletion.
+This phase uploads photos downloaded in Phase 10 to Stadion WordPress and handles photo deletion from both local storage and Stadion when photos are removed in Sportlink. The standard approach uses multipart/form-data requests to a custom WordPress REST API endpoint (`POST /rondo/v1/people/{id}/photo`) for uploading, and DELETE requests to remove photos. File operations use Node.js native fs/promises for local photo deletion.
 
 The Stadion plugin appears to provide a custom REST API endpoint specifically for photo uploads to the "people" post type. Based on standard WordPress custom endpoint patterns, this endpoint likely accepts multipart/form-data with Basic Authentication (Application Password), similar to the standard `/wp/v2/media` endpoint but specialized for attaching photos directly to person records.
 
@@ -86,7 +86,7 @@ async function uploadPhotoToStadion(stadionId, photoPath, options) {
     const request = https.request({
       hostname: parsedUrl.hostname,
       port: 443,
-      path: `/wp-json/stadion/v1/people/${stadionId}/photo`,
+      path: `/wp-json/rondo/v1/people/${stadionId}/photo`,
       method: 'POST',
       headers: {
         ...formHeaders,
@@ -326,7 +326,7 @@ Problems that look simple but have existing solutions:
 **What goes wrong:** Uploading to /wp/v2/media instead of custom endpoint creates unattached media
 **Why it happens:** Using standard media endpoint doesn't link photo to person record
 **How to avoid:**
-- Use custom `/stadion/v1/people/{id}/photo` endpoint (requirement PHOTO-06)
+- Use custom `/rondo/v1/people/{id}/photo` endpoint (requirement PHOTO-06)
 - This endpoint likely handles attachment to person post automatically
 - If endpoint doesn't exist, will need two-step: upload to /wp/v2/media, then link via person update
 - Verify endpoint exists early - test with single upload before batch processing
@@ -362,16 +362,16 @@ function uploadPhotoToStadion(stadionId, photoPath, options = {}) {
     form.append('file', fs.createReadStream(photoPath));
 
     // Get environment variables
-    const baseUrl = process.env.STADION_URL;
-    const username = process.env.STADION_USERNAME;
-    const password = process.env.STADION_APP_PASSWORD;
+    const baseUrl = process.env.RONDO_URL;
+    const username = process.env.RONDO_USERNAME;
+    const password = process.env.RONDO_APP_PASSWORD;
 
     // Build auth header
     const authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
 
     // Parse URL
     const parsedUrl = new URL(baseUrl);
-    const path = `/wp-json/stadion/v1/people/${stadionId}/photo`;
+    const path = `/wp-json/rondo/v1/people/${stadionId}/photo`;
 
     // Merge headers
     const headers = {
@@ -577,14 +577,14 @@ module.exports = { runPhotoUpload };
 Things that couldn't be fully resolved:
 
 1. **Custom Stadion Photo Endpoint Implementation**
-   - What we know: Requirements specify `POST /stadion/v1/people/{id}/photo` endpoint
+   - What we know: Requirements specify `POST /rondo/v1/people/{id}/photo` endpoint
    - What's unclear: Whether this endpoint exists in Stadion plugin, or needs to be created
    - Recommendation: Test endpoint existence first with single request. If 404, fallback to standard /wp/v2/media upload + manual attachment linking via person update
    - Confidence: LOW - Custom endpoint not verified in public documentation
 
 2. **Photo Deletion Endpoint**
    - What we know: Need to delete photos from Stadion when PersonImageDate becomes empty
-   - What's unclear: Whether to use `DELETE /stadion/v1/people/{id}/photo` or standard `/wp/v2/media/{attachment_id}?force=true`
+   - What's unclear: Whether to use `DELETE /rondo/v1/people/{id}/photo` or standard `/wp/v2/media/{attachment_id}?force=true`
    - Recommendation: Try custom endpoint first; if doesn't exist, use standard media deletion (requires fetching attachment_id first)
    - Confidence: LOW - Deletion endpoint not documented
 
@@ -625,7 +625,7 @@ Things that couldn't be fully resolved:
 - [Adding a custom endpoint to WordPress REST API to upload files](https://firxworx.com/blog/code/adding-an-endpoint-to-wordpress-rest-api-for-file-uploads/) - Custom endpoint patterns (2018, still relevant for structure)
 
 ### Tertiary (LOW confidence - flagged for validation)
-- Custom `/stadion/v1/people/{id}/photo` endpoint - Mentioned in requirements but not found in public documentation; needs testing
+- Custom `/rondo/v1/people/{id}/photo` endpoint - Mentioned in requirements but not found in public documentation; needs testing
 - Photo deletion via custom endpoint - Not verified; may need to use standard media deletion pattern
 - Automatic photo-to-person attachment - Unclear if custom endpoint handles linking or requires separate update
 

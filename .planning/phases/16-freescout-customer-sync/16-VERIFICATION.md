@@ -44,7 +44,7 @@ score: 7/7 must-haves verified
 |------|----|-----|--------|---------|
 | lib/freescout-client.js | FreeScout API | X-FreeScout-API-Key header | WIRED | Line 82: `'X-FreeScout-API-Key': apiKey` |
 | lib/freescout-db.js | freescout-sync.sqlite | better-sqlite3 | WIRED | Line 5: `DEFAULT_DB_PATH = 'freescout-sync.sqlite'` |
-| prepare-freescout-customers.js | stadion-sync.sqlite | stadion-db require | WIRED | Line 5: `require('./lib/stadion-db')` |
+| prepare-freescout-customers.js | rondo-sync.sqlite | stadion-db require | WIRED | Line 5: `require('./lib/stadion-db')` |
 | prepare-freescout-customers.js | nikki-sync.sqlite | nikki-db require (optional) | WIRED | Lines 14-19: graceful require with fallback |
 | submit-freescout-sync.js | FreeScout API | freescoutRequest calls | WIRED | 6 API calls: search, create, update, delete, custom_fields |
 | submit-freescout-sync.js | freescout-sync.sqlite | freescout-db | WIRED | Line 12: `require('./lib/freescout-db')` |

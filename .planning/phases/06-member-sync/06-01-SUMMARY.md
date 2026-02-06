@@ -69,7 +69,7 @@ Each task was committed atomically:
 
 ## Files Created/Modified
 - `lib/stadion-db.js` - SQLite state tracking with change detection
-- `.gitignore` - Added stadion-sync.sqlite to ignore list
+- `.gitignore` - Added rondo-sync.sqlite to ignore list
 
 ## Decisions Made
 
@@ -87,10 +87,10 @@ None - followed plan as specified. Pattern copied from proven laposta-db.js impl
 - **Verification:** Database opens successfully, hash computation works
 - **Committed in:** Not committed (node_modules excluded)
 
-**2. [Rule 2 - Missing Critical] Added stadion-sync.sqlite to .gitignore**
+**2. [Rule 2 - Missing Critical] Added rondo-sync.sqlite to .gitignore**
 - **Found during:** Task 1 (Post-commit review)
 - **Issue:** Database file should not be committed (runtime state data)
-- **Fix:** Added stadion-sync.sqlite to .gitignore following laposta-sync.sqlite pattern
+- **Fix:** Added rondo-sync.sqlite to .gitignore following laposta-sync.sqlite pattern
 - **Files modified:** .gitignore
 - **Verification:** Git status confirms database file ignored
 - **Committed in:** 2ccdfab (Task 1 commit)

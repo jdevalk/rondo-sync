@@ -80,7 +80,7 @@ Extended `sync-nikki-to-stadion.js` to write per-year contribution data alongsid
 
 - **Found during:** Task 3 (server verification)
 - **Issue:** Per-year fields were being sent in PUT requests but not saved because they weren't registered ACF fields
-- **Fix:** Created 12 custom fields via Stadion's `/stadion/v1/custom-fields/person` API endpoint
+- **Fix:** Created 12 custom fields via Stadion's `/rondo/v1/custom-fields/person` API endpoint
 - **Files modified:** None (server-side API calls only)
 - **Commit:** N/A (runtime configuration)
 

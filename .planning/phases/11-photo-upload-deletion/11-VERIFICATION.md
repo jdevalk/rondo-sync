@@ -41,8 +41,8 @@ score: 4/4 must-haves verified
 | upload-photos-to-stadion.js | lib/stadion-db.js | getMembersByPhotoState | ✓ WIRED | Line 8: Import declaration, Line 286: `getMembersByPhotoState(db, 'downloaded')`, Line 351: `getMembersByPhotoState(db, 'pending_delete')` |
 | upload-photos-to-stadion.js | lib/stadion-db.js | updatePhotoState | ✓ WIRED | Line 8: Import declaration, Line 320: `updatePhotoState(db, member.knvb_id, 'synced')` called after successful upload |
 | upload-photos-to-stadion.js | lib/stadion-db.js | clearPhotoState | ✓ WIRED | Line 8: Import declaration, Line 396: `clearPhotoState(db, member.knvb_id)` called after deletion |
-| upload-photos-to-stadion.js | Stadion API (POST) | multipart/form-data POST to /stadion/v1/people/{id}/photo | ✓ WIRED | Lines 91, 96-97: Constructs `/wp-json/stadion/v1/people/${stadionId}/photo` with FormData, pipes form to https.request |
-| upload-photos-to-stadion.js | Stadion API (DELETE) | DELETE to /stadion/v1/people/{id}/photo | ✓ WIRED | Lines 179, 187: DELETE method to same endpoint, proper auth headers |
+| upload-photos-to-stadion.js | Stadion API (POST) | multipart/form-data POST to /rondo/v1/people/{id}/photo | ✓ WIRED | Lines 91, 96-97: Constructs `/wp-json/rondo/v1/people/${stadionId}/photo` with FormData, pipes form to https.request |
+| upload-photos-to-stadion.js | Stadion API (DELETE) | DELETE to /rondo/v1/people/{id}/photo | ✓ WIRED | Lines 179, 187: DELETE method to same endpoint, proper auth headers |
 
 **All key links verified and wired correctly.**
 
@@ -50,7 +50,7 @@ score: 4/4 must-haves verified
 
 | Requirement | Status | Supporting Evidence |
 |-------------|--------|---------------------|
-| PHOTO-06: Upload photo to Stadion via POST endpoint | ✓ SATISFIED | `uploadPhotoToStadion()` function (lines 69-149) constructs multipart POST to `/stadion/v1/people/{id}/photo` |
+| PHOTO-06: Upload photo to Stadion via POST endpoint | ✓ SATISFIED | `uploadPhotoToStadion()` function (lines 69-149) constructs multipart POST to `/rondo/v1/people/{id}/photo` |
 | PHOTO-07: Match person by KNVB ID before uploading | ✓ SATISFIED | Lines 298-305: Validates `stadion_id` exists (which comes from KNVB ID matching in submit-stadion-sync.js) |
 | PHOTO-08: Detect when PersonImageDate becomes empty | ✓ SATISFIED | Handled by stadion-db.js upsertMembers (line 140-142: triggers 'pending_delete' state) |
 | PHOTO-09: Delete local photo file when removed | ✓ SATISFIED | `deleteLocalPhoto()` function (lines 241-250) uses `fs.unlink()` to remove file |
@@ -154,7 +154,7 @@ The codebase demonstrates complete implementation of photo upload and deletion f
    - Queries members with 'downloaded' photo state
    - Validates stadion_id exists before upload
    - Constructs multipart/form-data POST request
-   - Uploads to `/wp-json/stadion/v1/people/{id}/photo`
+   - Uploads to `/wp-json/rondo/v1/people/{id}/photo`
    - Updates state to 'synced' on success
    - Sequential processing with 2s rate limiting
 

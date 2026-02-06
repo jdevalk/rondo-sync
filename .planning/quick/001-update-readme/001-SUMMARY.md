@@ -49,7 +49,7 @@ completed: 2026-01-25
 
 ## Accomplishments
 - Updated README to document Stadion WordPress sync capabilities (v1.3)
-- Documented all STADION_* environment variables (URL, username, app password, person type)
+- Documented all RONDO_* environment variables (URL, username, app password, person type)
 - Documented all POSTMARK_* email delivery environment variables
 - Added comprehensive architecture section with sync pipeline and data flow diagram
 - Documented all sync-stadion npm scripts (standard, verbose, parents-only modes)

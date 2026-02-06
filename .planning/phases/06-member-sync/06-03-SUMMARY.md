@@ -107,10 +107,10 @@ None - implementation followed plan specifications smoothly.
 
 ## User Setup Required
 
-None - uses existing STADION_URL, STADION_USERNAME, STADION_APP_PASSWORD environment variables from Wave 1.
+None - uses existing RONDO_URL, RONDO_USERNAME, RONDO_APP_PASSWORD environment variables from Wave 1.
 
 Optional environment variable:
-- `STADION_PERSON_TYPE` (default: 'person') - Custom post type slug if using different CPT name
+- `RONDO_PERSON_TYPE` (default: 'person') - Custom post type slug if using different CPT name
 
 ## Next Phase Readiness
 

@@ -23,7 +23,7 @@ re_verification: false
 | 2 | Client can make authenticated POST request to WordPress REST API | ✓ VERIFIED | Method parameter supports any HTTP verb (line 73: `method.toUpperCase()`), handles request body (lines 67, 129-131) |
 | 3 | Invalid credentials return structured error (not crash) | ✓ VERIFIED | Errors return Error with `.details` property (line 106), testConnection catches and returns `{success: false, error, details}` (lines 194-207), no crashes |
 | 4 | Network errors return structured error (not crash) | ✓ VERIFIED | Timeout handling (lines 122-127), network error handling (lines 112-120), all wrapped in Promise with structured reject |
-| 5 | Missing env vars fail fast with clear message | ✓ VERIFIED | `validateCredentials()` checks all 3 env vars (lines 14-26), throws clear message "STADION_URL, STADION_USERNAME, and STADION_APP_PASSWORD required in .env", CLI test confirms: "Stadion connection FAILED: STADION_URL, STADION_USERNAME, and STADION_APP_PASSWORD required in .env" |
+| 5 | Missing env vars fail fast with clear message | ✓ VERIFIED | `validateCredentials()` checks all 3 env vars (lines 14-26), throws clear message "RONDO_URL, RONDO_USERNAME, and RONDO_APP_PASSWORD required in .env", CLI test confirms: "Stadion connection FAILED: RONDO_URL, RONDO_USERNAME, and RONDO_APP_PASSWORD required in .env" |
 
 **Score:** 5/5 truths verified
 
@@ -51,14 +51,14 @@ re_verification: false
 
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
-| `lib/stadion-client.js` | `process.env.STADION_*` | `varlock/auto-load` and `readEnv()` | ✓ WIRED | Line 1: `require('varlock/auto-load')`, lines 15-17: reads STADION_URL, STADION_USERNAME, STADION_APP_PASSWORD via readEnv() |
+| `lib/stadion-client.js` | `process.env.RONDO_*` | `varlock/auto-load` and `readEnv()` | ✓ WIRED | Line 1: `require('varlock/auto-load')`, lines 15-17: reads RONDO_URL, RONDO_USERNAME, RONDO_APP_PASSWORD via readEnv() |
 | `lib/stadion-client.js` | WordPress REST API | `https.request` with Basic Auth | ✓ WIRED | Line 56: Basic Auth header construction, line 85: `https.request()` call, line 75: Authorization header set |
 
 ### Requirements Coverage
 
 | Requirement | Description | Status | Evidence |
 |-------------|-------------|--------|----------|
-| STAD-03 | Authenticate via WordPress application password | ✓ SATISFIED | Basic Auth header built from STADION_USERNAME:STADION_APP_PASSWORD (lines 54-56) |
+| STAD-03 | Authenticate via WordPress application password | ✓ SATISFIED | Basic Auth header built from RONDO_USERNAME:RONDO_APP_PASSWORD (lines 54-56) |
 | STAD-04 | Handle API errors gracefully without failing entire sync | ✓ SATISFIED | Structured error responses (line 106), testConnection never throws (lines 194-207), timeout handling (lines 122-127) |
 | STAD-18 | Configure Stadion via environment variables | ✓ SATISFIED | All credentials from env vars (lines 15-17), validated before use (lines 19-25) |
 
@@ -155,8 +155,8 @@ grep "catch (error)" lib/stadion-client.js -A 3
 # Found: lines 194-207, returns {success: false, error, details}
 
 # CLI test with missing env vars (should not crash)
-STADION_URL= STADION_USERNAME= STADION_APP_PASSWORD= node lib/stadion-client.js 2>&1
-# Output: "Stadion connection FAILED: STADION_URL, STADION_USERNAME, and STADION_APP_PASSWORD required in .env"
+RONDO_URL= RONDO_USERNAME= RONDO_APP_PASSWORD= node lib/stadion-client.js 2>&1
+# Output: "Stadion connection FAILED: RONDO_URL, RONDO_USERNAME, and RONDO_APP_PASSWORD required in .env"
 # No stack trace, clean error message
 ```
 
@@ -204,12 +204,12 @@ grep "validateCredentials()" lib/stadion-client.js
 # Found: line 41 (in try block at start of stadionRequest)
 
 # Clear error message
-grep "STADION_URL, STADION_USERNAME, and STADION_APP_PASSWORD required" lib/stadion-client.js
+grep "RONDO_URL, RONDO_USERNAME, and RONDO_APP_PASSWORD required" lib/stadion-client.js
 # Found: line 20
 
 # CLI behavior test
-STADION_URL= STADION_USERNAME= STADION_APP_PASSWORD= node lib/stadion-client.js 2>&1
-# Output: "Stadion connection FAILED: STADION_URL, STADION_USERNAME, and STADION_APP_PASSWORD required in .env"
+RONDO_URL= RONDO_USERNAME= RONDO_APP_PASSWORD= node lib/stadion-client.js 2>&1
+# Output: "Stadion connection FAILED: RONDO_URL, RONDO_USERNAME, and RONDO_APP_PASSWORD required in .env"
 ```
 
 **Status:** ✓ VERIFIED - Fast fail with clear message

@@ -115,7 +115,7 @@ EXIT_CODE=${PIPESTATUS[0]}
 **Email with Custom Subject:**
 ```bash
 if [ -n "$MAILTO" ]; then
-    SUBJECT="Sportlink Sync Report - $(date +%Y-%m-%d)"
+    SUBJECT="Rondo Sync Report - $(date +%Y-%m-%d)"
     cat "$LOG_FILE" | mail -s "$SUBJECT" "$MAILTO"
 fi
 ```
@@ -123,7 +123,7 @@ fi
 **Crontab Installation:**
 ```bash
 CRON_ENTRIES="
-# Sportlink Sync automation (installed $(date +%Y-%m-%d))
+# Rondo Sync automation (installed $(date +%Y-%m-%d))
 CRON_TZ=Europe/Amsterdam
 TZ=Europe/Amsterdam
 MAILTO=$OPERATOR_EMAIL
@@ -147,7 +147,7 @@ MAILTO=$OPERATOR_EMAIL
 
 2. **Email Delivery Strategy**
    - Email sent from wrapper script, not crontab MAILTO
-   - Enables custom subject: "Sportlink Sync Report - YYYY-MM-DD"
+   - Enables custom subject: "Rondo Sync Report - YYYY-MM-DD"
    - Uses mail command with -s flag for subject
    - Only sends if MAILTO environment variable is set
 

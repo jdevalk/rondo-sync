@@ -32,7 +32,7 @@ Sportlink Club → SQLite → Stadion WordPress
 
 ### State Tracking Pattern
 
-SQLite database (`stadion-sync.sqlite`) stores:
+SQLite database (`rondo-sync.sqlite`) stores:
 - `knvb_id` → `stadion_id` mapping (WordPress post ID)
 - `source_hash` (SHA-256 of member data)
 - `last_synced_hash` (hash of data last pushed to Stadion)
