@@ -283,7 +283,7 @@ async function runSyncAll(options = {}) {
     updated: 0,
     errors: [],
     lists: [],
-    stadion: {
+    rondoClub: {
       total: 0,
       synced: 0,
       created: 0,

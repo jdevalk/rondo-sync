@@ -26,7 +26,7 @@ function printSummary(logger, stats) {
   logger.log(`Contributions downloaded: ${stats.download.count}`);
   logger.log('');
 
-  logger.log('STADION SYNC');
+  logger.log('RONDO CLUB SYNC');
   logger.log(minorDivider);
   logger.log(`Members updated: ${stats.rondoClub.updated}`);
   logger.log(`Skipped (no changes): ${stats.rondoClub.skipped}`);
@@ -57,7 +57,7 @@ async function runNikkiSync(options = {}) {
       count: 0,
       errors: []
     },
-    stadion: {
+    rondoClub: {
       updated: 0,
       skipped: 0,
       noRondoClubId: 0,
