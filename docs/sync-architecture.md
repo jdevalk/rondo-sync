@@ -250,7 +250,7 @@ Source: `DateOfBirth`. Destination: `wp/v2/people` (person ACF field).
 Photos flow in two steps:
 
 1. **Download**: `photo_url` from Sportlink `MemberHeader` internal request -> saved to `photos/{knvb_id}.{ext}`
-2. **Upload**: `POST /wp-json/stadion/v1/people/{stadion_id}/photo` (multipart form-data)
+2. **Upload**: `POST /wp-json/rondo/v1/people/{stadion_id}/photo` (multipart form-data)
 
 Photo states tracked in `stadion_members.photo_state`: `pending_download` -> `downloaded` -> `synced`. Removed photos go through `pending_delete` -> `no_photo`.
 

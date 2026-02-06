@@ -68,7 +68,7 @@ Created complete cron automation infrastructure with two executable shell script
    - Sets PATH to include standard binary locations
    - Runs npm run sync-all with tee logging
    - Captures exit code via PIPESTATUS[0]
-   - Touches /tmp/sportlink-sync-retry flag on failure
+   - Touches /tmp/rondo-sync-retry flag on failure
    - Sends email with custom subject if MAILTO is set
    - Exits with original sync exit code
 
@@ -132,7 +132,7 @@ MAILTO=$OPERATOR_EMAIL
 0 6 * * * flock -w 0 $PROJECT_DIR/.cron.lock $PROJECT_DIR/scripts/cron-wrapper.sh
 
 # Retry job: runs at 8:00 AM if previous sync failed
-0 8 * * * [ -f /tmp/sportlink-sync-retry ] && rm /tmp/sportlink-sync-retry && flock -w 0 $PROJECT_DIR/.cron.lock $PROJECT_DIR/scripts/cron-wrapper.sh
+0 8 * * * [ -f /tmp/rondo-sync-retry ] && rm /tmp/rondo-sync-retry && flock -w 0 $PROJECT_DIR/.cron.lock $PROJECT_DIR/scripts/cron-wrapper.sh
 "
 
 (crontab -l 2>/dev/null || true; echo "$CRON_ENTRIES") | crontab -
@@ -154,7 +154,7 @@ MAILTO=$OPERATOR_EMAIL
 3. **Retry Timing**
    - Main sync: 6:00 AM daily
    - Retry: 8:00 AM (2 hours after failure)
-   - Flag file: /tmp/sportlink-sync-retry
+   - Flag file: /tmp/rondo-sync-retry
    - Gives time for transient network/service issues to resolve
 
 4. **Lockfile Location**

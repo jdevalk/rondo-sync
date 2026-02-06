@@ -5,7 +5,7 @@
 ## Directory Layout
 
 ```
-sportlink-sync/
+rondo-sync/
 ├── .env                          # Environment config (not committed)
 ├── .env.example                  # Template for required env vars
 ├── .gitignore                    # Git exclusions
@@ -116,7 +116,7 @@ sportlink-sync/
 
 **New Feature/Command:**
 
-- Create new file at root: `/Users/joostdevalk/Code/sportlink-sync/[feature-name].js`
+- Create new file at root: `/Users/joostdevalk/Code/rondo/rondo-sync/[feature-name].js`
 - Import shared utilities: `const { openDb, ... } = require('./laposta-db');`
 - Add npm script in `package.json` under `scripts` object
 - Follow error handling pattern: `require('dotenv').config()` at top, `.catch()` on `main()`

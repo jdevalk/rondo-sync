@@ -28,7 +28,7 @@ human_verification:
 | 1 | Email sender displays as "Sportlink SYNC" | VERIFIED | `scripts/send-email.js:97`: `From: \`Sportlink SYNC <${process.env.POSTMARK_FROM_EMAIL}>\`` |
 | 2 | Email body is HTML with proper formatting | VERIFIED | `scripts/send-email.js:39-71`: `formatAsHtml()` creates valid HTML with DOCTYPE, charset, viewport, CSS styles, and pre tag; line 100: `HtmlBody: formatAsHtml(logContent)` |
 | 3 | Email does not contain npm script header | VERIFIED | `scripts/cron-wrapper.sh:38`: Direct `node "$PROJECT_DIR/sync-all.js"` instead of `npm run sync-all`; no `npm run` anywhere in script |
-| 4 | install-cron replaces existing entries (idempotent) | VERIFIED | `scripts/install-cron.sh:88`: `grep -v 'sportlink-sync\|cron-wrapper.sh'` filters existing entries before adding new ones |
+| 4 | install-cron replaces existing entries (idempotent) | VERIFIED | `scripts/install-cron.sh:88`: `grep -v 'rondo-sync\|cron-wrapper.sh'` filters existing entries before adding new ones |
 
 **Score:** 4/4 truths verified
 
@@ -57,7 +57,7 @@ human_verification:
 | EMAIL-06: Sync reports are sent as HTML email with proper formatting | SATISFIED | formatAsHtml creates valid HTML template with CSS; HtmlBody passed to Postmark API |
 | EMAIL-07: Email from name displays as "Sportlink SYNC" | SATISFIED | From field uses RFC 5322 display name format: `Sportlink SYNC <email>` |
 | EMAIL-08: Email body does not include npm script execution header | SATISFIED | cron-wrapper.sh uses `node sync-all.js` not `npm run sync-all` |
-| INST-01: Running install-cron replaces existing sportlink-sync cron entries | SATISFIED | grep -v filter removes existing entries before appending new ones |
+| INST-01: Running install-cron replaces existing rondo-sync cron entries | SATISFIED | grep -v filter removes existing entries before appending new ones |
 
 ### Anti-Patterns Found
 
@@ -91,7 +91,7 @@ No anti-patterns (TODO, FIXME, placeholder, stub implementations) found in modif
 
 **Test:** Run `npm run install-cron` twice (provide any test values when prompted), then run `crontab -l` to view installed entries.
 
-**Expected:** Exactly 2 sportlink-sync cron entries:
+**Expected:** Exactly 2 rondo-sync cron entries:
 - Main sync at 6:00 AM
 - Retry at 8:00 AM
 
@@ -109,7 +109,7 @@ All four requirements for Phase 4 have been verified as implemented:
 
 3. **No npm Header (EMAIL-08):** The cron-wrapper.sh calls `node sync-all.js` directly instead of `npm run sync-all`, eliminating the npm lifecycle header from log output.
 
-4. **Idempotent Cron (INST-01):** The install-cron.sh uses a filter-before-append pattern with `grep -v 'sportlink-sync\|cron-wrapper.sh'` to remove any existing entries before adding new ones.
+4. **Idempotent Cron (INST-01):** The install-cron.sh uses a filter-before-append pattern with `grep -v 'rondo-sync\|cron-wrapper.sh'` to remove any existing entries before adding new ones.
 
 All code passes syntax validation and contains no stub patterns. Phase goal achieved.
 

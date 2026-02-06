@@ -52,7 +52,7 @@ yum install mailx
 
 ### Recommended Project Structure
 ```
-sportlink-sync/
+rondo-sync/
 ├── scripts/
 │   ├── cron-wrapper.sh      # Environment setup, locking, email
 │   └── install-cron.sh      # Automated crontab installation
@@ -147,10 +147,10 @@ MAILTO="operator@example.com"
 0 6 * * * /path/to/wrapper.sh --main
 
 # Retry at 8:00 AM (only if flag file exists)
-0 8 * * * [ -f /tmp/sportlink-sync-retry ] && /path/to/wrapper.sh --retry && rm /tmp/sportlink-sync-retry
+0 8 * * * [ -f /tmp/rondo-sync-retry ] && /path/to/wrapper.sh --retry && rm /tmp/rondo-sync-retry
 
 # Wrapper creates retry flag on failure:
-npm run sync-all || touch /tmp/sportlink-sync-retry
+npm run sync-all || touch /tmp/rondo-sync-retry
 ```
 
 ### Pattern 5: Timezone Configuration
@@ -312,7 +312,7 @@ echo "=== Rondo Sync Completed: $(date) Exit Code: $EXIT_CODE ===" | tee -a "$LO
 # === RETRY HANDLING ===
 # Create retry flag on failure
 if [ $EXIT_CODE -ne 0 ]; then
-    touch /tmp/sportlink-sync-retry
+    touch /tmp/rondo-sync-retry
 fi
 
 exit $EXIT_CODE
@@ -332,10 +332,10 @@ MAILTO=operator@example.com
 
 # Main sync job: Daily at 6:00 AM with lockfile prevention
 # Uses flock for additional protection (belt and suspenders)
-0 6 * * * /usr/bin/flock -w 0 /home/user/sportlink-sync/.cron.lock /home/user/sportlink-sync/scripts/cron-wrapper.sh | mail -s "Rondo Sync Report - $(date +\%Y-\%m-\%d)" operator@example.com
+0 6 * * * /usr/bin/flock -w 0 /home/user/rondo-sync/.cron.lock /home/user/rondo-sync/scripts/cron-wrapper.sh | mail -s "Rondo Sync Report - $(date +\%Y-\%m-\%d)" operator@example.com
 
 # Retry job: Runs at 8:00 AM only if retry flag exists
-0 8 * * * [ -f /tmp/sportlink-sync-retry ] && /home/user/sportlink-sync/scripts/cron-wrapper.sh --retry && rm /tmp/sportlink-sync-retry || true
+0 8 * * * [ -f /tmp/rondo-sync-retry ] && /home/user/rondo-sync/scripts/cron-wrapper.sh --retry && rm /tmp/rondo-sync-retry || true
 ```
 
 ### Email with Custom Subject (Alternative Pattern)
@@ -392,7 +392,7 @@ MAILTO=$OPERATOR_EMAIL
 0 6 * * * /usr/bin/flock -w 0 $PROJECT_DIR/.cron.lock $PROJECT_DIR/scripts/cron-wrapper.sh | mail -s \"Rondo Sync Report - \$(date +\\%Y-\\%m-\\%d)\" $OPERATOR_EMAIL
 
 # Retry: 8:00 AM if previous failed
-0 8 * * * [ -f /tmp/sportlink-sync-retry ] && $PROJECT_DIR/scripts/cron-wrapper.sh && rm /tmp/sportlink-sync-retry || true
+0 8 * * * [ -f /tmp/rondo-sync-retry ] && $PROJECT_DIR/scripts/cron-wrapper.sh && rm /tmp/rondo-sync-retry || true
 "
 
 # Add to crontab
@@ -405,10 +405,10 @@ echo "Remove with: crontab -r"
 
 ### Logrotate Configuration
 ```bash
-# /etc/logrotate.d/sportlink-sync
+# /etc/logrotate.d/rondo-sync
 # Source: https://betterstack.com/community/guides/logging/how-to-manage-log-files-with-logrotate-on-ubuntu-20-04/
 
-/home/user/sportlink-sync/logs/cron/*.log {
+/home/user/rondo-sync/logs/cron/*.log {
     daily
     rotate 30
     compress
@@ -419,7 +419,7 @@ echo "Remove with: crontab -r"
     sharedscripts
     postrotate
         # Optional: Clean up logs older than 30 days
-        find /home/user/sportlink-sync/logs/cron -name "*.log.gz" -mtime +30 -delete
+        find /home/user/rondo-sync/logs/cron -name "*.log.gz" -mtime +30 -delete
     endscript
 }
 ```

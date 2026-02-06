@@ -393,13 +393,13 @@ Things that couldn't be fully resolved.
 ## Sources
 
 ### Primary (HIGH confidence)
-- `/Users/joostdevalk/Code/sportlink-sync/sync-all.js` - Pipeline orchestration, non-critical sync pattern, summary format
-- `/Users/joostdevalk/Code/sportlink-sync/scripts/send-email.js` - Email HTML formatting logic
-- `/Users/joostdevalk/Code/sportlink-sync/submit-stadion-teams.js` - Team sync implementation and result structure
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-all.js` - Pipeline orchestration, non-critical sync pattern, summary format
+- `/Users/joostdevalk/Code/rondo/rondo-sync/scripts/send-email.js` - Email HTML formatting logic
+- `/Users/joostdevalk/Code/rondo/rondo-sync/submit-stadion-teams.js` - Team sync implementation and result structure
 
 ### Secondary (MEDIUM confidence)
-- `/Users/joostdevalk/Code/sportlink-sync/sync-important-dates.js` - Similar non-critical sync pattern
-- `/Users/joostdevalk/Code/sportlink-sync/lib/logger.js` - Logging API
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-important-dates.js` - Similar non-critical sync pattern
+- `/Users/joostdevalk/Code/rondo/rondo-sync/lib/logger.js` - Logging API
 
 ### Tertiary (LOW confidence)
 - None

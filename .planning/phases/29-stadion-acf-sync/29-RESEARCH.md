@@ -494,11 +494,11 @@ Things that couldn't be fully resolved:
 
 ### Primary (HIGH confidence)
 
-- `/Users/joostdevalk/Code/sportlink-sync/sync-nikki-to-stadion.js` - Production sync script with proven patterns
-- `/Users/joostdevalk/Code/sportlink-sync/lib/nikki-db.js` - SQLite schema and data access
-- `/Users/joostdevalk/Code/sportlink-sync/lib/stadion-client.js` - WordPress API client implementation
-- `/Users/joostdevalk/Code/sportlink-sync/CLAUDE.md` - Documented gotchas (first_name/last_name requirement)
-- `/Users/joostdevalk/Code/stadion/docs/api-leden-crud.md` - Official Stadion API documentation
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-nikki-to-stadion.js` - Production sync script with proven patterns
+- `/Users/joostdevalk/Code/rondo/rondo-sync/lib/nikki-db.js` - SQLite schema and data access
+- `/Users/joostdevalk/Code/rondo/rondo-sync/lib/stadion-client.js` - WordPress API client implementation
+- `/Users/joostdevalk/Code/rondo/rondo-sync/CLAUDE.md` - Documented gotchas (first_name/last_name requirement)
+- `/Users/joostdevalk/Code/rondo/rondo-club/docs/api-leden-crud.md` - Official Stadion API documentation
 
 ### Secondary (MEDIUM confidence)
 

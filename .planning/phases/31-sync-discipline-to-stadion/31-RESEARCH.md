@@ -336,13 +336,13 @@ Things that couldn't be fully resolved:
 ## Sources
 
 ### Primary (HIGH confidence)
-- `/Users/joostdevalk/Code/sportlink-sync/submit-stadion-teams.js` - Sync pattern reference
-- `/Users/joostdevalk/Code/sportlink-sync/submit-stadion-commissies.js` - Sync pattern reference
-- `/Users/joostdevalk/Code/sportlink-sync/sync-important-dates.js` - Taxonomy term lookup pattern
-- `/Users/joostdevalk/Code/sportlink-sync/lib/stadion-db.js` - Database schema and hash patterns
-- `/Users/joostdevalk/Code/sportlink-sync/lib/discipline-db.js` - Existing discipline database
-- `/Users/joostdevalk/Code/sportlink-sync/CLAUDE.md` - Codebase patterns and gotchas
-- `/Users/joostdevalk/Code/stadion/docs/api-leden-crud.md` - Stadion REST API patterns
+- `/Users/joostdevalk/Code/rondo/rondo-sync/submit-stadion-teams.js` - Sync pattern reference
+- `/Users/joostdevalk/Code/rondo/rondo-sync/submit-stadion-commissies.js` - Sync pattern reference
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-important-dates.js` - Taxonomy term lookup pattern
+- `/Users/joostdevalk/Code/rondo/rondo-sync/lib/stadion-db.js` - Database schema and hash patterns
+- `/Users/joostdevalk/Code/rondo/rondo-sync/lib/discipline-db.js` - Existing discipline database
+- `/Users/joostdevalk/Code/rondo/rondo-sync/CLAUDE.md` - Codebase patterns and gotchas
+- `/Users/joostdevalk/Code/rondo/rondo-club/docs/api-leden-crud.md` - Stadion REST API patterns
 
 ### Secondary (MEDIUM confidence)
 - Phase 31 CONTEXT.md - User decisions on field mapping, season logic, sync behavior

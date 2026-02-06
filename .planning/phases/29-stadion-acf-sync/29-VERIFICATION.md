@@ -38,7 +38,7 @@ score: 4/4 must-haves verified
 #### sync-nikki-to-stadion.js
 
 **Level 1 (Existence):** PASS
-- File exists at `/Users/joostdevalk/Code/sportlink-sync/sync-nikki-to-stadion.js`
+- File exists at `/Users/joostdevalk/Code/rondo/rondo-sync/sync-nikki-to-stadion.js`
 - 280 lines of code
 
 **Level 2 (Substantive):** PASS

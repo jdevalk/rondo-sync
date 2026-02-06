@@ -399,7 +399,7 @@ CREATE TABLE IF NOT EXISTS stadion_important_dates (
 ### Primary (HIGH confidence)
 - Project codebase: `steps/sync-important-dates.js`, `steps/prepare-stadion-members.js`, `pipelines/sync-people.js`
 - Database schema: `lib/stadion-db.js` lines 64-78 (stadion_important_dates table)
-- Stadion API docs: `~/Code/stadion/docs/api-leden-crud.md` lines 82 (birthdate field confirmed)
+- Stadion API docs: `~/Code/rondo/rondo-club/docs/api-leden-crud.md` lines 82 (birthdate field confirmed)
 - Existing patterns: Hash computation (`lib/utils.js`), ACF field handling (throughout codebase)
 
 ### Secondary (MEDIUM confidence)

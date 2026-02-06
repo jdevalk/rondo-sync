@@ -220,7 +220,7 @@ The Rondo Club WordPress site needs:
   - `POST /wp-json/rondo/v1/people/{id}/photo` (for photo uploads)
   - `GET /wp-json/rondo/v1/current-season` (for discipline cases)
 
-Refer to `~/Code/stadion/docs/` for full Rondo Club API documentation.
+Refer to `~/Code/rondo/rondo-club/docs/` for full Rondo Club API documentation.
 
 ## Troubleshooting
 

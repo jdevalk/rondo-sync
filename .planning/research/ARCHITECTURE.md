@@ -603,7 +603,7 @@ Reverse sync is production-ready when:
 
 **WordPress API:**
 - [WordPress REST API: Posts](https://developer.wordpress.org/rest-api/reference/posts/) - Standard `modified` and `modified_gmt` fields
-- [Stadion API Documentation](~/Code/stadion/docs/api-leden-crud.md) - Custom person ACF fields
+- [Stadion API Documentation](~/Code/rondo/rondo-club/docs/api-leden-crud.md) - Custom person ACF fields
 
 ---
 

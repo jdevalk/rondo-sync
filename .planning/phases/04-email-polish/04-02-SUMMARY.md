@@ -72,7 +72,7 @@ Each task was committed atomically:
 ## Decisions Made
 
 - **Direct node invocation:** Using `node sync-all.js` instead of `npm run sync-all` eliminates the npm header line that was polluting email reports
-- **Filter pattern:** Using `grep -v 'sportlink-sync\|cron-wrapper.sh'` catches both the comment lines and the cron job lines
+- **Filter pattern:** Using `grep -v 'rondo-sync\|cron-wrapper.sh'` catches both the comment lines and the cron job lines
 
 ## Deviations from Plan
 

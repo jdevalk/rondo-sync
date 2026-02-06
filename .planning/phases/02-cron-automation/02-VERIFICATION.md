@@ -21,7 +21,7 @@ score: 4/4 must-haves verified
 | 1 | Crontab entry exists that runs sync daily at 6:00 AM Amsterdam time | ✓ VERIFIED | install-cron.sh line 36: `0 6 * * * flock -w 0 $PROJECT_DIR/.cron.lock $PROJECT_DIR/scripts/cron-wrapper.sh` with CRON_TZ=Europe/Amsterdam |
 | 2 | Email with custom subject sent after each sync run | ✓ VERIFIED | cron-wrapper.sh lines 47-50: Sends email with subject "Rondo Sync Report - YYYY-MM-DD" if MAILTO is set |
 | 3 | Overlapping executions are prevented by lockfile | ✓ VERIFIED | cron-wrapper.sh lines 13-18: flock-based locking with .cron.lock, exits if already locked |
-| 4 | Failed sync triggers retry 2 hours later | ✓ VERIFIED | cron-wrapper.sh line 43: touches /tmp/sportlink-sync-retry on failure; install-cron.sh line 39: retry job at 8:00 AM checks for flag |
+| 4 | Failed sync triggers retry 2 hours later | ✓ VERIFIED | cron-wrapper.sh line 43: touches /tmp/rondo-sync-retry on failure; install-cron.sh line 39: retry job at 8:00 AM checks for flag |
 
 **Score:** 4/4 truths verified
 
@@ -85,7 +85,7 @@ score: 4/4 must-haves verified
 ### Additional Wiring Verified
 
 **Retry mechanism wiring:**
-- ✓ Wrapper touches /tmp/sportlink-sync-retry on failure (line 43)
+- ✓ Wrapper touches /tmp/rondo-sync-retry on failure (line 43)
 - ✓ Installer creates retry job checking for flag (line 39)
 - ✓ Retry job removes flag before execution
 - ✓ Both jobs use same lockfile for mutual exclusion
@@ -186,7 +186,7 @@ All implementations are complete and substantive.
 **Test:**
 1. Temporarily break sync (e.g., remove .env file)
 2. Run `./scripts/cron-wrapper.sh`
-3. Verify /tmp/sportlink-sync-retry file exists
+3. Verify /tmp/rondo-sync-retry file exists
 4. Fix sync (restore .env)
 5. Simulate retry job: check for flag and run wrapper
 6. Verify flag is removed after retry

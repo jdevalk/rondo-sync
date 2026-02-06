@@ -5,7 +5,7 @@ type: execute
 wave: 1
 depends_on: []
 files_modified:
-  - /Users/joostdevalk/Code/stadion/src/components/FinancesCard.jsx
+  - /Users/joostdevalk/Code/rondo/rondo-club/src/components/FinancesCard.jsx
 autonomous: true
 codebase: stadion
 
@@ -42,17 +42,17 @@ Output: Updated FinancesCard.jsx that shows:
 </execution_context>
 
 <context>
-@/Users/joostdevalk/Code/stadion/src/components/FinancesCard.jsx
-@/Users/joostdevalk/Code/stadion/src/hooks/useDisciplineCases.js
-@/Users/joostdevalk/Code/stadion/src/pages/People/PersonDetail.jsx (lines 71-85 for currentUser and discipline case pattern)
-@/Users/joostdevalk/Code/stadion/acf-json/group_discipline_case_fields.json
+@/Users/joostdevalk/Code/rondo/rondo-club/src/components/FinancesCard.jsx
+@/Users/joostdevalk/Code/rondo/rondo-club/src/hooks/useDisciplineCases.js
+@/Users/joostdevalk/Code/rondo/rondo-club/src/pages/People/PersonDetail.jsx (lines 71-85 for currentUser and discipline case pattern)
+@/Users/joostdevalk/Code/rondo/rondo-club/acf-json/group_discipline_case_fields.json
 </context>
 
 <tasks>
 
 <task type="auto">
   <name>Task 1: Add discipline fees to FinancesCard</name>
-  <files>/Users/joostdevalk/Code/stadion/src/components/FinancesCard.jsx</files>
+  <files>/Users/joostdevalk/Code/rondo/rondo-club/src/components/FinancesCard.jsx</files>
   <action>
 Modify FinancesCard.jsx to display discipline administrative fees:
 

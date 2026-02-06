@@ -230,7 +230,7 @@ Research provides strong foundation for implementation. Medium confidence areas 
 
 **Sportlink validation rules:** Research infers email/phone format requirements. Exact validation must be tested to match pre-sync validation. **Validation:** Form submission testing during Phase 4 execution.
 
-**Stadion ACF field keys:** Research uses placeholder field names (`datum-vog`, `freescout-id`, `financiele-blokkade`). Exact ACF keys must be verified from Stadion API documentation. **Validation:** Check ~/Code/stadion/docs/api-leden-crud.md during Phase 3.
+**Stadion ACF field keys:** Research uses placeholder field names (`datum-vog`, `freescout-id`, `financiele-blokkade`). Exact ACF keys must be verified from Stadion API documentation. **Validation:** Check ~/Code/rondo/rondo-club/docs/api-leden-crud.md during Phase 3.
 
 **Production server clock sync:** Research assumes NTP configured on 46.202.155.16. Must verify before relying on timestamp comparison. **Validation:** SSH to server, run `timedatectl status` during Phase 2 setup.
 
@@ -241,7 +241,7 @@ Research provides strong foundation for implementation. Medium confidence areas 
 ### Primary (HIGH confidence)
 - [WordPress REST API Posts Reference](https://developer.wordpress.org/rest-api/reference/posts/) — `modified` and `modified_gmt` fields verified as standard
 - [Playwright Actions Documentation](https://playwright.dev/docs/input) — Form automation API confirmed
-- [Stadion API Documentation](~/Code/stadion/docs/) — ACF field structure, person API endpoints
+- [Stadion API Documentation](~/Code/rondo/rondo-club/docs/) — ACF field structure, person API endpoints
 - [Rondo Sync CLAUDE.md](CLAUDE.md) — Current architecture, existing patterns, database schema
 
 ### Secondary (MEDIUM confidence)

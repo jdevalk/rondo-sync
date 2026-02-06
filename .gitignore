@@ -11,4 +11,10 @@ photos/
 downloads/
 
 # Logs
-logs/.DS_Store
+logs/
+
+# Databases
+*.sqlite
+
+# OS
+.DS_Store

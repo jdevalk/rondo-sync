@@ -455,8 +455,8 @@ Things that couldn't be fully resolved:
 - Project documentation: `.planning/phases/18-financial-block-sync/18-CONTEXT.md`
 
 ### Secondary (MEDIUM confidence)
-- Stadion documentation: `~/Code/stadion/docs/api-leden-crud.md` - ACF update patterns
-- Stadion documentation: `~/Code/stadion/docs/rest-api.md` - API endpoint structure
+- Stadion documentation: `~/Code/rondo/rondo-club/docs/api-leden-crud.md` - ACF update patterns
+- Stadion documentation: `~/Code/rondo/rondo-club/docs/rest-api.md` - API endpoint structure
 - Project documentation: `.planning/ROADMAP.md` - Phase 18 requirements
 
 ### Tertiary (LOW confidence)

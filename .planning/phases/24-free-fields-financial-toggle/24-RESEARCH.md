@@ -299,7 +299,7 @@ async function syncMemberWithFailFast(page, knvbId, pageChanges, options = {}) {
 ```bash
 # In scripts/install-cron.sh or manual crontab
 # Reverse sync: every 15 minutes
-*/15 * * * * /usr/bin/flock -n /tmp/sportlink-sync-reverse.lock bash -c 'cd /home/sportlink && scripts/sync.sh reverse >> logs/cron/sync-reverse-$(date +\%Y\%m\%d-\%H\%M).log 2>&1 && scripts/send-email.js logs/cron/sync-reverse-$(date +\%Y\%m\%d-\%H\%M).log'
+*/15 * * * * /usr/bin/flock -n /tmp/rondo-sync-reverse.lock bash -c 'cd /home/sportlink && scripts/sync.sh reverse >> logs/cron/sync-reverse-$(date +\%Y\%m\%d-\%H\%M).log 2>&1 && scripts/send-email.js logs/cron/sync-reverse-$(date +\%Y\%m\%d-\%H\%M).log'
 
 # Or using scripts/sync.sh wrapper:
 */15 * * * * cd /home/sportlink && scripts/sync.sh reverse

@@ -46,7 +46,7 @@ No additional packages needed - form-data already in package.json.
 
 ### Recommended Project Structure
 ```
-sportlink-sync/
+rondo-sync/
 ├── upload-photos-to-stadion.js   # NEW: Photo upload orchestrator
 ├── delete-photos.js               # NEW: Photo deletion handler
 ├── photos/                        # Existing: Downloaded photos

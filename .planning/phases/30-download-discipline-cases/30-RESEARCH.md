@@ -53,7 +53,7 @@ npx playwright install chromium  # Browser binary
 
 ### Recommended Project Structure
 ```
-sportlink-sync/
+rondo-sync/
 ├── download-discipline-cases.js     # Main download script (new)
 ├── lib/
 │   ├── discipline-db.js             # Database operations (new)

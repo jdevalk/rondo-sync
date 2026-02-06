@@ -124,7 +124,7 @@ logger.error('Error messages');
 
 **Required fields on ACF updates:** When updating a person via PUT, `first_name` and `last_name` are always required, even for single-field updates. Partial ACF updates require a GET first.
 
-**Rondo Club API docs** are at `~/Code/stadion/docs/`:
+**Rondo Club API docs** are at `~/Code/rondo/rondo-club/docs/`:
 - `api-leden-crud.md` - Person API (fields, work_history, relationships)
 - `api-teams.md`, `api-commissies.md` - Team and Commissie APIs
 - `rest-api.md` - Full REST API docs including important dates

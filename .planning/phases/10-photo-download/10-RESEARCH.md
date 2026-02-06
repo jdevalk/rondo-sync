@@ -43,7 +43,7 @@ No additional packages needed - all dependencies already in package.json.
 
 ### Recommended Project Structure
 ```
-sportlink-sync/
+rondo-sync/
 ├── download-data-from-sportlink.js  # Extend with photo download function
 ├── photos/                           # NEW: Local photo storage (gitignored)
 │   ├── <PublicPersonId>.jpg

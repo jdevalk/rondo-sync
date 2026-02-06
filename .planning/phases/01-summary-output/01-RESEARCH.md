@@ -54,7 +54,7 @@ npm install chalk
 
 ### Recommended Project Structure
 ```
-sportlink-sync/
+rondo-sync/
 ├── logs/                    # Log file directory
 │   └── sync-2026-01-24.log # Date-based log files
 ├── lib/

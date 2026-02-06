@@ -43,7 +43,7 @@ npm install postmark
 
 ### Recommended Project Structure
 ```
-sportlink-sync/
+rondo-sync/
 ├── scripts/
 │   ├── cron-wrapper.sh       # Modified to call send-email.js
 │   ├── install-cron.sh       # Modified to prompt for Postmark credentials
@@ -160,7 +160,7 @@ Problems that look simple but have existing solutions:
 **What goes wrong:** Sync completes successfully but cron-wrapper.sh exits with code 1, triggering retry mechanism
 **Why it happens:** Email send script exits with code 1, bash script uses `set -e` which propagates the error
 **How to avoid:** Use `|| echo "Warning: email failed"` in bash to catch and log email failures without propagating error code
-**Warning signs:** Retry flag (/tmp/sportlink-sync-retry) created even when sync succeeded
+**Warning signs:** Retry flag (/tmp/rondo-sync-retry) created even when sync succeeded
 
 ### Pitfall 4: Using Test API Token in Production
 **What goes wrong:** Emails appear to send successfully but never arrive; no activity in Postmark dashboard

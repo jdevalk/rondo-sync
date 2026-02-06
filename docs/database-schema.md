@@ -1,6 +1,6 @@
 # Database Schema
 
-Complete schema documentation for all four SQLite databases used by sportlink-sync.
+Complete schema documentation for all four SQLite databases used by rondo-sync.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Complete schema documentation for all four SQLite databases used by sportlink-sy
 
 ## Overview
 
-The sportlink-sync system uses four SQLite databases to track sync state between Sportlink Club (source) and downstream systems (Laposta, Rondo Club WordPress, Nikki, FreeScout).
+The rondo-sync system uses four SQLite databases to track sync state between Sportlink Club (source) and downstream systems (Laposta, Rondo Club WordPress, Nikki, FreeScout).
 
 **Critical:** These databases must only exist on the production server. Running sync from a local machine creates duplicate entries because each machine tracks its own `stadion_id` mappings.
 

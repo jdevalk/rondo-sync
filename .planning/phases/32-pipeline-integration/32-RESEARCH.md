@@ -53,7 +53,7 @@ Discipline sync already has the building blocks from Phase 31:
 
 **Example from sync-teams.js:**
 ```javascript
-// Source: /Users/joostdevalk/Code/sportlink-sync/sync-teams.js
+// Source: /Users/joostdevalk/Code/rondo/rondo-sync/sync-teams.js
 const { createSyncLogger } = require('./lib/logger');
 const { runTeamDownload } = require('./download-teams-from-sportlink');
 const { runSync: runTeamSync } = require('./submit-stadion-teams');
@@ -630,14 +630,14 @@ Things that couldn't be fully resolved:
 ## Sources
 
 ### Primary (HIGH confidence)
-- `/Users/joostdevalk/Code/sportlink-sync/sync-teams.js` - Weekly sync pipeline pattern
-- `/Users/joostdevalk/Code/sportlink-sync/sync-functions.js` - Weekly sync pipeline pattern
-- `/Users/joostdevalk/Code/sportlink-sync/sync-nikki.js` - Daily sync pipeline pattern
-- `/Users/joostdevalk/Code/sportlink-sync/scripts/sync.sh` - Unified wrapper with flock and email
-- `/Users/joostdevalk/Code/sportlink-sync/scripts/install-cron.sh` - Cron installation script
-- `/Users/joostdevalk/Code/sportlink-sync/scripts/send-email.js` - Email formatter with HTML conversion
-- `/Users/joostdevalk/Code/sportlink-sync/lib/logger.js` - Dual-stream logger module
-- `/Users/joostdevalk/Code/sportlink-sync/sync-all.js` - Full sync orchestrator
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-teams.js` - Weekly sync pipeline pattern
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-functions.js` - Weekly sync pipeline pattern
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-nikki.js` - Daily sync pipeline pattern
+- `/Users/joostdevalk/Code/rondo/rondo-sync/scripts/sync.sh` - Unified wrapper with flock and email
+- `/Users/joostdevalk/Code/rondo/rondo-sync/scripts/install-cron.sh` - Cron installation script
+- `/Users/joostdevalk/Code/rondo/rondo-sync/scripts/send-email.js` - Email formatter with HTML conversion
+- `/Users/joostdevalk/Code/rondo/rondo-sync/lib/logger.js` - Dual-stream logger module
+- `/Users/joostdevalk/Code/rondo/rondo-sync/sync-all.js` - Full sync orchestrator
 
 ### Secondary (MEDIUM confidence)
 - Project README.md and CLAUDE.md - Documentation of sync patterns

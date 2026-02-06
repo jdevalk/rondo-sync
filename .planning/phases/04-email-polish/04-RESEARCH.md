@@ -8,7 +8,7 @@
 
 This phase involves four distinct improvements: HTML email formatting, sender name configuration, npm output cleanup, and cron installer idempotency. The research confirms all requirements are achievable with straightforward changes to existing code.
 
-The Postmark API natively supports HTML emails and sender name formatting - the current code already uses the correct library, it just needs to pass `HtmlBody` instead of `TextBody` and format the `From` field as `"Name <email>"`. The npm output header can be eliminated by calling Node.js directly instead of using `npm run`. The cron installer can be made idempotent by filtering out existing sportlink-sync entries before adding new ones.
+The Postmark API natively supports HTML emails and sender name formatting - the current code already uses the correct library, it just needs to pass `HtmlBody` instead of `TextBody` and format the `From` field as `"Name <email>"`. The npm output header can be eliminated by calling Node.js directly instead of using `npm run`. The cron installer can be made idempotent by filtering out existing rondo-sync entries before adding new ones.
 
 **Primary recommendation:** Make minimal, targeted changes to existing files - these are all small modifications, not refactors.
 
@@ -70,7 +70,7 @@ node "$PROJECT_DIR/sync-all.js" 2>&1 | tee -a "$LOG_FILE"
 (crontab -l 2>/dev/null || true; echo "$CRON_ENTRIES") | crontab -
 
 # Target (filter existing entries first)
-(crontab -l 2>/dev/null | grep -v 'sportlink-sync\|cron-wrapper.sh' || true; echo "$CRON_ENTRIES") | crontab -
+(crontab -l 2>/dev/null | grep -v 'rondo-sync\|cron-wrapper.sh' || true; echo "$CRON_ENTRIES") | crontab -
 ```
 
 ### HTML Formatting Pattern
@@ -136,7 +136,7 @@ Problems that look simple but have existing solutions:
 ### Pitfall 3: Crontab grep Pattern Too Broad
 **What goes wrong:** grep removes unrelated cron entries
 **Why it happens:** Pattern like "sync" matches other jobs
-**How to avoid:** Use specific pattern like `sportlink-sync\|cron-wrapper.sh`
+**How to avoid:** Use specific pattern like `rondo-sync\|cron-wrapper.sh`
 **Warning signs:** User's other cron jobs disappear after running install-cron
 
 ### Pitfall 4: Missing TextBody in HTML Email
@@ -171,7 +171,7 @@ client.sendEmail({
 ```bash
 # Source: Standard POSIX pattern from Unix documentation
 # Filter existing entries, then add new ones
-(crontab -l 2>/dev/null | grep -v 'sportlink-sync\|cron-wrapper.sh' || true; echo "$CRON_ENTRIES") | crontab -
+(crontab -l 2>/dev/null | grep -v 'rondo-sync\|cron-wrapper.sh' || true; echo "$CRON_ENTRIES") | crontab -
 ```
 
 ### Direct Node Invocation
