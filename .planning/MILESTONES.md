@@ -29,7 +29,7 @@
 
 ## v2.2 Discipline Cases (Shipped: 2026-02-03)
 
-**Delivered:** Discipline case sync from Sportlink to Stadion with season-based organization, person linking, and weekly automated pipeline.
+**Delivered:** Discipline case sync from Sportlink to Rondo Club with season-based organization, person linking, and weekly automated pipeline.
 
 **Phases completed:** 30-32 (3 plans total)
 
@@ -57,7 +57,7 @@
 
 ## v2.1 Improved Nikki Import (Shipped: 2026-02-02)
 
-**Delivered:** Enhanced Nikki contribution sync with CSV data extraction, per-year ACF field storage in Stadion, and 4-year historical retention.
+**Delivered:** Enhanced Nikki contribution sync with CSV data extraction, per-year ACF field storage in Rondo Club, and 4-year historical retention.
 
 **Phases completed:** 27-29 (3 plans total)
 
@@ -66,7 +66,7 @@
 - CSV download from Nikki Rapporten link with Playwright download handling
 - Hoofdsom extraction and data merge by nikki_id mapping
 - 4-year historical retention via year-based pruning (replaces destructive clear)
-- Per-year ACF field sync to Stadion (_nikki_{year}_total/saldo/status)
+- Per-year ACF field sync to Rondo Club (_nikki_{year}_total/saldo/status)
 - Added csv-parse library for robust CSV parsing with BOM handling
 
 **Stats:**
@@ -84,7 +84,7 @@
 
 ## v2.0 Bidirectional Sync (Shipped: 2026-01-29)
 
-**Delivered:** Bidirectional sync enabling corrections made in Stadion to flow back to Sportlink via browser automation, with last-edit-wins conflict resolution at field level.
+**Delivered:** Bidirectional sync enabling corrections made in Rondo Club to flow back to Sportlink via browser automation, with last-edit-wins conflict resolution at field level.
 
 **Phases completed:** 20-26 (10 plans total)
 
@@ -92,7 +92,7 @@
 
 - Per-field bidirectional timestamp tracking (14 columns) for conflict detection
 - Last-write-wins conflict resolution with 5-second grace period and audit trail
-- Hash-based change detection identifies Stadion modifications for reverse sync
+- Hash-based change detection identifies Rondo Club modifications for reverse sync
 - Playwright-based reverse sync pushes contact field corrections to Sportlink
 - Multi-page Sportlink updates for datum-vog, freescout-id, and financiele-blokkade
 - Full pipeline integration with email reporting for conflicts and reverse sync stats
@@ -119,7 +119,7 @@
 **Key accomplishments:**
 
 - MemberHeader API capture during existing `/other` page visit (zero overhead)
-- Financial block status syncs to Stadion `financiele-blokkade` field with activity audit trail
+- Financial block status syncs to Rondo Club `financiele-blokkade` field with activity audit trail
 - HTTP-based photo download replaces browser automation (faster, more reliable)
 - Photo change detection using `Photo.PhotoDate` (more accurate than PersonImageDate)
 - Simplified cron architecture (4 jobs instead of 5, photos merged into hourly people sync)
@@ -140,14 +140,14 @@
 
 ## v1.5 Team Sync (Shipped: 2026-01-26)
 
-**Delivered:** Member teams from Sportlink now sync to Stadion with work history entries linking persons to their teams.
+**Delivered:** Member teams from Sportlink now sync to Rondo Club with work history entries linking persons to their teams.
 
 **Phases completed:** 13-15 (3 plans total)
 
 **Key accomplishments:**
 
 - Team extraction from Sportlink (UnionTeams priority, ClubTeams fallback)
-- Team sync to Stadion WordPress via REST API with hash-based change detection
+- Team sync to Rondo Club WordPress via REST API with hash-based change detection
 - Work history linking persons to teams via ACF repeater field with "Speler" job title
 - Team change detection with automatic history tracking (ends old, creates new)
 - Integrated into daily pipeline with team and work history stats in email reports
@@ -168,7 +168,7 @@
 
 ## v1.4 Photo Sync (Shipped: 2026-01-26)
 
-**Delivered:** Member photos from Sportlink now sync to Stadion with full lifecycle management (download, upload, deletion).
+**Delivered:** Member photos from Sportlink now sync to Rondo Club with full lifecycle management (download, upload, deletion).
 
 **Phases completed:** 9-12 (4 plans total)
 
@@ -177,7 +177,7 @@
 - Photo state tracking via PersonImageDate in SQLite
 - Browser automation downloads photos from member detail pages
 - Photos saved locally in `photos/` directory with PublicPersonId as filename
-- Photos uploaded to Stadion via REST API endpoint
+- Photos uploaded to Rondo Club via REST API endpoint
 - Photo deletion when removed in Sportlink
 - Integrated into daily pipeline with photo sync statistics in email report
 
@@ -194,9 +194,9 @@
 
 ---
 
-## v1.3 Connect to Stadion (Shipped: 2026-01-25)
+## v1.3 Connect to Rondo Club (Shipped: 2026-01-25)
 
-**Delivered:** Dual-system sync pipeline - Sportlink member data now syncs to both Laposta email lists and Stadion WordPress app via REST API.
+**Delivered:** Dual-system sync pipeline - Sportlink member data now syncs to both Laposta email lists and Rondo Club WordPress app via REST API.
 
 **Phases completed:** 5-8 (8 plans total)
 
@@ -206,7 +206,7 @@
 - Implemented member sync with KNVB ID matching and email fallback
 - Built hash-based change detection for efficient incremental sync
 - Added parent sync as separate person records with bidirectional relationship linking
-- Unified sync-all pipeline orchestrating both Laposta and Stadion destinations
+- Unified sync-all pipeline orchestrating both Laposta and Rondo Club destinations
 - Extended email reports with dual-system statistics and consolidated error handling
 
 **Stats:**
